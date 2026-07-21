@@ -24,11 +24,12 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{max-width:100%;overflow-x:hidden}
 body{background:var(--bg);color:var(--txt);font-family:var(--body);font-size:15px;line-height:1.5;min-height:100vh}
-.wrap{max-width:760px;margin:0 auto;padding-bottom:70px}
+.wrap{max-width:760px;margin:0 auto;padding-bottom:40px}
+body.locked{overflow:hidden;touch-action:none}
 
 /* header */
 header{
-  position:sticky;top:0;z-index:20;background:var(--panel);
+  position:sticky;top:0;z-index:300;background:var(--panel);
   border-bottom:1px solid var(--line);
   display:flex;align-items:center;justify-content:space-between;
   padding:12px 14px;
@@ -44,7 +45,11 @@ header{
 .bell .dot.zero{display:none}
 
 /* map */
-#map{height:46vh;min-height:260px;background:#131A12;border-bottom:1px solid var(--line)}
+#map{
+  height:46vh;min-height:260px;background:#131A12;border-bottom:1px solid var(--line);
+  position:relative;z-index:0;isolation:isolate;
+}
+.leaflet-pane,.leaflet-top,.leaflet-bottom,.leaflet-control{z-index:auto !important}
 .leaflet-container{font-family:var(--mono)}
 .leaflet-popup-content-wrapper,.leaflet-popup-tip{background:var(--panel);color:var(--txt);border:1px solid var(--line)}
 .leaflet-popup-content{font-family:var(--mono);font-size:12px;margin:10px 12px}
@@ -86,47 +91,12 @@ header{
 .srow.hiddenrow .sid{color:var(--alert)}
 .empty{padding:24px 14px;font-family:var(--mono);font-size:12px;color:var(--txt-faint);letter-spacing:.08em}
 
-/* external documentation links.
-   Search-style URLs are used deliberately: they never 404, they always
-   land on genuine third-party material, and nothing is hotlinked. */
-var UNDOCUMENTED = ["VAD-0119"];
-function q(s){ return encodeURIComponent(s); }
-function buildRefs(s){
-  var box=document.getElementById("shRefs");
-  var yr=(s.date||"").slice(0,4);
-  var pushed = !!s.pushedAt;
-  var undoc = pushed || UNDOCUMENTED.indexOf(s.id)>=0;
-  if(undoc){
-    box.innerHTML="<h6>EXTERNAL DOCUMENTATION</h6>"+
-      "<div class='nodoc'>NONE ON FILE. THIS INTAKE HAS NOT BEEN PUBLISHED "+
-      "TO ANY COOPERATING ARCHIVE. DO NOT CIRCULATE PENDING SURVEY.</div>";
-    return;
-  }
-  var label = s.name + " " + yr;
-  var h="<h6>EXTERNAL DOCUMENTATION · UNAFFILIATED SOURCES</h6>";
-  h+="<a target='_blank' rel='noopener' href='https://www.google.com/search?tbm=isch&q="+
-     q(label+" crop circle")+"'>AERIAL IMAGERY SEARCH ↗<small>photographs of this formation</small></a>";
-  h+="<a target='_blank' rel='noopener' href='https://www.google.com/search?q="+
-     q("site:cropcircleconnector.com "+s.name+" "+yr)+"'>CROP CIRCLE CONNECTOR ↗<small>primary reporting archive, 1995 to present</small></a>";
-  h+="<a target='_blank' rel='noopener' href='https://www.google.com/search?q="+
-     q("site:circleresearcharchive.com "+s.name)+"'>CIRCLE RESEARCH ARCHIVE ↗<small>historical research database</small></a>";
-  if(s.wiki){
-    h+="<a target='_blank' rel='noopener' href='https://en.wikipedia.org/wiki/Special:Search?search="+
-       q(s.wiki)+"'>ENCYCLOPEDIA ENTRY ↗<small>"+esc(s.wiki)+"</small></a>";
-  }
-  h+="<a target='_blank' rel='noopener' href='https://www.google.com/search?q="+
-     q(label+" crop circle "+s.region.split(",")[0])+"'>OPEN WEB SEARCH ↗<small>everything else published on this intake</small></a>";
-  h+="<a target='_blank' rel='noopener' href='https://www.reddit.com/r/cropcircles/search/?q="+
-     q(s.name)+"&restrict_sr=1'>DISCUSSION THREADS ↗<small>r/cropcircles</small></a>";
-  box.innerHTML=h;
-}
-
 /* detail sheet */
 #sheet{
-  position:fixed;left:0;right:0;bottom:0;z-index:30;
+  position:fixed;left:0;right:0;bottom:0;z-index:900;
   background:var(--panel);border-top:2px solid var(--line);
   transform:translateY(105%);transition:transform .3s ease;
-  max-height:72vh;overflow-y:auto;padding:16px 16px 26px;
+  max-height:74vh;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:16px 16px 26px;
   max-width:760px;margin:0 auto;
 }
 #sheet.open{transform:none}
@@ -148,7 +118,7 @@ function buildRefs(s){
 
 /* alert panel */
 #alerts{
-  position:fixed;top:54px;right:8px;z-index:25;width:260px;max-width:86vw;
+  position:fixed;top:54px;right:8px;z-index:500;width:260px;max-width:86vw;
   background:var(--panel);border:1px solid var(--line);border-radius:4px;
   display:none;box-shadow:0 12px 30px rgba(0,0,0,.5);
 }
@@ -165,12 +135,12 @@ footer{
   color:var(--txt-faint);letter-spacing:.08em;border-top:1px solid var(--line);margin-top:18px;
 }
 #ver{
-  position:fixed;right:10px;bottom:10px;z-index:40;
+  display:inline-block;margin-top:8px;
   font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--txt-dim);
   background:var(--panel);border:1px solid var(--line);border-radius:3px;padding:3px 8px;cursor:pointer;
 }
 #toast{
-  position:fixed;left:50%;bottom:52px;transform:translateX(-50%);z-index:41;
+  position:fixed;left:50%;bottom:52px;transform:translateX(-50%);z-index:1100;
   background:var(--txt);color:var(--bg);font-family:var(--mono);font-size:12px;
   padding:8px 14px;border-radius:4px;opacity:0;transition:opacity .3s;pointer-events:none;
 }
@@ -204,13 +174,13 @@ footer{
 
 /* field manual */
 #manual{
-  position:fixed;inset:0;z-index:50;background:rgba(6,10,7,.9);display:none;
+  position:fixed;inset:0;z-index:1000;background:rgba(6,10,7,.94);display:none;
   align-items:flex-end;justify-content:center;
 }
 #manual.open{display:flex}
 .man{
   background:var(--panel);border:1px solid var(--line);border-bottom:none;border-radius:8px 8px 0 0;
-  max-width:640px;width:100%;max-height:86vh;overflow-y:auto;padding:18px 16px 30px;position:relative;
+  max-width:640px;width:100%;max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:18px 16px 30px;position:relative;
 }
 .man h3{font-family:var(--mono);font-size:12px;letter-spacing:.24em;color:var(--txt);margin-bottom:2px}
 .man .sub{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:var(--txt-faint);margin-bottom:14px}
@@ -334,17 +304,17 @@ footer{
       <div class="st"><b class="c-rev">RECLASSIFIED</b> — origin established after intake; record retained as a control case</div>
       <div class="st"><b class="c-sea">SEALED</b> — access restricted by program office</div>
       <div class="st"><b class="c-wdn">WITHDRAWN</b> — removed from the active index. Withdrawn references are not listed. They are, however, still numbered.</div>
+      <button class="abtn" id="manBegin" style="width:100%;margin-top:20px;padding:14px">BEGIN</button>
     </div>
   </div>
 
   <footer>
     U.S. DEPARTMENT OF AGRICULTURE COOPERATIVE SURVEY INSTRUMENT (UNOFFICIAL MIRROR)<br>
     FORM SILO-registry-04 · CONTROL NO. 0704-6114 · DATA REFRESH: DAILY 0400 UTC<br>
-    UNAUTHORIZED ACCESS TO ANNEXED MATERIAL IS LOGGED.
+    UNAUTHORIZED ACCESS TO ANNEXED MATERIAL IS LOGGED.<br>
+    <span id="ver">v0.6 · Jul 21</span>
   </footer>
 </div>
-
-<div id="ver">v0.5 · Jul 21</div>
 <div id="toast"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
@@ -354,7 +324,7 @@ footer{
 (function(){
 "use strict";
 
-var VERSION = "v0.5 · Jul 21";
+var VERSION = "v0.6 · Jul 21";
 var WITHDRAWN = ["VAD-0102","VAD-0105","VAD-0108","VAD-0112","VAD-0114"];
 
 /* ===== FIREBASE (optional — paste config to activate) =====
@@ -375,6 +345,12 @@ function toast(msg){
   toastTimer=setTimeout(function(){t.classList.remove("show");},1800);
 }
 document.getElementById("ver").addEventListener("click",function(){toast("SILO "+VERSION);});
+document.addEventListener("keydown",function(e){
+  if(e.key==="Escape"){
+    if(document.getElementById("manual").classList.contains("open")){closeManual();}
+    else if(document.getElementById("sheet").classList.contains("open")){closeSheet();}
+  }
+});
 
 /* discovery logging — queue locally, sync later if Firebase configured */
 var DB=null, SUBJECT=load("silo_sid");
@@ -437,6 +413,41 @@ function render(list){
 }
 
 /* detail sheet */
+/* external documentation links.
+   Search-style URLs are used deliberately: they never 404, they always
+   land on genuine third-party material, and nothing is hotlinked. */
+var UNDOCUMENTED = ["VAD-0119"];
+function q(s){ return encodeURIComponent(s); }
+function buildRefs(s){
+  var box=document.getElementById("shRefs");
+  var yr=(s.date||"").slice(0,4);
+  var pushed = !!s.pushedAt;
+  var undoc = pushed || UNDOCUMENTED.indexOf(s.id)>=0;
+  if(undoc){
+    box.innerHTML="<h6>EXTERNAL DOCUMENTATION</h6>"+
+      "<div class='nodoc'>NONE ON FILE. THIS INTAKE HAS NOT BEEN PUBLISHED "+
+      "TO ANY COOPERATING ARCHIVE. DO NOT CIRCULATE PENDING SURVEY.</div>";
+    return;
+  }
+  var label = s.name + " " + yr;
+  var h="<h6>EXTERNAL DOCUMENTATION · UNAFFILIATED SOURCES</h6>";
+  h+="<a target='_blank' rel='noopener' href='https://www.google.com/search?tbm=isch&q="+
+     q(label+" crop circle")+"'>AERIAL IMAGERY SEARCH ↗<small>photographs of this formation</small></a>";
+  h+="<a target='_blank' rel='noopener' href='https://www.google.com/search?q="+
+     q("site:cropcircleconnector.com "+s.name+" "+yr)+"'>CROP CIRCLE CONNECTOR ↗<small>primary reporting archive, 1995 to present</small></a>";
+  h+="<a target='_blank' rel='noopener' href='https://www.google.com/search?q="+
+     q("site:circleresearcharchive.com "+s.name)+"'>CIRCLE RESEARCH ARCHIVE ↗<small>historical research database</small></a>";
+  if(s.wiki){
+    h+="<a target='_blank' rel='noopener' href='https://en.wikipedia.org/wiki/Special:Search?search="+
+       q(s.wiki)+"'>ENCYCLOPEDIA ENTRY ↗<small>"+esc(s.wiki)+"</small></a>";
+  }
+  h+="<a target='_blank' rel='noopener' href='https://www.google.com/search?q="+
+     q(label+" crop circle "+s.region.split(",")[0])+"'>OPEN WEB SEARCH ↗<small>everything else published on this intake</small></a>";
+  h+="<a target='_blank' rel='noopener' href='https://www.reddit.com/r/cropcircles/search/?q="+
+     q(s.name)+"&restrict_sr=1'>DISCUSSION THREADS ↗<small>r/cropcircles</small></a>";
+  box.innerHTML=h;
+}
+
 var current=null;
 function openSheet(s){
   current=s;
@@ -453,14 +464,18 @@ function openSheet(s){
   document.getElementById("shEarth").href="https://earth.google.com/web/@"+s.lat+","+s.lng+",0a,2000d,35y,0h,0t,0r";
   buildRefs(s);
   document.getElementById("sheet").classList.add("open");
+  document.getElementById("sheet").scrollTop=0;
+  lock(true);
   logEvent("view", s.id);
 }
-document.getElementById("sheetClose").addEventListener("click",function(){
+function closeSheet(){
   document.getElementById("sheet").classList.remove("open");
-});
+  lock(false);
+}
+document.getElementById("sheetClose").addEventListener("click",closeSheet);
 document.getElementById("shZoom").addEventListener("click",function(){
   if(!current)return;
-  document.getElementById("sheet").classList.remove("open");
+  closeSheet();
   map.setView([current.lat,current.lng],15);
 });
 
@@ -482,8 +497,8 @@ function refreshAlerts(){
       a.innerHTML="◉ NEW FORMATION LOGGED<small>"+esc(s.id)+" · "+esc(s.region)+"</small>";
       a.addEventListener("click",function(){
         document.getElementById("alerts").classList.remove("open");
-        openSheet(s);
         map.setView([s.lat,s.lng],14);
+        openSheet(s);
       });
       list.appendChild(a);
     })(news[i]);
@@ -547,18 +562,25 @@ document.getElementById("search").addEventListener("input",function(){
 });
 
 /* field manual */
-function openManual(){document.getElementById("manual").classList.add("open");}
-document.getElementById("btnManual").addEventListener("click",function(){logEvent("manual");openManual();});
-document.getElementById("manClose").addEventListener("click",function(){
-  document.getElementById("manual").classList.remove("open");
-});
-document.getElementById("manual").addEventListener("click",function(e){
-  if(e.target===this){this.classList.remove("open");}
-});
-if(!load("silo_manual_seen")){
-  store("silo_manual_seen","1");
-  setTimeout(openManual,900);
+function lock(on){
+  document.body.classList[on?"add":"remove"]("locked");
+  if(map && map.dragging){ if(on){ map.dragging.disable(); } else { map.dragging.enable(); } }
 }
+function openManual(){
+  document.getElementById("manual").classList.add("open");
+  document.querySelector("#manual .man").scrollTop=0;
+  lock(true);
+}
+function closeManual(){
+  document.getElementById("manual").classList.remove("open");
+  lock(false);
+}
+document.getElementById("btnManual").addEventListener("click",function(){logEvent("manual");openManual();});
+document.getElementById("manClose").addEventListener("click",closeManual);
+document.getElementById("manBegin").addEventListener("click",closeManual);
+document.getElementById("manual").addEventListener("click",function(e){
+  if(e.target===this){closeManual();}
+});
 
 /* ---------- install ---------- */
 var deferredPrompt=null;
@@ -658,6 +680,10 @@ fetch("sightings.json").then(function(r){return r.json();}).then(function(j){
   STATIC=j.sightings||[];
   rebuild(true);
   openHash();
+  if(!load("silo_manual_seen") && !window.location.hash){
+    store("silo_manual_seen","1");
+    setTimeout(openManual,400);
+  }
 }).catch(function(){
   document.getElementById("rows").innerHTML="<div class='empty'>REGISTRY UNREACHABLE. CHECK CONNECTION.</div>";
 });
