@@ -1,7 +1,381 @@
 {
-  "registry_version": "0.2",
+  "registry_version": "0.3",
   "issued": "2026-07-21",
   "sightings": [
+    {
+      "id": "VAD-0001",
+      "name": "Tully Saucer Nest",
+      "date": "1966-01-19",
+      "lat": -17.934,
+      "lng": 146.03,
+      "region": "Tully, Queensland, AU",
+      "type": "NEST",
+      "status": "LOGGED",
+      "notes": "Circular depression of flattened swamp reeds, approx. 30 ft across, in the Horseshoe Lagoon. Reported by a banana farmer; investigated by police and the RAAF. Press coverage popularized the term 'saucer nest'. Predates the modern UK catalog by fourteen years."
+    },
+    {
+      "id": "VAD-0002",
+      "name": "Duhamel Circles",
+      "date": "1967-08-08",
+      "lat": 53.05,
+      "lng": -112.95,
+      "region": "Duhamel, Alberta, CA",
+      "type": "RINGS",
+      "status": "LOGGED",
+      "notes": "Three circles in a field. Canadian Department of National Defence investigators examined the site and concluded the formation was artificial, while stating they could not determine by whom or by what method. Case material held at Library and Archives Canada."
+    },
+    {
+      "id": "VAD-0004",
+      "name": "Westbury Whitesheet Hill",
+      "date": "1980-08-15",
+      "lat": 51.245,
+      "lng": -2.19,
+      "region": "Westbury, Wiltshire, UK",
+      "type": "SIMPLE CIRCLE",
+      "status": "LOGGED",
+      "notes": "Group of three plain circles below the Westbury White Horse. Widely cited as the formation that started sustained UK press interest in the phenomenon."
+    },
+    {
+      "id": "VAD-0011",
+      "name": "Bratton Quintuplet",
+      "date": "1983-07-01",
+      "lat": 51.263,
+      "lng": -2.135,
+      "region": "Bratton, Wiltshire, UK",
+      "type": "QUINCUNX",
+      "status": "LOGGED",
+      "notes": "Central circle with four satellites, the arrangement that became the template for early 1980s formations. Later claimed by hoaxers Bower and Chorley among their body of work."
+    },
+    {
+      "id": "VAD-0019",
+      "name": "Cheesefoot Head",
+      "date": "1986-06-24",
+      "lat": 51.045,
+      "lng": -1.256,
+      "region": "Nr Winchester, Hampshire, UK",
+      "type": "RINGED CIRCLE",
+      "status": "LOGGED",
+      "notes": "Natural amphitheatre known locally as the Devil's Punchbowl; repeatedly used site through the mid-1980s. Concentration of reports at a single natural bowl was noted but never explained."
+    },
+    {
+      "id": "VAD-0024",
+      "name": "Winterbourne Stoke Pictogram",
+      "date": "1990-06-11",
+      "lat": 51.15,
+      "lng": -1.87,
+      "region": "Winterbourne Stoke, Wiltshire, UK",
+      "type": "PICTOGRAM",
+      "status": "LOGGED",
+      "notes": "Transitional design: circles joined by straight pathways with claw-like appendages. Marks the shift from plain circles to linear pictograms."
+    },
+    {
+      "id": "VAD-0028",
+      "name": "Bower-Chorley Disclosure",
+      "date": "1991-09-09",
+      "lat": 51.06,
+      "lng": -1.32,
+      "region": "Southampton, Hampshire, UK",
+      "type": "ADMINISTRATIVE",
+      "status": "LOGGED",
+      "notes": "Not a formation. Filed for continuity: two men publicly claimed responsibility for more than 200 English formations made since 1978 using planks and rope, and demonstrated the method for the press. Reported formations increased in the following seasons rather than declining."
+    },
+    {
+      "id": "VAD-0030",
+      "name": "Grasdorf Pictogram",
+      "date": "1991-07-23",
+      "lat": 52.03,
+      "lng": 9.98,
+      "region": "Grasdorf, Lower Saxony, DE",
+      "type": "PICTOGRAM",
+      "status": "UNVERIFIED",
+      "notes": "Large pictogram in barley. Local accounts describe three engraved metal plates recovered from beneath the formation by a detectorist shortly after discovery. The plates were never submitted for independent provenance testing and their present location is not documented in this file."
+    },
+    {
+      "id": "VAD-0033",
+      "name": "Mandelbrot Set, Ickleton",
+      "date": "1991-08-12",
+      "lat": 52.06,
+      "lng": 0.183,
+      "region": "Ickleton, Cambridgeshire, UK",
+      "type": "FRACTAL",
+      "status": "LOGGED",
+      "notes": "Recognizable Mandelbrot set rendered in wheat. First widely reported formation depicting a specific mathematical object rather than abstract geometry."
+    },
+    {
+      "id": "VAD-0035",
+      "name": "Szekesfehervar Formation",
+      "date": "1992-06-08",
+      "lat": 47.19,
+      "lng": 18.41,
+      "region": "Szekesfehervar, HU",
+      "type": "GEOMETRIC",
+      "status": "LOGGED",
+      "notes": "First widely reported Hungarian formation. Two teenagers subsequently demonstrated their method publicly and were credited with its construction. Frequently cited as the cleanest documented case of authorship."
+    },
+    {
+      "id": "VAD-0037",
+      "name": "Bythorn Mandala",
+      "date": "1993-09-04",
+      "lat": 52.365,
+      "lng": -0.42,
+      "region": "Bythorn, Cambridgeshire, UK",
+      "type": "MANDALA",
+      "status": "LOGGED",
+      "notes": "Star-and-petal mandala. A claim of authorship was made and disputed; both accounts remain in circulation."
+    },
+    {
+      "id": "VAD-0039",
+      "name": "Oliver's Castle Footage",
+      "date": "1996-08-11",
+      "lat": 51.35,
+      "lng": -2.05,
+      "region": "Nr Devizes, Wiltshire, UK",
+      "type": "GEOMETRIC",
+      "status": "UNVERIFIED",
+      "notes": "Video circulated showing a formation apparently taking shape in daylight beneath moving light forms. The footage was later stated to be fabricated by the person who supplied it. It remains the single most reproduced recording associated with the phenomenon."
+    },
+    {
+      "id": "VAD-0041",
+      "name": "Winchester Snowflake",
+      "date": "1997-06-21",
+      "lat": 51.07,
+      "lng": -1.29,
+      "region": "Nr Winchester, Hampshire, UK",
+      "type": "GEOMETRIC",
+      "status": "LOGGED",
+      "notes": "Sixfold radial design, 189 circles counted in survey photographs."
+    },
+    {
+      "id": "VAD-0044",
+      "name": "East Field Yield Report",
+      "date": "1997-08-01",
+      "lat": 51.36,
+      "lng": -1.86,
+      "region": "Alton Barnes, Wiltshire, UK",
+      "type": "AGRONOMIC",
+      "status": "UNVERIFIED",
+      "notes": "Landowner reported an increase in yield from the affected area following formation events. Reported figures were not independently audited. Appears repeatedly in alignment-survey literature, which this office does not endorse or fund."
+    },
+    {
+      "id": "VAD-0046",
+      "name": "Silbury Hill Koch Snowflake",
+      "date": "1997-07-23",
+      "lat": 51.416,
+      "lng": -1.857,
+      "region": "Silbury Hill, Wiltshire, UK",
+      "type": "FRACTAL",
+      "status": "LOGGED",
+      "notes": "Triangular Koch fractal in the field adjoining the neolithic mound. Proximity of formations to prehistoric monuments is a documented pattern in the UK reporting record."
+    },
+    {
+      "id": "VAD-0052",
+      "name": "Avebury Beltane Wheel",
+      "date": "1998-05-30",
+      "lat": 51.428,
+      "lng": -1.854,
+      "region": "Avebury Trusloe, Wiltshire, UK",
+      "type": "GEOMETRIC",
+      "status": "LOGGED",
+      "notes": "Thirty-three spoke wheel adjacent to the Avebury henge. Nearly half of all UK formations recorded in some seasons fall within 15 km of Avebury."
+    },
+    {
+      "id": "VAD-0055",
+      "name": "Hoeven Series",
+      "date": "2009-07-07",
+      "lat": 51.585,
+      "lng": 4.6,
+      "region": "Hoeven, North Brabant, NL",
+      "type": "SIMPLE CIRCLE",
+      "status": "UNVERIFIED",
+      "notes": "Part of a long-running Dutch sequence associated with a single repeat witness who reported advance impressions of formation locations. Sampling was conducted by an independent research team; interpretations vary sharply."
+    },
+    {
+      "id": "VAD-0058",
+      "name": "Alton Priors Sunflower",
+      "date": "2000-08-12",
+      "lat": 51.352,
+      "lng": -1.842,
+      "region": "Alton Priors, Wiltshire, UK",
+      "type": "GEOMETRIC",
+      "status": "LOGGED",
+      "notes": "Radial floret arrangement consistent with a Fibonacci packing. Analysis published in the amateur literature; not peer reviewed."
+    },
+    {
+      "id": "VAD-0059",
+      "name": "Flemingsburg Rye",
+      "date": "2003-05-03",
+      "lat": 38.42,
+      "lng": -83.73,
+      "region": "Fleming County, Kentucky, US",
+      "type": "RINGS",
+      "status": "LOGGED",
+      "notes": "Formation in a rye field along Tea Run Road. Earliest US intake of the 2003 season."
+    },
+    {
+      "id": "VAD-0060",
+      "name": "Serpent Mound Formation",
+      "date": "2003-08-24",
+      "lat": 39.0286,
+      "lng": -83.4302,
+      "region": "Adams County, Ohio, US",
+      "type": "VESICA",
+      "status": "LOGGED",
+      "notes": "Soybean formation, approx. 271 ft along its longest axis, oriented east to west, incorporating a vesica piscis motif. Located across from the Serpent Mound effigy. Surveyed by the Independent Crop Circle Researchers Association; node anomalies were reported in sampled stems. Witnesses reported lights over the area the preceding night. Soybean is difficult to traverse without visible damage; no tracks were reported at discovery."
+    },
+    {
+      "id": "VAD-0061",
+      "name": "Paint Creek Island",
+      "date": "2003-10-01",
+      "lat": 39.23,
+      "lng": -83.3,
+      "region": "Ross County, Ohio, US",
+      "type": "GEOMETRIC",
+      "status": "LOGGED",
+      "notes": "Three-armed pattern in soybeans, approx. 280 ft, near the Seip Mound earthworks. Second mound-adjacent Ohio formation of the 2003 season. The investigating researcher noted a further formation less than a mile away in 2000. The clustering of Ohio intakes around earthwork sites is not addressed by this registry."
+    },
+    {
+      "id": "VAD-0063",
+      "name": "Wayland's Smithy Snowflake",
+      "date": "2005-08-08",
+      "lat": 51.566,
+      "lng": -1.596,
+      "region": "Oxfordshire, UK",
+      "type": "GEOMETRIC",
+      "status": "LOGGED",
+      "notes": "Adjacent to a neolithic long barrow on the Ridgeway. Another monument-proximate intake."
+    },
+    {
+      "id": "VAD-0066",
+      "name": "Oxfordshire Jellyfish",
+      "date": "2009-05-29",
+      "lat": 51.6,
+      "lng": -1.28,
+      "region": "Oxfordshire, UK",
+      "type": "BIOMORPH",
+      "status": "LOGGED",
+      "notes": "Approx. 183 m in length. First reported formation of this morphology; widely photographed."
+    },
+    {
+      "id": "VAD-0071",
+      "name": "Nazca Adjacency Report",
+      "date": "2007-11-02",
+      "lat": -14.739,
+      "lng": -75.13,
+      "region": "Nazca, Ica, PE",
+      "type": "ADMINISTRATIVE",
+      "status": "UNVERIFIED",
+      "notes": "Filed after an inquiry compared modern formation geometry to the Nazca ground figures. No crop involved; no field survey conducted. Retained because the comparison keeps resurfacing in correspondence."
+    },
+    {
+      "id": "VAD-0083",
+      "name": "Sleman Paddy Formation",
+      "date": "2011-01-23",
+      "lat": -7.81698,
+      "lng": 110.46434,
+      "region": "Berbah, Sleman, Yogyakarta, ID",
+      "type": "MANDALA",
+      "status": "LOGGED",
+      "notes": "Approx. 70 m in a rice paddy beneath a high-voltage transmission line; first widely reported Indonesian formation. National aerospace institute concluded human construction; university researchers disputed the finding. Two further formations followed within a week in Bantul and Magelang. Coordinates in this record were replaced with the published field-survey GPS fix (Dusun Krasakan, Desa Jogotirto)."
+    },
+    {
+      "id": "VAD-0084",
+      "name": "Piyungan Formation",
+      "date": "2011-01-30",
+      "lat": -7.83,
+      "lng": 110.44,
+      "region": "Piyungan, Bantul, Yogyakarta, ID",
+      "type": "GEOMETRIC",
+      "status": "LOGGED",
+      "notes": "Second formation of the January 2011 Indonesian cluster, reported within days of VAD-0088."
+    },
+    {
+      "id": "VAD-0085",
+      "name": "Magelang Formation",
+      "date": "2011-01-31",
+      "lat": -7.47,
+      "lng": 110.22,
+      "region": "Magelang, Central Java, ID",
+      "type": "GEOMETRIC",
+      "status": "UNVERIFIED",
+      "notes": "Third of the January 2011 Indonesian cluster. Least documented of the three."
+    },
+    {
+      "id": "VAD-0089",
+      "name": "Santena / Poirino",
+      "date": "2012-06-17",
+      "lat": 44.938,
+      "lng": 7.77,
+      "region": "Santena, Piedmont, IT",
+      "type": "GEOMETRIC",
+      "status": "LOGGED",
+      "notes": "Italy's most consistently productive site. Several Poirino-area formations were later claimed and demonstrated by a named land-art group, including a timed overnight build of a 65 x 120 m design."
+    },
+    {
+      "id": "VAD-0093",
+      "name": "Hertfordshire Pamphlet Report",
+      "date": "1678-08-22",
+      "lat": 51.85,
+      "lng": -0.2,
+      "region": "Hertfordshire, UK",
+      "type": "HISTORICAL",
+      "status": "ARCHIVAL",
+      "notes": "RETRO-FILED (intake number reflects date of filing, not date of event). Pamphlet titled 'The Mowing-Devil: or, Strange News out of Hartford-shire' describes a field of oats cut overnight into round shapes, with a woodcut illustration. Stalks described as cut rather than bent; researchers dispute this as a true precedent. Retained as the earliest printed account in the file."
+    },
+    {
+      "id": "VAD-0094",
+      "name": "Chualar Barley Formation",
+      "date": "2013-12-28",
+      "lat": 36.57,
+      "lng": -121.52,
+      "region": "Chualar, Salinas Valley, California, US",
+      "type": "GLYPH",
+      "status": "RECLASSIFIED",
+      "notes": "310 ft formation containing an encoded numeral sequence and Morse-style elements. Went viral over roughly ten days before a technology company disclosed it as a commissioned advertising build. Retained in the registry as a control case: the interval between appearance and disclosure is the useful measurement, not the formation."
+    },
+    {
+      "id": "VAD-0095",
+      "name": "Plot Field Rings",
+      "date": "1686-01-01",
+      "lat": 52.8,
+      "lng": -2.0,
+      "region": "Staffordshire, UK",
+      "type": "HISTORICAL",
+      "status": "ARCHIVAL",
+      "notes": "RETRO-FILED (intake number reflects date of filing, not date of event). Naturalist Robert Plot recorded rings and arcs in fields and attributed them to air flows descending from the sky. Earliest attempt at a physical explanation on record."
+    },
+    {
+      "id": "VAD-0096",
+      "name": "Capron Surrey Observation",
+      "date": "1880-07-21",
+      "lat": 51.22,
+      "lng": -0.57,
+      "region": "Surrey, UK",
+      "type": "HISTORICAL",
+      "status": "LOGGED",
+      "notes": "RETRO-FILED (intake number reflects date of filing, not date of event). Amateur astronomer John Rand Capron described circular patches of flattened standing wheat following violent local storms, published in a scientific journal of the period. Cited by both the meteorological and the anomalous literature, for opposite reasons."
+    },
+    {
+      "id": "VAD-0098",
+      "name": "Raisting Ammersee Formation",
+      "date": "2014-07-25",
+      "lat": 47.913,
+      "lng": 11.113,
+      "region": "Raisting, Bavaria, DE",
+      "type": "GEOMETRIC",
+      "status": "LOGGED",
+      "notes": "Large formation in a Bavarian wheat field near a satellite earth station; drew thousands of visitors before harvest. Authorship later claimed by a group of young people."
+    },
+    {
+      "id": "VAD-0100",
+      "name": "Krasnodar Ring Series",
+      "date": "2017-06-30",
+      "lat": 45.04,
+      "lng": 38.98,
+      "region": "Krasnodar Krai, RU",
+      "type": "RINGED CIRCLE",
+      "status": "UNVERIFIED",
+      "notes": "Concentric rings in wheat, reported through regional press. No independent survey. Retained pending documentation."
+    },
     {
       "id": "VAD-0101",
       "name": "Alton Barnes Pictogram",
@@ -102,6 +476,18 @@
       "notes": "Reported flattening pattern in barley. Single-source report, no aerial documentation recovered. Retained in registry pending review."
     },
     {
+      "id": "VAD-0119",
+      "name": "UNCLASSIFIED",
+      "date": "2026-07-17",
+      "lat": 41.031,
+      "lng": -81.207,
+      "region": "Portage County, Ohio, US",
+      "type": "PENDING",
+      "status": "UNDER REVIEW",
+      "notes": "Preliminary intake. Geometry analysis incomplete. Field access restricted pending survey. SURVEY REF AX-K/119.",
+      "new": true
+    },
+    {
       "id": "VAD-0120",
       "name": "Wiltshire Season Opener",
       "date": "2026-04-29",
@@ -188,18 +574,6 @@
       "type": "GEOMETRIC",
       "status": "LOGGED",
       "notes": "Approx. 70 m, wheat. No public access. Roughly 80 percent of UK formations cluster in Wiltshire, disproportionately near Avebury and Stonehenge. The registry does not currently offer an explanation for this distribution."
-    },
-    {
-      "id": "VAD-0119",
-      "name": "UNCLASSIFIED",
-      "date": "2026-07-17",
-      "lat": 41.031,
-      "lng": -81.207,
-      "region": "Portage County, Ohio, US",
-      "type": "PENDING",
-      "status": "UNDER REVIEW",
-      "notes": "Preliminary intake. Geometry analysis incomplete. Field access restricted pending survey. SURVEY REF AX-K/119.",
-      "new": true
     }
   ]
 }

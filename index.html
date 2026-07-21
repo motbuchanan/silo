@@ -220,6 +220,7 @@ footer{
 
       <h5>1 · THE MAP</h5>
       <p>Each marker is a logged formation. Pinch to zoom the satellite imagery down to field level. Tap a marker, then OPEN RECORD for the full registry entry. Red-ringed markers are new intakes.</p>
+      <p>Coordinates are given to four decimal places so that any entry can be independently checked against public satellite imagery and against the external archives listed in section 6. Historic intakes reach back to 1966 and span six continents; the registry is not a UK-only instrument, whatever the distribution suggests.</p>
 
       <h5>2 · THE REGISTRY</h5>
       <p>The list below the map holds every active record: reference number, designation, and status. Tap any row for date, region, formation type, coordinates, and survey notes.</p>
@@ -246,6 +247,7 @@ footer{
       <div class="st"><b class="c-log">LOGGED</b> — verified intake, record complete</div>
       <div class="st"><b class="c-unv">UNVERIFIED</b> — single-source report, retained pending review</div>
       <div class="st"><b class="c-rev">UNDER REVIEW</b> — active survey, record may change</div>
+      <div class="st"><b class="c-rev">RECLASSIFIED</b> — origin established after intake; record retained as a control case</div>
       <div class="st"><b class="c-sea">SEALED</b> — access restricted by program office</div>
       <div class="st"><b class="c-wdn">WITHDRAWN</b> — removed from the active index. Withdrawn references are not listed. They are, however, still numbered.</div>
     </div>
@@ -266,7 +268,7 @@ footer{
 (function(){
 "use strict";
 
-var VERSION = "v0.2 · Jul 21";
+var VERSION = "v0.3 · Jul 21";
 var WITHDRAWN = ["VAD-0102","VAD-0105","VAD-0108","VAD-0112","VAD-0114"];
 
 /* ===== FIREBASE (optional — paste config to activate) =====

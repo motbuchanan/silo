@@ -1,44 +1,63 @@
-SILO — v0.2 DEPLOY NOTES (FLAT REPO)
+SILO — v0.3 DEPLOY NOTES (FLAT REPO)
 ====================================
 
 FILES (all at repo root, no folders):
-  index.html        Joe's app (SILO)
-  sightings.json    registry data — edit this to add/move formations
-  ax-k.html         hidden annex (search AX-K in-app)
-  rec.html          withdrawn-records viewer (search a withdrawn ref in-app)
-  gpi.html          ops console (agents + you)
-  gpi.webmanifest   ops PWA identity ("Grain Price Index")
-  gpi-192.png, gpi-512.png   fake icons
-  sw.js             ops service worker — caches ONLY gpi files
-  .nojekyll         required for Pages
+  index.html       Joe's app (SILO tracker + field manual)
+  sightings.json   registry data — 52 records, 1678 to now, 11 countries
+  ax-k.html        hidden annex (reached by searching AX-K in-app)
+  rec.html         withdrawn-record dossiers (reached by searching a pulled ref)
+  gpi.html         ops console (you + agents), installs as a PWA
+  gpi.webmanifest  ops PWA identity ("Grain Price Index")
+  gpi-192.png / gpi-512.png   fake commodity-app icons
+  sw.js            ops service worker (caches ONLY gpi files)
+  doc-6114.html    AGENT BRIEFING — the link you send a recruit
+  .nojekyll        required for Pages
 
-1. REPO: new GitHub account, inert name (e.g. srv-archive-2209), public.
-   Upload all files to root. Settings > Pages > Deploy from branch > main.
+1. DEPLOY
+   New GitHub account, inert repo name (e.g. srv-archive-2209), public.
+   Upload every file to the repo ROOT. Settings > Pages > Deploy from
+   branch > main > / (root). Wait ~1 min for the first build.
 
 2. URLS
-   Joe:      https://ACCOUNT.github.io/REPO/
-   Ops:      https://ACCOUNT.github.io/REPO/gpi.html   <- paste into agent briefing CONFIG
-   (ax-k.html and rec.html are reached in-app, never linked)
+   Joe:     https://ACCOUNT.github.io/REPO/
+   Agent:   https://ACCOUNT.github.io/REPO/doc-6114.html   <- send this
+   Console: https://ACCOUNT.github.io/REPO/gpi.html
+   (ax-k.html and rec.html are never linked; they are found in-app)
 
-3. CODES (djb2-hashed in source)
-   Operator FURROW-77 · Director (you) SCYTHE-19 · Decoy WINNOW-6
+3. CODES (djb2-hashed in source, never plaintext)
+   Operator (agents)  FURROW-77
+   Director (you)     SCYTHE-19   — adds POST TASK + REMOVE
+   Decoy (Joe, later) WINNOW-6    — opens the annex placeholder layer
    Obfuscation, not security.
 
-4. THE HIDDEN LAYER SO FAR
-   - Manual auto-opens on Joe's first visit; section 7 lists WITHDRAWN as a
-     status and says withdrawn refs "are still numbered" (the nudge).
-   - ax-k.html tells him to find the missing numbers.
-   - Searching VAD-0102 / 0105 / 0108 / 0112 / 0114 surfaces an ARCHIVED row
-     -> rec.html dossier. Each dossier breadcrumbs a REAL googleable rabbit
-     hole: Tully 1966 + ley alignments / San Luis Valley + Snippy /
-     Rendlesham + the Halt memo / 4625 kHz (UVB-76) / Hessdalen.
-   - Gaps 0103, 0106, 0109, 0117 remain unassigned = future episodes.
+4. THE TRAIL AS IT STANDS
+   a. Manual auto-opens on first run. Section 7 defines WITHDRAWN and notes
+      that withdrawn refs "are still numbered."
+   b. VAD-0119 (Ohio, flagged NEW) carries SURVEY REF AX-K/119.
+   c. Searching AX-K reveals a SEALED row -> ax-k.html. CHAFF's first
+      message tells him to count forward from 0101 and find five holes.
+   d. Those five are VAD-0102 / 0105 / 0108 / 0112 / 0114. Searching any of
+      them reveals an ARCHIVED row -> rec.html dossier.
+   e. Each dossier breadcrumbs a REAL rabbit hole he can chase on the open
+      internet with no further help from us:
+        0102  Tully 1966 saucer nest + ley alignment survey
+        0105  San Luis Valley livestock corridor + the 1967 Alamosa case
+        0108  Rendlesham Forest + the released Halt memorandum
+        0112  4625 kHz — the buzzer channel, still transmitting today
+        0114  Hessdalen lights + the valley's live automated station
+   f. VAD-0103 / 0106 / 0109 / 0117 are EMPTY on purpose. Searching them
+      returns "NO ARCHIVED COPY MATCHES THAT REFERENCE. THIS QUERY HAS BEEN
+      LOGGED." Those four slots are your future episodes.
 
-5. VERSION RULE: any change to gpi.html must bump its badge AND the CACHE
-   name in sw.js (currently gpi-ops-v0.2) or installed phones won't update.
+5. VERSION RULE
+   Any change to gpi.html must bump BOTH its version badge and the CACHE
+   string in sw.js (currently gpi-ops-v0.2) or installed phones won't update.
 
-6. FIREBASE (phase 3): new project (not garrett-apps). Bring the config and
-   I wire live sync + alert polling + rules.
+6. FIREBASE (next phase)
+   New project, NOT garrett-apps. Collections: tasks, alerts, suggestions,
+   log. Paste the config into FIREBASE_CONFIG in index.html and gpi.html.
+   Bring me the config and I wire live sync, alert polling, and rules.
 
-7. PLANTED ANOMALY: VAD-0119 at 41.031, -81.207 (rural Portage Co. near
-   Atwater). Adjust in sightings.json.
+7. PLANTED ANOMALY
+   VAD-0119 sits at 41.031, -81.207 (rural Portage County near Atwater).
+   Adjust in sightings.json to taste.

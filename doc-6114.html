@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>DOC 6-114 · INTERNAL ROUTING</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime:wght@400;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#E9E1CA; --paper-2:#DFD5B8; --paper-edge:#C9BC97;
+  --ink:#211E17; --ink-soft:#4A4437;
+  --stamp:#A8291D;
+  --term-bg:#0C120E; --phos:#86C793; --phos-dim:#3E5C46;
+  --field:#131A12; --crop:#B09C6A;
+  --tw:'Special Elite',monospace; --body:'Courier Prime',monospace; --mono:'IBM Plex Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+html,body{max-width:100%;overflow-x:hidden}
+body{
+  background:var(--paper-2);
+  color:var(--ink);
+  font-family:var(--body);
+  font-size:16px;line-height:1.55;
+  min-height:100vh;
+}
+img,svg{max-width:100%;height:auto}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;opacity:.5;z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.45 0 0 0 0 0.41 0 0 0 0 0.31 0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.page{position:relative;z-index:1;max-width:660px;margin:0 auto;padding:20px 14px 90px}
+
+/* COVER */
+#cover{
+  position:fixed;inset:0;z-index:50;background:var(--paper);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:24px;text-align:center;padding:24px;
+  transition:opacity .8s ease, visibility .8s;
+}
+#cover.open{opacity:0;visibility:hidden}
+#cover .doc-id{font-family:var(--mono);font-size:12px;letter-spacing:.2em;color:var(--ink-soft)}
+#seal{width:170px;height:170px;cursor:pointer;transition:transform .15s;-webkit-tap-highlight-color:transparent}
+#seal:active{transform:scale(.96)}
+#cover h1{font-family:var(--tw);font-size:19px;letter-spacing:.08em;font-weight:400}
+#cover .hint{font-family:var(--mono);font-size:12px;color:var(--ink-soft);letter-spacing:.15em;animation:pulse 2.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.45}50%{opacity:1}}
+#seal.cracked{animation:crack .9s ease forwards}
+@keyframes crack{
+  0%{transform:rotate(0) scale(1);opacity:1}
+  30%{transform:rotate(-7deg) scale(1.05)}
+  100%{transform:rotate(14deg) scale(.6) translateY(60px);opacity:0}
+}
+
+/* STAMPS */
+.stamp{
+  display:inline-block;font-family:var(--tw);color:var(--stamp);
+  border:3px solid var(--stamp);padding:4px 14px;border-radius:3px;
+  font-size:19px;letter-spacing:.14em;transform:rotate(-6deg);
+  opacity:0;mix-blend-mode:multiply;
+}
+.stamp.slam{animation:slam .5s cubic-bezier(.2,1.6,.4,1) forwards}
+@keyframes slam{
+  0%{opacity:0;transform:rotate(-6deg) scale(2.6)}
+  60%{opacity:1;transform:rotate(-6deg) scale(.94)}
+  100%{opacity:.92;transform:rotate(-6deg) scale(1)}
+}
+
+/* DOC SECTIONS */
+.doc{
+  background:var(--paper);
+  border:1px solid var(--paper-edge);
+  box-shadow:0 2px 0 rgba(70,60,35,.15), 0 10px 24px rgba(60,50,25,.12);
+  margin:26px 0;padding:22px 18px 24px;position:relative;
+  opacity:0;transform:translateY(26px);
+  transition:opacity .7s ease, transform .7s ease;
+}
+.doc.vis{opacity:1;transform:none}
+.tab{
+  position:absolute;top:-13px;left:14px;
+  background:var(--paper-edge);color:var(--ink);
+  font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.18em;
+  padding:3px 12px;border-radius:2px 2px 0 0;
+}
+h2{font-family:var(--tw);font-weight:400;font-size:19px;letter-spacing:.05em;margin:8px 0 14px;text-transform:uppercase}
+p{margin:0 0 12px}
+p:last-child{margin-bottom:0}
+.small{font-size:13px;color:var(--ink-soft)}
+.field{font-family:var(--mono);font-size:13px;margin:3px 0;word-break:break-word}
+.field b{font-weight:600;letter-spacing:.08em}
+.rule{border:none;border-top:1px dashed var(--paper-edge);margin:16px 0}
+
+.lh{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.lh svg{flex:0 0 auto}
+.lh .org{font-family:var(--tw);font-size:14px;line-height:1.3;letter-spacing:.05em}
+.lh .org span{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.22em;color:var(--ink-soft)}
+
+.ooc{border:2px solid var(--ink);background:#F3EDDB;padding:14px 14px 12px;margin:14px 0 4px}
+.ooc h3{font-family:var(--mono);font-size:12px;letter-spacing:.2em;margin-bottom:8px}
+.ooc p{font-size:14px}
+
+/* redaction — wraps now (v1 zoom bug fix) */
+.rx{
+  background:var(--ink);color:var(--ink);border-radius:2px;padding:0 6px;
+  cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;
+  transition:background .4s;word-break:break-word;
+  box-decoration-break:clone;-webkit-box-decoration-break:clone;
+}
+.rx.open{background:transparent;color:var(--stamp);font-weight:700;cursor:default}
+.rx.busy{color:var(--paper)}
+.rx-note{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--ink-soft);margin-top:10px}
+
+/* duties */
+.duty{display:flex;gap:12px;margin:14px 0}
+.duty .glyph{flex:0 0 40px}
+.duty h4{font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.14em;margin-bottom:4px}
+.duty p{font-size:14px;margin-bottom:4px}
+
+/* terminal */
+.term{
+  background:var(--term-bg);border-radius:6px;padding:16px 14px;margin:14px 0 6px;
+  font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--phos);
+  box-shadow:inset 0 0 40px rgba(0,0,0,.55);
+  min-height:230px;overflow:hidden;
+}
+.term .dim{color:var(--phos-dim)}
+.term .ln{display:block;white-space:pre-wrap;word-break:break-word}
+.cursor{display:inline-block;width:8px;height:14px;background:var(--phos);vertical-align:-2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* PHONE MOCK */
+.phonewrap{display:flex;justify-content:center;margin:18px 0 8px}
+.phone{
+  width:230px;background:#1B1B1E;border-radius:26px;padding:10px 8px;
+  box-shadow:0 14px 34px rgba(30,25,10,.35), inset 0 0 0 2px #2E2E33;
+}
+.screen{background:var(--field);border-radius:18px;overflow:hidden}
+.app-hd{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:9px 12px;background:#0E1410;border-bottom:1px solid #223022;
+}
+.app-hd .logo{font-family:var(--mono);font-weight:600;font-size:13px;letter-spacing:.3em;color:#C8D8C2}
+.app-hd .bell{position:relative}
+.app-hd .bell i{
+  position:absolute;top:-3px;right:-4px;width:8px;height:8px;border-radius:50%;
+  background:var(--stamp);animation:pulse 1.6s ease-in-out infinite;
+}
+.maparea{position:relative;height:190px}
+.maparea svg{display:block;width:100%;height:100%}
+.pin{transform-origin:center;animation:pinpulse 2s ease-in-out infinite}
+@keyframes pinpulse{0%,100%{opacity:.55}50%{opacity:1}}
+.rowlist{border-top:1px solid #223022}
+.row{
+  display:flex;justify-content:space-between;gap:8px;
+  padding:8px 12px;border-bottom:1px solid #1A241A;
+  font-family:var(--mono);font-size:10.5px;color:#AFC3A9;
+}
+.row .id{color:#7B8F77}
+.row .new{color:#D8837A;font-weight:600}
+.caption{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--ink-soft);text-align:center;margin-top:8px}
+
+/* catalog cards */
+.cat{display:flex;gap:10px;justify-content:space-between;margin:16px 0 6px;flex-wrap:wrap}
+.catcard{
+  flex:1 1 30%;min-width:96px;background:#F3EDDB;border:1px solid var(--paper-edge);
+  padding:8px 6px 6px;text-align:center;
+}
+.catcard svg{display:block;margin:0 auto}
+.catcard .cid{font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--ink-soft);margin-top:6px}
+.spin{transform-origin:60px 60px;animation:slowspin 40s linear infinite}
+@keyframes slowspin{to{transform:rotate(360deg)}}
+
+/* artifact: routing slip */
+.slip{
+  background:#F5F0DF;border:1px solid var(--paper-edge);padding:14px 12px;margin:14px 0 6px;
+  font-family:var(--mono);font-size:12px;line-height:1.9;
+  transform:rotate(-.6deg);box-shadow:0 4px 12px rgba(60,50,25,.12);
+  overflow-wrap:break-word;
+}
+.slip .hd{font-weight:600;letter-spacing:.12em;border-bottom:1px solid var(--paper-edge);padding-bottom:6px;margin-bottom:8px}
+.slip .li{display:flex;justify-content:space-between;gap:6px;flex-wrap:wrap}
+.slip .ok{color:var(--ink-soft)}
+
+/* artifact: cipher */
+.cipher{
+  background:#F5F0DF;border:1px dashed var(--ink-soft);padding:12px;margin:14px 0 4px;
+  font-family:var(--mono);text-align:center;letter-spacing:.2em;font-size:15px;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;word-break:break-word;
+}
+.cipher.done{color:var(--stamp);font-weight:600;cursor:default}
+.cipher-hint{font-family:var(--mono);font-size:10px;letter-spacing:.15em;color:var(--ink-soft);text-align:center;margin-top:6px}
+
+/* chips + buttons */
+.chip{
+  display:inline-block;font-family:var(--mono);font-weight:600;font-size:13px;
+  border:1px solid var(--ink);border-radius:3px;padding:2px 10px;background:#F3EDDB;letter-spacing:.08em;
+  word-break:break-word;
+}
+.btnrow{display:flex;gap:12px;margin-top:18px;flex-wrap:wrap}
+button.big{
+  font-family:var(--tw);font-size:17px;letter-spacing:.08em;
+  padding:14px 22px;border-radius:4px;cursor:pointer;flex:1 1 40%;min-width:150px;
+  border:2px solid var(--ink);background:var(--paper);color:var(--ink);
+  -webkit-tap-highlight-color:transparent;transition:transform .12s;
+}
+button.big:active{transform:scale(.97)}
+#btnAccept{background:var(--ink);color:var(--paper)}
+#declineMsg{font-family:var(--mono);font-size:13px;color:var(--stamp);margin-top:12px;min-height:1.4em;letter-spacing:.06em}
+
+/* activation */
+#activated{
+  position:fixed;inset:0;z-index:60;background:rgba(20,18,12,.92);
+  display:none;align-items:center;justify-content:center;padding:20px;
+}
+#activated.show{display:flex}
+.card{
+  background:var(--paper);max-width:380px;width:100%;padding:22px 20px;
+  border:1px solid var(--paper-edge);box-shadow:0 20px 60px rgba(0,0,0,.5);
+  text-align:center;animation:cardIn .6s cubic-bezier(.2,1.4,.4,1);
+}
+@keyframes cardIn{0%{transform:translateY(40px) scale(.9);opacity:0}100%{transform:none;opacity:1}}
+.card .stamp{font-size:23px}
+.card .id{font-family:var(--mono);font-size:13px;margin:14px 0 4px;letter-spacing:.1em}
+.card .cs{font-family:var(--tw);font-size:30px;letter-spacing:.14em;margin:2px 0 10px}
+.card button{margin-top:16px;font-family:var(--mono);font-size:13px;padding:10px 18px;border:1px solid var(--ink);background:transparent;border-radius:3px;cursor:pointer}
+
+#ver{
+  position:fixed;right:10px;bottom:10px;z-index:40;
+  font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--ink-soft);
+  background:var(--paper);border:1px solid var(--paper-edge);border-radius:3px;padding:3px 8px;cursor:pointer;
+}
+#toast{
+  position:fixed;left:50%;bottom:52px;transform:translateX(-50%);z-index:41;
+  background:var(--ink);color:var(--paper);font-family:var(--mono);font-size:12px;
+  padding:8px 14px;border-radius:4px;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;
+}
+#toast.show{opacity:1}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001s !important;transition-duration:.001s !important}
+  .doc{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div id="cover">
+  <div class="doc-id">DOC 6-114 · ROUTING COPY 1 OF 1</div>
+  <svg id="seal" viewBox="0 0 200 200" role="button" aria-label="Break seal">
+    <circle cx="100" cy="100" r="92" fill="none" stroke="#A8291D" stroke-width="5"/>
+    <circle cx="100" cy="100" r="72" fill="none" stroke="#A8291D" stroke-width="2"/>
+    <path id="arcTop" d="M 30 100 A 70 70 0 0 1 170 100" fill="none"/>
+    <path id="arcBot" d="M 30 100 A 70 70 0 0 0 170 100" fill="none"/>
+    <text font-family="'IBM Plex Mono',monospace" font-size="15" letter-spacing="4" fill="#A8291D" font-weight="600">
+      <textPath href="#arcTop" startOffset="50%" text-anchor="middle">PALE HARVEST</textPath>
+    </text>
+    <text font-family="'IBM Plex Mono',monospace" font-size="11" letter-spacing="3" fill="#A8291D">
+      <textPath href="#arcBot" startOffset="50%" text-anchor="middle">AUTHORIZED EYES ONLY</textPath>
+    </text>
+    <g stroke="#A8291D" stroke-width="3" fill="none">
+      <path d="M100 58 v84 M72 74 l56 52 M128 74 l-56 52 M66 100 h68"/>
+      <circle cx="100" cy="100" r="14" fill="#E9E1CA"/>
+      <path d="M92 100 q8 -14 16 0 q-8 14 -16 0" fill="#A8291D" stroke="none"/>
+    </g>
+  </svg>
+  <h1>A DOCUMENT IS WAITING FOR YOU.</h1>
+  <div class="hint">TAP THE SEAL TO BREAK IT</div>
+</div>
+
+<div class="page">
+
+  <!-- 01 MEMO -->
+  <section class="doc" id="d1">
+    <div class="tab">MEMORANDUM 01</div>
+    <div class="lh">
+      <svg width="42" height="42" viewBox="0 0 42 42"><circle cx="21" cy="21" r="19" fill="none" stroke="#211E17" stroke-width="2"/><path d="M21 8 v26 M12 13 l18 16 M30 13 l-18 16" stroke="#211E17" stroke-width="1.6" fill="none"/></svg>
+      <div class="org">SYSTEM FOR IMAGING LAND OBSERVATIONS<span>INTERNAL PROGRAM CORRESPONDENCE</span></div>
+    </div>
+    <div style="text-align:right;margin:-6px 0 10px"><span class="stamp" id="stampEyes">EYES ONLY</span></div>
+    <p class="field"><b>TO:</b> <span data-cfg="assetLabel">CANDIDATE ASSET</span></p>
+    <p class="field"><b>FROM:</b> DIRECTOR, FIELD OPERATIONS</p>
+    <p class="field"><b>RE:</b> RECRUITMENT — PROGRAM <span class="rx" data-txt="PALE HARVEST">██████ ██████</span></p>
+    <hr class="rule">
+    <p>You were not chosen at random. You were chosen for proximity, reliability, and a demonstrated capacity to keep a straight face.</p>
+    <p>What follows is your mission, should you choose to accept it. Read the whole document. Tap anything that looks censored. Then make your decision at the bottom.</p>
+    <p class="rx-note">▓ REDACTED TEXT CAN BE DECRYPTED BY TAPPING IT</p>
+  </section>
+
+  <!-- 02 OOC -->
+  <section class="doc">
+    <div class="tab">PLAIN ENGLISH</div>
+    <div class="ooc">
+      <h3>■ OUT OF CHARACTER — THE ACTUAL SITUATION</h3>
+      <p>Mot is building a long-running game for <b>Joe</b>. On the surface it's a crop circle tracking app called <b>SILO</b>. Underneath, it unravels into a full conspiracy rabbit hole: hidden files, ciphers, a secret program, real declassified history woven together with invented lore.</p>
+      <p><b>Joe knows the app is a game and that Mot runs it.</b> That's the deal, and it stays that way.</p>
+      <p>What Joe does <em>not</em> know is that the game has a second human inside it. That's you. Your involvement is the secret. The goal is delight, not humiliation.</p>
+    </div>
+  </section>
+
+  <!-- 03 THE MACHINE -->
+  <section class="doc">
+    <div class="tab">EXHIBIT A</div>
+    <h2>The Machine He'll Be Given</h2>
+    <p>This is roughly what SILO looks like from the subject's side. A dry little monitoring tool: satellite map, formation registry, alert feed. It works. The data is real. Mostly.</p>
+    <div class="phonewrap">
+      <div class="phone">
+        <div class="screen">
+          <div class="app-hd">
+            <span class="logo">SILO</span>
+            <span class="bell">
+              <svg width="16" height="16" viewBox="0 0 16 16"><path d="M8 2 a4 4 0 0 1 4 4 v3 l1.5 2 h-11 l1.5 -2 v-3 a4 4 0 0 1 4 -4z M6.5 12 a1.5 1.5 0 0 0 3 0" fill="none" stroke="#C8D8C2" stroke-width="1.2"/></svg>
+              <i></i>
+            </span>
+          </div>
+          <div class="maparea">
+            <svg viewBox="0 0 214 190" preserveAspectRatio="xMidYMid slice">
+              <rect width="214" height="190" fill="#131A12"/>
+              <g stroke="#1E2A1C" stroke-width="1">
+                <path d="M0 30 H214 M0 65 H214 M0 100 H214 M0 135 H214 M0 170 H214"/>
+                <path d="M30 0 V190 M75 0 V190 M120 0 V190 M165 0 V190"/>
+              </g>
+              <g stroke="#26361F" stroke-width="6" opacity=".7">
+                <path d="M10 12 q40 8 70 2 q50 -8 80 4" fill="none"/>
+                <path d="M-4 52 q60 12 110 0 q60 -12 112 6" fill="none"/>
+                <path d="M-4 92 q50 -10 105 2 q60 12 116 -4" fill="none"/>
+                <path d="M-4 132 q70 10 120 -2 q50 -10 100 6" fill="none"/>
+              </g>
+              <g stroke="#3A4A2E" stroke-width="1.4" fill="none" opacity=".9">
+                <circle cx="58" cy="60" r="10"/><circle cx="58" cy="60" r="5"/>
+                <circle cx="152" cy="118" r="12"/><circle cx="152" cy="118" r="6"/><circle cx="168" cy="106" r="4"/>
+              </g>
+              <g class="pin">
+                <circle cx="58" cy="60" r="15" fill="none" stroke="#D8837A" stroke-width="1"/>
+                <circle cx="58" cy="60" r="2.5" fill="#D8837A"/>
+              </g>
+              <g class="pin" style="animation-delay:.7s">
+                <circle cx="152" cy="118" r="17" fill="none" stroke="#D8837A" stroke-width="1"/>
+                <circle cx="152" cy="118" r="2.5" fill="#D8837A"/>
+              </g>
+              <text x="8" y="184" font-family="monospace" font-size="8" fill="#54604E">ESRI IMG · GRID 41N</text>
+            </svg>
+          </div>
+          <div class="rowlist">
+            <div class="row"><span class="id">VAD-0117</span><span>Wiltshire, UK</span><span class="ok">logged</span></div>
+            <div class="row"><span class="id">VAD-0118</span><span>Alberta, CA</span><span class="ok">logged</span></div>
+            <div class="row"><span class="id">VAD-0119</span><span>Ohio, US</span><span class="new">NEW ◉</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="caption">FIG. 1 — SUBJECT-FACING INTERFACE (MOCKUP)</div>
+  </section>
+
+  <!-- 04 ROLE -->
+  <section class="doc">
+    <div class="tab">ASSIGNMENT</div>
+    <h2>Your Role: The Insider</h2>
+    <p>In the fiction, you are an analyst inside the program — someone who has seen too much and has quietly decided to help an outsider. Your callsign is <span class="rx" data-txt="CHAFF">█████</span>.</p>
+    <p>You never appear as yourself. The insider communicates only through the game: messages in the app, notes in drops, warnings signed with your operator ID. If the campaign goes the distance, the reveal that the insider was <em>you the whole time</em> is the ending.</p>
+    <hr class="rule">
+    <div class="duty">
+      <div class="glyph"><svg width="40" height="40" viewBox="0 0 40 40"><rect x="4" y="8" width="32" height="24" rx="2" fill="none" stroke="#211E17" stroke-width="2"/><path d="M4 10 l16 12 16-12" fill="none" stroke="#211E17" stroke-width="2"/></svg></div>
+      <div><h4>LEAVE WARNINGS</h4><p>Short, paranoid, specific. "Stop using the search bar." "They log Tuesdays." Most are queued by Mot; you can propose your own.</p></div>
+    </div>
+    <div class="duty">
+      <div class="glyph"><svg width="40" height="40" viewBox="0 0 40 40"><circle cx="20" cy="20" r="14" fill="none" stroke="#211E17" stroke-width="2"/><path d="M20 6 v28 M6 20 h28" stroke="#211E17" stroke-width="1.4"/></svg></div>
+      <div><h4>PLACE FIELD DROPS</h4><p>You live near the subject. When a drop task is posted (a laminated card, a container, a marked object at coordinates), you place it and confirm it. Public, legal, safe locations only.</p></div>
+    </div>
+    <div class="duty">
+      <div class="glyph"><svg width="40" height="40" viewBox="0 0 40 40"><path d="M8 30 c4-14 20-14 24-22 M8 30 c8-2 20-8 24-22" fill="none" stroke="#211E17" stroke-width="2"/><circle cx="8" cy="30" r="3" fill="#211E17"/></svg></div>
+      <div><h4>FEED INTEL</h4><p>Anything Joe says, watches, or gets excited about is raw material. Report it. The game reacts to his real life — that's what makes it feel alive.</p></div>
+    </div>
+    <div class="duty">
+      <div class="glyph"><svg width="40" height="40" viewBox="0 0 40 40"><path d="M20 5 l4 9 10 1 -7 7 2 10 -9-5 -9 5 2-10 -7-7 10-1z" fill="none" stroke="#211E17" stroke-width="2"/></svg></div>
+      <div><h4>PITCH BEATS</h4><p>Got an idea for a twist, a document, a location, a character? Log it as a suggestion. Best ideas get built.</p></div>
+    </div>
+  </section>
+
+  <!-- 05 WHAT HE'LL UNCOVER -->
+  <section class="doc">
+    <div class="tab">EXHIBIT B</div>
+    <h2>What He'll Uncover</h2>
+    <p>The registry starts boring on purpose. The deeper he digs, the stranger the catalog gets. Samples of the kind of material seeded through the system:</p>
+
+    <div class="cat">
+      <div class="catcard">
+        <svg width="96" height="96" viewBox="0 0 120 120">
+          <rect width="120" height="120" fill="none"/>
+          <g stroke="#211E17" stroke-width="2" fill="none">
+            <circle cx="60" cy="60" r="30"/><circle cx="60" cy="60" r="14"/>
+            <circle cx="60" cy="14" r="8"/><circle cx="106" cy="60" r="8"/>
+            <circle cx="60" cy="106" r="8"/><circle cx="14" cy="60" r="8"/>
+          </g>
+        </svg>
+        <div class="cid">VAD-0117 · CELTIC CROSS</div>
+      </div>
+      <div class="catcard">
+        <svg width="96" height="96" viewBox="0 0 120 120">
+          <g class="spin" stroke="#211E17" stroke-width="2" fill="none">
+            <circle cx="60" cy="24" r="14"/><circle cx="88" cy="40" r="11"/>
+            <circle cx="96" cy="68" r="9"/><circle cx="84" cy="92" r="7"/>
+            <circle cx="62" cy="102" r="5.5"/><circle cx="42" cy="98" r="4.5"/>
+            <circle cx="30" cy="86" r="3.5"/><circle cx="26" cy="72" r="2.8"/>
+          </g>
+        </svg>
+        <div class="cid">VAD-0142 · JULIA SPIRAL</div>
+      </div>
+      <div class="catcard">
+        <svg width="96" height="96" viewBox="0 0 120 120">
+          <g stroke="#211E17" stroke-width="2" fill="none">
+            <circle cx="60" cy="60" r="34"/>
+            <path d="M60 26 v-14 M60 94 v14 M26 60 h-14 M94 60 h14"/>
+            <path d="M44 60 h32 M60 44 v32 M50 50 l20 20 M70 50 l-20 20"/>
+            <circle cx="60" cy="60" r="6" fill="#211E17"/>
+          </g>
+        </svg>
+        <div class="cid">VAD-0119 · UNCLASSIFIED ★</div>
+      </div>
+    </div>
+    <div class="caption">FIG. 2 — FORMATION CATALOG PLATES</div>
+
+    <hr class="rule">
+    <p class="small">Buried documents reference programs that really existed. Everything he can google checks out — which is exactly what makes the one line that doesn't exist feel true:</p>
+    <div class="slip">
+      <div class="hd">ANNUAL REVIEW · AERIAL PHENOMENA PORTFOLIO</div>
+      <div class="li"><span>PROJECT BLUE BOOK</span><span class="ok">TERM. 1969 · DECLASS.</span></div>
+      <div class="li"><span>PROJECT STARGATE</span><span class="ok">TERM. 1995 · DECLASS.</span></div>
+      <div class="li"><span>PALE HARVEST</span><span class="rx" data-txt="ACTIVE — SEE ANNEX K">██████ — ███ █████ █</span></div>
+    </div>
+    <div class="caption">FIG. 3 — ROUTING SLIP (FABRICATED, SEEDED IN A DROP)</div>
+
+    <hr class="rule">
+    <p class="small">And ciphers. Simple ones early, meaner ones later. Try this one:</p>
+    <div class="cipher" id="cipher">WKH ILUVW ILHOG LV FORVH</div>
+    <div class="cipher-hint">HINT: SHIFT THREE · TAP TO DECODE</div>
+  </section>
+
+  <!-- 06 OPS CONSOLE -->
+  <section class="doc" id="dTerm">
+    <div class="tab">SYSTEM ACCESS</div>
+    <h2>Your Console</h2>
+    <p>Your tools live in a separate app that installs to your phone's home screen like any other. It presents itself as <b>GPI — Grain Price Index</b>, with a commodity bar-chart icon. Nobody has ever opened a grain price app by accident.</p><p class="small" style="margin-bottom:12px">To install: open the console link below in your phone browser, then use the browser menu and choose <b>Add to Home Screen</b>. Log in once with your ident and access code and it stays logged in.</p>
+    <div class="term" id="term"><span class="ln dim" id="termSeed">// awaiting uplink…</span></div>
+    <p class="field"><b>CONSOLE:</b> <a class="chip" id="opsLink" href="gpi.html" data-cfg="opsUrl">gpi.html</a></p>
+    <p class="field"><b>YOUR ACCESS CODE:</b> <span class="chip" data-cfg="accessCode">FURROW-77</span></p>
+    <p class="small" style="margin-top:10px">Console functions: the <b>drop board</b> (tasks posted → you mark them placed), the <b>discovery log</b> (live view of what Joe has found), the <b>alert trigger</b> (fire a "new sighting" from your phone), and the <b>suggestion box</b>. If more operators join the program, tasks are assigned by callsign — the board shows only what's yours, plus anything open for claim.</p>
+  </section>
+
+
+  <!-- 06b STATE OF PLAY -->
+  <section class="doc">
+    <div class="tab">STATE OF PLAY</div>
+    <h2>What Is Already Built</h2>
+    <p>The system is live before the subject has touched it. This is deliberate: if he binges, there needs to be floor under him.</p>
+    <div class="duty">
+      <div class="glyph"><svg width="40" height="40" viewBox="0 0 40 40"><rect x="5" y="7" width="30" height="26" rx="2" fill="none" stroke="#211E17" stroke-width="2"/><path d="M5 15 h30 M13 15 v18" stroke="#211E17" stroke-width="1.4"/></svg></div>
+      <div><h4>THE REGISTRY</h4><p>Fifty-plus records spanning 1678 to this month, across eleven countries. Nearly every one is a real, documented, googleable formation with accurate dates and coordinates. He can verify them against outside archives and they will hold up. That is what buys the invented ones their credibility.</p></div>
+    </div>
+    <div class="duty">
+      <div class="glyph"><svg width="40" height="40" viewBox="0 0 40 40"><circle cx="20" cy="20" r="15" fill="none" stroke="#211E17" stroke-width="2"/><path d="M20 12 v9 l6 4" fill="none" stroke="#211E17" stroke-width="2"/></svg></div>
+      <div><h4>THE HOOK</h4><p>One record is ours: an unclassified intake in Ohio, close enough to matter, flagged NEW, carrying a survey reference. That reference is a door.</p></div>
+    </div>
+    <div class="duty">
+      <div class="glyph"><svg width="40" height="40" viewBox="0 0 40 40"><path d="M8 8 h24 v24 h-24z" fill="none" stroke="#211E17" stroke-width="2"/><path d="M13 16 h14 M13 21 h14 M13 26 h8" stroke="#211E17" stroke-width="1.6"/></svg></div>
+      <div><h4>THE FIRST DESCENT</h4><p>Searching that reference opens a sealed annex he was never meant to reach, where the insider speaks for the first time and points him at five registry numbers that were quietly removed. Each removed number opens a dossier. Each dossier lands him on a real, deep, verifiable rabbit hole that continues without us: a 1966 Queensland case and ley alignments, a Colorado livestock corridor, an English air base and a released memorandum, a shortwave channel that is still broadcasting right now, and a Norwegian valley with a live measurement station.</p></div>
+    </div>
+    <p class="small">Four further numbers in that block are empty and will stay empty until we fill them. Those are the future episodes. That is where your suggestions land.</p>
+  </section>
+
+  <!-- 07 TWO CODES -->
+  <section class="doc">
+    <div class="tab">CRITICAL SECRET</div>
+    <h2>The Two Codes</h2>
+    <p>At some point, Joe will discover that a hidden console exists. This is planned. He will then be <em>fed</em> a code:</p>
+    <p style="text-align:center;margin:14px 0"><span class="chip">WINNOW-6</span></p>
+    <p>That code works. It opens a deeper layer built just for him — and he will believe he broke in. He didn't. It's a guided tour wearing a broken lock.</p>
+    <p>A second code exists that opens <em>everything</em>: the real console, the drop history, the whole machine. Joe never gets it during play. At the finale, we show him what the other code would have unlocked.</p>
+    <p><b>This is the one secret that can kill the campaign.</b> Guard it: <span class="rx" data-txt="never say either code out loud,">█████ ███ ██████ ████ ████ ██ █████,</span> <span class="rx" data-txt="never log in where he can see your screen,">█████ ███ ██ █████ ██ ███ ███ ████ ██████,</span> <span class="rx" data-txt="never confirm the console exists.">█████ ███████ ███ ███████ ██████.</span></p>
+  </section>
+
+  <!-- 08 ROE -->
+  <section class="doc">
+    <div class="tab">RULES OF ENGAGEMENT</div>
+    <h2>Rules of Engagement</h2>
+    <p><b>1.</b> Joe always knows the game is a game. If he ever seems genuinely rattled rather than delighted, flag it and we throttle back. Fun is the mission objective.</p>
+    <p><b>2.</b> Your involvement stays secret until the finale. If Joe asks you directly about the app, you're mildly curious and a little skeptical. That's it.</p>
+    <p><b>3.</b> Everything checkable stays true. Real programs (BLUE BOOK, STARGATE) stay factual — our fiction lives in the gaps between real things.</p>
+    <p><b>4.</b> Drops go in public, safe, legal spots. No trespassing, for you or for him.</p>
+    <p><b>5.</b> Nothing about real people we know goes into the game without a green light from Mot.</p>
+    <p><b>6.</b> When in doubt, do nothing and ask. A missed beat is recoverable. A blown secret isn't.</p>
+  </section>
+
+  <!-- 09 DECISION -->
+  <section class="doc">
+    <div class="tab">DECISION</div>
+    <h2>Your Decision</h2>
+    <p>This file will not self-destruct. It does, however, expect an answer.</p>
+    <div class="btnrow">
+      <button class="big" id="btnAccept">ACCEPT MISSION</button>
+      <button class="big" id="btnDecline">DECLINE</button>
+    </div>
+    <div id="declineMsg"></div>
+  </section>
+
+</div>
+
+<!-- ACTIVATION -->
+<div id="activated">
+  <div class="card">
+    <span class="stamp slam" style="opacity:.92">ASSET ACTIVATED</span>
+    <div class="id">OPERATOR ID · PH-<span data-cfg="opId">0000</span></div>
+    <div class="cs" data-cfg="callsign">CHAFF</div>
+    <svg width="150" height="60" viewBox="0 0 150 60" aria-hidden="true">
+      <g stroke="#211E17" stroke-width="2" fill="none">
+        <rect x="4" y="4" width="142" height="52" rx="4"/>
+        <path d="M14 44 q10 -30 20 0 M40 44 q10 -30 20 0 M66 44 q10 -30 20 0 M92 44 q10 -30 20 0 M118 44 q10 -30 20 0"/>
+      </g>
+    </svg>
+    <p class="small">Clearance: PALE HARVEST · EYES ONLY<br>Await first tasking on the console.</p>
+    <button id="btnClose">FILE THIS AWAY</button>
+  </div>
+</div>
+
+<div id="ver">v2.1 · Jul 21</div>
+<div id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ================= CONFIG — Mot edits here ================= */
+var CONFIG = {
+  assetLabel: "CANDIDATE ASSET",
+  callsign:   "CHAFF",
+  accessCode: "FURROW-77",
+  opsUrl:     "gpi.html",
+  opId:       String(1000 + Math.floor(Math.random()*9000)),
+  version:    "v2.1 · Jul 21"
+};
+/* =========================================================== */
+
+var reduced = false;
+try{ reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches; }catch(e){}
+
+function store(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+function load(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+
+var cfgEls = document.querySelectorAll("[data-cfg]");
+for(var i=0;i<cfgEls.length;i++){
+  var key = cfgEls[i].getAttribute("data-cfg");
+  if(CONFIG[key]) cfgEls[i].textContent = CONFIG[key];
+  if(key === "opsUrl" && cfgEls[i].tagName === "A"){ cfgEls[i].setAttribute("href", CONFIG.opsUrl); }
+}
+document.getElementById("ver").textContent = CONFIG.version;
+
+// cover / seal
+var cover = document.getElementById("cover");
+var seal = document.getElementById("seal");
+var opened = false;
+function openDoc(){
+  if(opened) return; opened = true;
+  seal.classList.add("cracked");
+  setTimeout(function(){
+    cover.classList.add("open");
+    revealAll();
+  }, reduced ? 0 : 650);
+}
+seal.addEventListener("click", openDoc);
+
+// section reveal
+var docs = document.querySelectorAll(".doc");
+var io = null;
+if("IntersectionObserver" in window){
+  io = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(en.isIntersecting){
+        en.target.classList.add("vis");
+        if(en.target.id === "d1") slamStamp();
+        if(en.target.id === "dTerm") runTerminal();
+        io.unobserve(en.target);
+      }
+    });
+  }, {threshold:.15});
+}
+function revealAll(){
+  if(io){
+    for(var j=0;j<docs.length;j++){ io.observe(docs[j]); }
+  } else {
+    for(var k2=0;k2<docs.length;k2++){ docs[k2].classList.add("vis"); }
+    slamStamp(); runTerminal();
+  }
+}
+
+// stamp
+var stamped = false;
+function slamStamp(){
+  if(stamped) return; stamped = true;
+  setTimeout(function(){ document.getElementById("stampEyes").classList.add("slam"); }, reduced?0:400);
+}
+
+// redactions
+var CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#$%&";
+function decrypt(el){
+  if(el.classList.contains("open") || el.classList.contains("busy")) return;
+  var target = el.getAttribute("data-txt") || "";
+  el.classList.add("busy");
+  if(reduced){ el.textContent = target; el.classList.remove("busy"); el.classList.add("open"); return; }
+  var frame = 0, total = 18;
+  var iv = setInterval(function(){
+    frame++;
+    var out = "";
+    for(var k=0;k<target.length;k++){
+      var settled = (k / target.length) < (frame / total);
+      if(target.charAt(k) === " "){ out += " "; }
+      else if(settled){ out += target.charAt(k); }
+      else { out += CHARS.charAt(Math.floor(Math.random()*CHARS.length)); }
+    }
+    el.textContent = out;
+    if(frame >= total){
+      clearInterval(iv);
+      el.textContent = target;
+      el.classList.remove("busy");
+      el.classList.add("open");
+    }
+  }, 45);
+}
+var rxs = document.querySelectorAll(".rx");
+for(var r=0;r<rxs.length;r++){
+  (function(el){ el.addEventListener("click", function(){ decrypt(el); }); })(rxs[r]);
+}
+
+// cipher — caesar shift back by 3 on tap, letter by letter
+var cipherDone = false;
+document.getElementById("cipher").addEventListener("click", function(){
+  if(cipherDone) return; cipherDone = true;
+  var el = this;
+  var src = el.textContent;
+  function shift(ch){
+    var c = ch.charCodeAt(0);
+    if(c >= 65 && c <= 90){ return String.fromCharCode(((c - 65 + 23) % 26) + 65); }
+    return ch;
+  }
+  var out = "";
+  for(var m=0;m<src.length;m++){ out += shift(src.charAt(m)); }
+  if(reduced){ el.textContent = out; el.classList.add("done"); return; }
+  var pos = 0;
+  var iv = setInterval(function(){
+    pos++;
+    el.textContent = out.substring(0,pos) + src.substring(pos);
+    if(pos >= src.length){ clearInterval(iv); el.classList.add("done"); }
+  }, 55);
+});
+
+// terminal typing
+var termRan = false;
+function runTerminal(){
+  if(termRan) return; termRan = true;
+  var term = document.getElementById("term");
+  var lines = [
+    ["dim","SILO OPS CONSOLE  ·  build 0.9  ·  uplink OK"],
+    ["dim","authenticating…"],
+    ["","> IDENT: " + CONFIG.callsign],
+    ["","> CODE:  " + CONFIG.accessCode.replace(/./g,"*")],
+    ["dim","clearance verified · welcome, operator"],
+    ["","[1] DROP BOARD ......... 0 pending"],
+    ["","[2] DISCOVERY LOG ...... subject idle"],
+    ["","[3] TRIGGER ALERT ...... armed"],
+    ["","[4] SUGGESTION BOX ..... open"],
+    ["dim","this session is a preview. live console pending."]
+  ];
+  term.innerHTML = "";
+  var li = 0;
+  function nextLine(){
+    if(li >= lines.length){
+      var c = document.createElement("span");
+      c.className = "cursor";
+      term.appendChild(c);
+      return;
+    }
+    var span = document.createElement("span");
+    span.className = "ln" + (lines[li][0] ? " " + lines[li][0] : "");
+    term.appendChild(span);
+    var text = lines[li][1];
+    if(reduced){ span.textContent = text; li++; nextLine(); return; }
+    var ci = 0;
+    var iv = setInterval(function(){
+      ci++;
+      span.textContent = text.substring(0, ci);
+      if(ci >= text.length){ clearInterval(iv); li++; setTimeout(nextLine, 120); }
+    }, 14);
+  }
+  setTimeout(nextLine, reduced?0:500);
+}
+
+// decision
+document.getElementById("btnAccept").addEventListener("click", function(){
+  store("ph_accepted", "1");
+  document.getElementById("activated").classList.add("show");
+});
+document.getElementById("btnClose").addEventListener("click", function(){
+  document.getElementById("activated").classList.remove("show");
+});
+var declines = 0;
+var declineLines = [
+  "REQUEST DENIED.",
+  "REQUEST DENIED. THE PROGRAM HAS ALREADY BEGUN.",
+  "REQUEST DENIED. YOUR NAME IS ALREADY ON THE ROSTER.",
+  "THERE IS NO FORM FOR DECLINING. ACCEPT THE MISSION."
+];
+document.getElementById("btnDecline").addEventListener("click", function(){
+  var msg = declineLines[Math.min(declines, declineLines.length-1)];
+  declines++;
+  document.getElementById("declineMsg").textContent = msg;
+});
+
+// version badge
+var toastTimer = null;
+document.getElementById("ver").addEventListener("click", function(){
+  var t = document.getElementById("toast");
+  t.textContent = "PALE HARVEST briefing · " + CONFIG.version;
+  t.classList.add("show");
+  if(toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ t.classList.remove("show"); }, 1800);
+});
+
+})();
+</script>
+</body>
+</html>
