@@ -106,3 +106,46 @@ FILES (all at repo root, no folders):
      config could still sign in anonymously and read those collections. This
      is game-grade, not bank-grade. Keep nothing in Firestore you would mind
      him eventually seeing.
+
+================================================================
+9. INSTALL + NOTIFICATIONS (v0.5)
+================================================================
+   Joe's app is now a real installable PWA:
+     silo.webmanifest, silo-192.png, silo-512.png, sw.js
+
+   IMPORTANT: there is now ONE service worker (sw.js) shared by both
+   apps, because both live at the repo root and only one SW can own a
+   scope. Cache name is silo-v0.5. Bump it on EVERY content change or
+   installed phones will keep serving old files.
+
+   HOW IT BEHAVES
+     - An INSTALL banner appears when the browser offers it.
+     - An INTAKE ALERTS banner asks for notification permission.
+     - Once granted, a pushed sighting raises a real system notification
+       with vibration; tapping it deep-links straight to that record
+       (index.html#VAD-0128).
+     - Anything missed while the app was closed shows up on next open.
+
+   True background push (phone fully closed) needs Cloud Messaging and a
+   Cloud Function, which needs the Blaze plan. See push-notifications.txt.
+   The push listener in sw.js is already written and dormant.
+
+================================================================
+10. EXTERNAL DOCUMENTATION LINKS
+================================================================
+   Every record's detail sheet now ends with an EXTERNAL DOCUMENTATION
+   block: aerial imagery search, Crop Circle Connector, Circle Research
+   Archive, encyclopedia entry (where one exists), open web search, and
+   r/cropcircles threads. Plus SATELLITE and GOOGLE EARTH buttons that
+   open the exact coordinates.
+
+   Nothing is hotlinked and nothing can 404 — these are search URLs, so
+   they always resolve and always land on genuine third-party material.
+
+   OUR records are the exception. VAD-0119 and anything you push live
+   display: "NONE ON FILE. THIS INTAKE HAS NOT BEEN PUBLISHED TO ANY
+   COOPERATING ARCHIVE." That contrast is the point. Fifty-one records
+   corroborate instantly; ours cannot be found anywhere. He will notice.
+
+   To mark a future record as undocumented, add its ref to the
+   UNDOCUMENTED array in index.html. Pushed records are automatic.

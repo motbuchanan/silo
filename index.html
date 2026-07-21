@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>SILO · System for Imaging Land Observations</title>
 <meta name="theme-color" content="#0E1410">
+<link rel="manifest" href="silo.webmanifest">
+<link rel="apple-touch-icon" href="silo-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SILO">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
@@ -81,6 +86,41 @@ header{
 .srow.hiddenrow .sid{color:var(--alert)}
 .empty{padding:24px 14px;font-family:var(--mono);font-size:12px;color:var(--txt-faint);letter-spacing:.08em}
 
+/* external documentation links.
+   Search-style URLs are used deliberately: they never 404, they always
+   land on genuine third-party material, and nothing is hotlinked. */
+var UNDOCUMENTED = ["VAD-0119"];
+function q(s){ return encodeURIComponent(s); }
+function buildRefs(s){
+  var box=document.getElementById("shRefs");
+  var yr=(s.date||"").slice(0,4);
+  var pushed = !!s.pushedAt;
+  var undoc = pushed || UNDOCUMENTED.indexOf(s.id)>=0;
+  if(undoc){
+    box.innerHTML="<h6>EXTERNAL DOCUMENTATION</h6>"+
+      "<div class='nodoc'>NONE ON FILE. THIS INTAKE HAS NOT BEEN PUBLISHED "+
+      "TO ANY COOPERATING ARCHIVE. DO NOT CIRCULATE PENDING SURVEY.</div>";
+    return;
+  }
+  var label = s.name + " " + yr;
+  var h="<h6>EXTERNAL DOCUMENTATION · UNAFFILIATED SOURCES</h6>";
+  h+="<a target='_blank' rel='noopener' href='https://www.google.com/search?tbm=isch&q="+
+     q(label+" crop circle")+"'>AERIAL IMAGERY SEARCH ↗<small>photographs of this formation</small></a>";
+  h+="<a target='_blank' rel='noopener' href='https://www.google.com/search?q="+
+     q("site:cropcircleconnector.com "+s.name+" "+yr)+"'>CROP CIRCLE CONNECTOR ↗<small>primary reporting archive, 1995 to present</small></a>";
+  h+="<a target='_blank' rel='noopener' href='https://www.google.com/search?q="+
+     q("site:circleresearcharchive.com "+s.name)+"'>CIRCLE RESEARCH ARCHIVE ↗<small>historical research database</small></a>";
+  if(s.wiki){
+    h+="<a target='_blank' rel='noopener' href='https://en.wikipedia.org/wiki/Special:Search?search="+
+       q(s.wiki)+"'>ENCYCLOPEDIA ENTRY ↗<small>"+esc(s.wiki)+"</small></a>";
+  }
+  h+="<a target='_blank' rel='noopener' href='https://www.google.com/search?q="+
+     q(label+" crop circle "+s.region.split(",")[0])+"'>OPEN WEB SEARCH ↗<small>everything else published on this intake</small></a>";
+  h+="<a target='_blank' rel='noopener' href='https://www.reddit.com/r/cropcircles/search/?q="+
+     q(s.name)+"&restrict_sr=1'>DISCUSSION THREADS ↗<small>r/cropcircles</small></a>";
+  box.innerHTML=h;
+}
+
 /* detail sheet */
 #sheet{
   position:fixed;left:0;right:0;bottom:0;z-index:30;
@@ -136,6 +176,32 @@ footer{
 }
 #toast.show{opacity:1}
 
+/* install + alert banners */
+.banner{
+  display:none;align-items:center;gap:10px;padding:11px 13px;
+  background:var(--panel-2);border-bottom:1px solid var(--line);
+  font-family:var(--mono);font-size:11.5px;color:var(--txt-dim);
+}
+.banner.show{display:flex}
+.banner b{color:var(--txt);font-weight:600;letter-spacing:.06em}
+.banner .sp{flex:1}
+.banner button{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;
+  border:1px solid var(--amber);color:var(--amber);background:none;
+  border-radius:3px;padding:7px 11px;cursor:pointer;white-space:nowrap;
+}
+.banner .x{border-color:var(--line);color:var(--txt-faint);padding:7px 9px}
+
+/* external references */
+.refs{margin-top:14px;border-top:1px dashed var(--line);padding-top:12px}
+.refs h6{font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;color:var(--txt-faint);margin-bottom:8px}
+.refs a{
+  display:block;font-family:var(--mono);font-size:11.5px;color:var(--amber);
+  text-decoration:none;padding:7px 0;border-bottom:1px solid var(--line-dim);
+}
+.refs a small{display:block;color:var(--txt-faint);font-size:9.5px;letter-spacing:.06em;margin-top:2px}
+.refs .nodoc{font-family:var(--mono);font-size:11px;color:var(--alert);letter-spacing:.06em;padding:6px 0}
+
 /* field manual */
 #manual{
   position:fixed;inset:0;z-index:50;background:rgba(6,10,7,.9);display:none;
@@ -178,6 +244,17 @@ footer{
     </div>
   </header>
 
+  <div class="banner" id="bnInstall">
+    <b>INSTALL</b><span class="sp">Add SILO to your home screen for offline registry access.</span>
+    <button id="bnInstallGo">INSTALL</button>
+    <button class="x" id="bnInstallX">✕</button>
+  </div>
+  <div class="banner" id="bnAlert">
+    <b>INTAKE ALERTS</b><span class="sp">Get notified when a new formation is logged.</span>
+    <button id="bnAlertGo">ENABLE</button>
+    <button class="x" id="bnAlertX">✕</button>
+  </div>
+
   <div id="map"></div>
 
   <div class="bar">
@@ -207,9 +284,12 @@ footer{
     <div class="kv"><b>COORDS</b><span id="shCoords">—</span></div>
     <div class="notes" id="shNotes">—</div>
     <div class="actions">
-      <a class="abtn" id="shDir" target="_blank" rel="noopener">GET DIRECTIONS ↗</a>
+      <a class="abtn" id="shDir" target="_blank" rel="noopener">DIRECTIONS ↗</a>
+      <a class="abtn" id="shSat" target="_blank" rel="noopener">SATELLITE ↗</a>
+      <a class="abtn" id="shEarth" target="_blank" rel="noopener">GOOGLE EARTH ↗</a>
       <button class="abtn" id="shZoom">VIEW ON MAP</button>
     </div>
+    <div class="refs" id="shRefs"></div>
   </div>
 
   <div id="manual">
@@ -231,11 +311,15 @@ footer{
       <h5>4 · ALERTS</h5>
       <p>The bell lights when a new formation enters the registry. Data refresh runs daily at 0400 UTC. Tap an alert to jump to the record and its map position.</p>
 
+      <h5>4b · INSTALLATION</h5>
+      <p>Install SILO to your home screen when prompted. The registry then works without a connection and intake alerts can reach you directly. Enable alerts when asked, or you will only see new intakes when you happen to open the terminal.</p>
+
       <h5>5 · FIELD VISITS</h5>
       <p>GET DIRECTIONS routes to the formation from your position. Most formations sit on private farmland: view from public rights of way, and never enter a crop without the landowner's permission. Harvested fields close for the season.</p>
 
       <h5>6 · CROSS-REFERENCE SOURCES (EXTERNAL · UNAFFILIATED)</h5>
-      <p>The registry is a filing instrument, not a primary source. Verify entries independently:</p>
+      <p>The registry is a filing instrument, not a primary source. Every record carries an EXTERNAL DOCUMENTATION block at the bottom of its entry: aerial imagery, archive listings, encyclopedia entries, and open discussion. Use them. A record that cannot be corroborated outside this system should be treated with more interest, not less.</p>
+      <p>General archives:</p>
       <div class="src"><a href="https://www.cropcircleconnector.com" target="_blank" rel="noopener">cropcircleconnector.com</a><small>Primary reporting archive since 1995. Most UK intakes originate here.</small></div>
       <div class="src"><a href="https://circleresearcharchive.com" target="_blank" rel="noopener">circleresearcharchive.com</a><small>Historical research database, free access.</small></div>
       <div class="src"><a href="http://www.bltresearch.com" target="_blank" rel="noopener">bltresearch.com</a><small>Plant and soil analysis literature (node elongation studies).</small></div>
@@ -260,7 +344,7 @@ footer{
   </footer>
 </div>
 
-<div id="ver">v0.1 · Jul 21</div>
+<div id="ver">v0.5 · Jul 21</div>
 <div id="toast"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
@@ -270,7 +354,7 @@ footer{
 (function(){
 "use strict";
 
-var VERSION = "v0.3 · Jul 21";
+var VERSION = "v0.5 · Jul 21";
 var WITHDRAWN = ["VAD-0102","VAD-0105","VAD-0108","VAD-0112","VAD-0114"];
 
 /* ===== FIREBASE (optional — paste config to activate) =====
@@ -365,6 +449,9 @@ function openSheet(s){
   document.getElementById("shCoords").textContent=s.lat.toFixed(4)+", "+s.lng.toFixed(4);
   document.getElementById("shNotes").textContent=s.notes;
   document.getElementById("shDir").href="https://www.google.com/maps/dir/?api=1&destination="+s.lat+","+s.lng;
+  document.getElementById("shSat").href="https://www.google.com/maps/@"+s.lat+","+s.lng+",2000m/data=!3m1!1e3";
+  document.getElementById("shEarth").href="https://earth.google.com/web/@"+s.lat+","+s.lng+",0a,2000d,35y,0h,0t,0r";
+  buildRefs(s);
   document.getElementById("sheet").classList.add("open");
   logEvent("view", s.id);
 }
@@ -473,6 +560,62 @@ if(!load("silo_manual_seen")){
   setTimeout(openManual,900);
 }
 
+/* ---------- install ---------- */
+var deferredPrompt=null;
+window.addEventListener("beforeinstallprompt",function(e){
+  e.preventDefault(); deferredPrompt=e;
+  if(!load("silo_inst_x")){ document.getElementById("bnInstall").classList.add("show"); }
+});
+document.getElementById("bnInstallGo").addEventListener("click",function(){
+  document.getElementById("bnInstall").classList.remove("show");
+  if(deferredPrompt){ deferredPrompt.prompt(); deferredPrompt=null; }
+  logEvent("install_prompt");
+});
+document.getElementById("bnInstallX").addEventListener("click",function(){
+  store("silo_inst_x","1");
+  document.getElementById("bnInstall").classList.remove("show");
+});
+
+/* ---------- notifications ---------- */
+var SWREG=null;
+if("serviceWorker" in navigator && window.location.protocol==="https:"){
+  navigator.serviceWorker.register("sw.js",{scope:"./"}).then(function(r){ SWREG=r; }).catch(function(){});
+}
+function canNotify(){
+  return ("Notification" in window) && Notification.permission==="granted";
+}
+function showAlertNote(s){
+  if(!canNotify()) return;
+  var title="SILO — INTAKE ALERT";
+  var body=s.id+" logged · "+(s.region||"location pending");
+  var opts={ body:body, icon:"silo-192.png", badge:"silo-192.png",
+             tag:s.id, data:{ref:s.id}, vibrate:[200,100,200] };
+  try{
+    if(SWREG && SWREG.showNotification){ SWREG.showNotification(title,opts); }
+    else{ new Notification(title,opts); }
+  }catch(e){}
+}
+function initNotify(){
+  if(!("Notification" in window)) return;
+  if(Notification.permission==="default" && !load("silo_note_x")){
+    document.getElementById("bnAlert").classList.add("show");
+  }
+}
+document.getElementById("bnAlertGo").addEventListener("click",function(){
+  document.getElementById("bnAlert").classList.remove("show");
+  try{
+    Notification.requestPermission().then(function(p){
+      logEvent("notify_"+p);
+      if(p==="granted"){ toast("INTAKE ALERTS ENABLED"); }
+    });
+  }catch(e){}
+});
+document.getElementById("bnAlertX").addEventListener("click",function(){
+  store("silo_note_x","1");
+  document.getElementById("bnAlert").classList.remove("show");
+});
+initNotify();
+
 /* ---------- data: static registry + live pushes ---------- */
 var STATIC=[], LIVE=[], pinLayer=L.layerGroup().addTo(map), fitted=false;
 
@@ -504,9 +647,17 @@ function rebuild(fit){
   if(fit && !fitted && group.length){ map.fitBounds(group,{padding:[24,24]}); fitted=true; }
 }
 
+function openHash(){
+  var h=(window.location.hash||"").replace("#","").toUpperCase();
+  if(!h) return;
+  for(var i=0;i<SIGHTINGS.length;i++){
+    if(SIGHTINGS[i].id===h){ openSheet(SIGHTINGS[i]); map.setView([SIGHTINGS[i].lat,SIGHTINGS[i].lng],14); return; }
+  }
+}
 fetch("sightings.json").then(function(r){return r.json();}).then(function(j){
   STATIC=j.sightings||[];
   rebuild(true);
+  openHash();
 }).catch(function(){
   document.getElementById("rows").innerHTML="<div class='empty'>REGISTRY UNREACHABLE. CHECK CONNECTION.</div>";
 });
@@ -524,14 +675,25 @@ if(FIREBASE_CONFIG && window.firebase){
         store("silo_flushed","1");
       }
     }catch(e){}
+    var known={};
+    try{ known=JSON.parse(load("silo_known")||"{}"); }catch(e){ known={}; }
+    var firstSnap=true;
     DB.collection("alerts").onSnapshot(function(snap){
-      var live=[];
+      var live=[], fresh=[];
       snap.forEach(function(doc){
         var a=doc.data();
-        if(a && a.id){ live.push(a); }
+        if(a && a.id){
+          live.push(a);
+          if(!known[a.id]){ known[a.id]=1; fresh.push(a); }
+        }
       });
+      store("silo_known", JSON.stringify(known));
       LIVE=live;
       rebuild(false);
+      for(var n=0;n<fresh.length;n++){
+        if(!firstSnap || fresh[n]["new"]){ showAlertNote(fresh[n]); }
+      }
+      firstSnap=false;
     }, function(){});
   }catch(e){}
 }

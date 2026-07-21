@@ -1,0 +1,71 @@
+BACKGROUND PUSH — OPTIONAL UPGRADE
+==================================
+
+WHAT WORKS RIGHT NOW (no extra setup, no billing)
+-------------------------------------------------
+Joe installs SILO to his home screen and taps ENABLE on the intake-alerts
+banner. After that, when you PUSH SIGHTING from the console:
+
+  - if his app is open, or open in a background tab, or the installed PWA
+    is still resident in his app switcher, his phone raises a real system
+    notification with vibration, and tapping it opens that record.
+  - if the app has been fully closed/swiped away, he gets the notification
+    the next time he opens it (nothing is lost, it just waits).
+
+For a game with a slow burn, that covers most of what you want. Push a
+sighting in the morning and there's a good chance it buzzes him live.
+
+
+WHAT IT DOESN'T DO
+------------------
+Wake a phone where the app has been fully killed. Web push requires a
+server to send the message; a browser page cannot send one to another
+device. That means Firebase Cloud Messaging plus one Cloud Function.
+
+
+IF YOU WANT TRUE BACKGROUND PUSH LATER
+--------------------------------------
+Requirements:
+  1. Firebase project upgraded to the Blaze (pay-as-you-go) plan. It needs
+     a card on file. The free monthly allowance is far above anything this
+     game will ever use — realistically this stays a $0 bill — but the card
+     requirement is real and you should decide deliberately.
+  2. Cloud Messaging > Web Push certificates > Generate key pair. Copy the
+     VAPID public key.
+  3. Deploy the function below. It fires whenever a doc is written to the
+     alerts collection and pushes to every registered device.
+
+  // functions/index.js
+  const {onDocumentWritten} = require("firebase-functions/v2/firestore");
+  const {initializeApp} = require("firebase-admin/app");
+  const {getMessaging} = require("firebase-admin/messaging");
+  const {getFirestore} = require("firebase-admin/firestore");
+  initializeApp();
+
+  exports.intakeAlert = onDocumentWritten("alerts/{ref}", async (event) => {
+    const after = event.data.after.data();
+    if (!after) return;
+    const tokens = [];
+    const snap = await getFirestore().collection("devices").get();
+    snap.forEach(d => { if (d.data().token) tokens.push(d.data().token); });
+    if (!tokens.length) return;
+    await getMessaging().sendEachForMulticast({
+      tokens,
+      data: {
+        title: "SILO — INTAKE ALERT",
+        body: `${after.id} logged · ${after.region || "location pending"}`,
+        ref: after.id
+      }
+    });
+  });
+
+  4. Tell me when the VAPID key exists and I'll add the token-registration
+     code to index.html (it writes each device token to a devices
+     collection) and the FCM handler to sw.js. Roughly 30 lines total.
+     The push listener in sw.js is already written and waiting.
+
+RECOMMENDATION
+--------------
+Launch without it. Play a few weeks, see whether the timing of alerts
+actually matters to how Joe engages. If it does, the upgrade above is a
+short session. If it doesn't, you saved yourself a billing account.

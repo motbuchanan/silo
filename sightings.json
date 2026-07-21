@@ -1,5 +1,5 @@
 {
-  "registry_version": "0.3",
+  "registry_version": "0.5",
   "issued": "2026-07-21",
   "sightings": [
     {
@@ -11,7 +11,8 @@
       "region": "Tully, Queensland, AU",
       "type": "NEST",
       "status": "LOGGED",
-      "notes": "Circular depression of flattened swamp reeds, approx. 30 ft across, in the Horseshoe Lagoon. Reported by a banana farmer; investigated by police and the RAAF. Press coverage popularized the term 'saucer nest'. Predates the modern UK catalog by fourteen years."
+      "notes": "Circular depression of flattened swamp reeds, approx. 30 ft across, in the Horseshoe Lagoon. Reported by a banana farmer; investigated by police and the RAAF. Press coverage popularized the term 'saucer nest'. Predates the modern UK catalog by fourteen years.",
+      "wiki": "Tully saucer nest"
     },
     {
       "id": "VAD-0002",
@@ -33,7 +34,8 @@
       "region": "Westbury, Wiltshire, UK",
       "type": "SIMPLE CIRCLE",
       "status": "LOGGED",
-      "notes": "Group of three plain circles below the Westbury White Horse. Widely cited as the formation that started sustained UK press interest in the phenomenon."
+      "notes": "Group of three plain circles below the Westbury White Horse. Widely cited as the formation that started sustained UK press interest in the phenomenon.",
+      "wiki": "Crop circle"
     },
     {
       "id": "VAD-0011",
@@ -77,7 +79,8 @@
       "region": "Southampton, Hampshire, UK",
       "type": "ADMINISTRATIVE",
       "status": "LOGGED",
-      "notes": "Not a formation. Filed for continuity: two men publicly claimed responsibility for more than 200 English formations made since 1978 using planks and rope, and demonstrated the method for the press. Reported formations increased in the following seasons rather than declining."
+      "notes": "Not a formation. Filed for continuity: two men publicly claimed responsibility for more than 200 English formations made since 1978 using planks and rope, and demonstrated the method for the press. Reported formations increased in the following seasons rather than declining.",
+      "wiki": "Doug Bower"
     },
     {
       "id": "VAD-0030",
@@ -99,7 +102,8 @@
       "region": "Ickleton, Cambridgeshire, UK",
       "type": "FRACTAL",
       "status": "LOGGED",
-      "notes": "Recognizable Mandelbrot set rendered in wheat. First widely reported formation depicting a specific mathematical object rather than abstract geometry."
+      "notes": "Recognizable Mandelbrot set rendered in wheat. First widely reported formation depicting a specific mathematical object rather than abstract geometry.",
+      "wiki": "Mandelbrot set"
     },
     {
       "id": "VAD-0035",
@@ -132,7 +136,8 @@
       "region": "Nr Devizes, Wiltshire, UK",
       "type": "GEOMETRIC",
       "status": "UNVERIFIED",
-      "notes": "Video circulated showing a formation apparently taking shape in daylight beneath moving light forms. The footage was later stated to be fabricated by the person who supplied it. It remains the single most reproduced recording associated with the phenomenon."
+      "notes": "Video circulated showing a formation apparently taking shape in daylight beneath moving light forms. The footage was later stated to be fabricated by the person who supplied it. It remains the single most reproduced recording associated with the phenomenon.",
+      "wiki": "Oliver's Castle"
     },
     {
       "id": "VAD-0041",
@@ -220,7 +225,8 @@
       "region": "Adams County, Ohio, US",
       "type": "VESICA",
       "status": "LOGGED",
-      "notes": "Soybean formation, approx. 271 ft along its longest axis, oriented east to west, incorporating a vesica piscis motif. Located across from the Serpent Mound effigy. Surveyed by the Independent Crop Circle Researchers Association; node anomalies were reported in sampled stems. Witnesses reported lights over the area the preceding night. Soybean is difficult to traverse without visible damage; no tracks were reported at discovery."
+      "notes": "Soybean formation, approx. 271 ft along its longest axis, oriented east to west, incorporating a vesica piscis motif. Located across from the Serpent Mound effigy. Surveyed by the Independent Crop Circle Researchers Association; node anomalies were reported in sampled stems. Witnesses reported lights over the area the preceding night. Soybean is difficult to traverse without visible damage; no tracks were reported at discovery.",
+      "wiki": "Serpent Mound"
     },
     {
       "id": "VAD-0061",
@@ -264,7 +270,8 @@
       "region": "Nazca, Ica, PE",
       "type": "ADMINISTRATIVE",
       "status": "UNVERIFIED",
-      "notes": "Filed after an inquiry compared modern formation geometry to the Nazca ground figures. No crop involved; no field survey conducted. Retained because the comparison keeps resurfacing in correspondence."
+      "notes": "Filed after an inquiry compared modern formation geometry to the Nazca ground figures. No crop involved; no field survey conducted. Retained because the comparison keeps resurfacing in correspondence.",
+      "wiki": "Nazca Lines"
     },
     {
       "id": "VAD-0083",
@@ -319,7 +326,8 @@
       "region": "Hertfordshire, UK",
       "type": "HISTORICAL",
       "status": "ARCHIVAL",
-      "notes": "RETRO-FILED (intake number reflects date of filing, not date of event). Pamphlet titled 'The Mowing-Devil: or, Strange News out of Hartford-shire' describes a field of oats cut overnight into round shapes, with a woodcut illustration. Stalks described as cut rather than bent; researchers dispute this as a true precedent. Retained as the earliest printed account in the file."
+      "notes": "RETRO-FILED (intake number reflects date of filing, not date of event). Pamphlet titled 'The Mowing-Devil: or, Strange News out of Hartford-shire' describes a field of oats cut overnight into round shapes, with a woodcut illustration. Stalks described as cut rather than bent; researchers dispute this as a true precedent. Retained as the earliest printed account in the file.",
+      "wiki": "Mowing Devil"
     },
     {
       "id": "VAD-0094",
@@ -330,7 +338,8 @@
       "region": "Chualar, Salinas Valley, California, US",
       "type": "GLYPH",
       "status": "RECLASSIFIED",
-      "notes": "310 ft formation containing an encoded numeral sequence and Morse-style elements. Went viral over roughly ten days before a technology company disclosed it as a commissioned advertising build. Retained in the registry as a control case: the interval between appearance and disclosure is the useful measurement, not the formation."
+      "notes": "310 ft formation containing an encoded numeral sequence and Morse-style elements. Went viral over roughly ten days before a technology company disclosed it as a commissioned advertising build. Retained in the registry as a control case: the interval between appearance and disclosure is the useful measurement, not the formation.",
+      "wiki": "Chualar crop circle"
     },
     {
       "id": "VAD-0095",
@@ -363,7 +372,8 @@
       "region": "Raisting, Bavaria, DE",
       "type": "GEOMETRIC",
       "status": "LOGGED",
-      "notes": "Large formation in a Bavarian wheat field near a satellite earth station; drew thousands of visitors before harvest. Authorship later claimed by a group of young people."
+      "notes": "Large formation in a Bavarian wheat field near a satellite earth station; drew thousands of visitors before harvest. Authorship later claimed by a group of young people.",
+      "wiki": "Crop circle"
     },
     {
       "id": "VAD-0100",
@@ -418,7 +428,8 @@
       "region": "Wiltshire, UK",
       "type": "FRACTAL",
       "status": "LOGGED",
-      "notes": "409 circles, six-arm spiral, approx. 780 ft across. Among the largest formations on record."
+      "notes": "409 circles, six-arm spiral, approx. 780 ft across. Among the largest formations on record.",
+      "wiki": "Milk Hill"
     },
     {
       "id": "VAD-0111",
@@ -429,7 +440,8 @@
       "region": "Hampshire, UK",
       "type": "GLYPH",
       "status": "LOGGED",
-      "notes": "Rectangular glyph adjacent to Chilbolton radio observatory, resembling a reply to the 1974 Arecibo transmission. Appeared alongside a face glyph."
+      "notes": "Rectangular glyph adjacent to Chilbolton radio observatory, resembling a reply to the 1974 Arecibo transmission. Appeared alongside a face glyph.",
+      "wiki": "Arecibo message"
     },
     {
       "id": "VAD-0113",
@@ -451,7 +463,8 @@
       "region": "Wiltshire, UK",
       "type": "MATHEMATICAL",
       "status": "LOGGED",
-      "notes": "Ratcheted spiral encoding the first ten digits of pi. Independently decoded by multiple analysts."
+      "notes": "Ratcheted spiral encoding the first ten digits of pi. Independently decoded by multiple analysts.",
+      "wiki": "Pi"
     },
     {
       "id": "VAD-0116",

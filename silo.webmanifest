@@ -1,0 +1,16 @@
+{
+  "name": "SILO — System for Imaging Land Observations",
+  "short_name": "SILO",
+  "description": "Formation registry and intake monitor.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0C120E",
+  "theme_color": "#0E1410",
+  "icons": [
+    { "src": "silo-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "silo-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "silo-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
