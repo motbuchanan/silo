@@ -156,11 +156,22 @@ textarea{min-height:84px;resize:vertical}
   </div>
 
   <div class="pane" id="pane-alert">
-    <h4>TRIGGER SIGHTING ALERT</h4>
-    <input class="f" id="aRef" placeholder="REGISTRY REF (e.g. VAD-0120)">
-    <input class="f" id="aRegion" placeholder="REGION (e.g. STARK COUNTY, OHIO)">
-    <button class="send" id="aFire">FIRE ALERT</button>
-    <p class="hint">Queues an alert record. In phase 2 the subject app polls these and lights the bell. Until Firestore is live this stores locally as a rehearsal.</p>
+    <h4>PUSH NEW SIGHTING TO SUBJECT</h4>
+    <input class="f" id="aRef" placeholder="REF (e.g. VAD-0128)">
+    <input class="f" id="aName" placeholder="DESIGNATION (e.g. UNCLASSIFIED)">
+    <input class="f" id="aDate" type="date">
+    <input class="f" id="aRegion" placeholder="REGION (e.g. Stark County, Ohio, US)">
+    <input class="f" id="aLat" placeholder="LATITUDE (e.g. 40.8)" inputmode="decimal">
+    <input class="f" id="aLng" placeholder="LONGITUDE (e.g. -81.4)" inputmode="decimal">
+    <input class="f" id="aType" placeholder="TYPE (e.g. PENDING)">
+    <input class="f" id="aStatus" placeholder="STATUS (e.g. UNDER REVIEW)">
+    <textarea id="aNotes" placeholder="SURVEY NOTES — this is where hooks go."></textarea>
+    <label style="display:flex;gap:8px;align-items:center;font-size:12px;color:var(--dim);margin-bottom:10px">
+      <input type="checkbox" id="aNew" checked> FLAG AS NEW (lights his alert bell)
+    </label>
+    <button class="send" id="aFire">PUSH SIGHTING</button>
+    <p class="hint">Appears in his registry and on his map within seconds. No repo upload needed. Pushed records live in Firestore and always sort above the static registry.</p>
+    <div id="aList" style="margin-top:16px"></div>
   </div>
 
   <div class="pane" id="pane-ideas">
@@ -172,14 +183,17 @@ textarea{min-height:84px;resize:vertical}
 </div>
 </div>
 
-<div id="ver">ops v0.1 · Jul 21</div>
+<div id="ver">ops v0.4 · Jul 21</div>
 <div id="toast"></div>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script>
 (function(){
 "use strict";
 
-var VERSION="ops v0.1 · Jul 21";
+var VERSION="ops v0.4 · Jul 21";
 
 /* ===== FIREBASE (optional — paste config to activate) ===== */
 var FIREBASE_CONFIG=null;
@@ -266,13 +280,19 @@ function initData(){
     try{
       firebase.initializeApp(FIREBASE_CONFIG);
       db=firebase.firestore();
-      document.getElementById("modeLine").innerHTML="MODE: <b>LIVE</b> — synced.";
-      watchTasks(); watchLog(); watchIdeas();
+      document.getElementById("modeLine").innerHTML="MODE: <b>LIVE</b> — authenticating…";
+      firebase.auth().signInAnonymously().then(function(){
+        document.getElementById("modeLine").innerHTML="MODE: <b>LIVE</b> — synced as "+esc(WHO)+".";
+        watchTasks(); watchLog(); watchIdeas(); watchAlerts();
+      }).catch(function(err){
+        document.getElementById("modeLine").innerHTML="MODE: <b>AUTH FAILED</b> — enable Anonymous sign-in in Firebase Auth.";
+      });
       return;
     }catch(e){}
   }
   renderTasks(jload("gpi_tasks",[]));
   renderIdeas(jload("gpi_ideas",[]));
+  renderPushed(jload("gpi_alerts",[]));
 }
 
 /* tasks */
@@ -371,18 +391,54 @@ function watchLog(){
 }
 
 /* alerts */
-document.getElementById("aFire").addEventListener("click",function(){
-  var ref=document.getElementById("aRef").value.trim().toUpperCase();
-  var region=document.getElementById("aRegion").value.trim();
-  if(!ref){toast("REF REQUIRED");return;}
-  var a={ref:ref,region:region,by:WHO,at:new Date().toISOString()};
-  if(db){db.collection("alerts").add(a).then(function(){toast("ALERT FIRED");});}
-  else{
-    var alerts=jload("gpi_alerts",[]);alerts.push(a);
-    store("gpi_alerts",JSON.stringify(alerts));toast("ALERT QUEUED (LOCAL)");
+function val(id){return document.getElementById(id).value.trim();}
+function renderPushed(list){
+  var el=document.getElementById("aList");
+  el.innerHTML="";
+  list.sort(function(a,b){return (b.pushedAt||"").localeCompare(a.pushedAt||"");});
+  for(var i=0;i<list.length;i++){
+    (function(a){
+      var d=document.createElement("div");d.className="logline";
+      d.innerHTML="<b>"+esc(a.id)+"</b> "+esc(a.name||"")+"<small>"+esc(a.region||"")+" · pushed by "+esc(a.by||"?")+"</small>";
+      if(ROLE==="director"&&db&&a._doc){
+        var b=document.createElement("button");b.className="b warn";b.style.marginTop="6px";b.textContent="PULL BACK";
+        b.addEventListener("click",function(){db.collection("alerts").doc(a._doc).delete().then(function(){toast("PULLED");});});
+        d.appendChild(b);
+      }
+      el.appendChild(d);
+    })(list[i]);
   }
-  document.getElementById("aRef").value="";document.getElementById("aRegion").value="";
+}
+document.getElementById("aFire").addEventListener("click",function(){
+  var ref=val("aRef").toUpperCase();
+  if(!ref){toast("REF REQUIRED");return;}
+  var lat=parseFloat(val("aLat")), lng=parseFloat(val("aLng"));
+  if(isNaN(lat)||isNaN(lng)){toast("COORDS REQUIRED");return;}
+  var s={
+    id:ref,
+    name:val("aName")||"UNCLASSIFIED",
+    date:val("aDate")||new Date().toISOString().slice(0,10),
+    region:val("aRegion")||"UNSPECIFIED",
+    lat:lat, lng:lng,
+    type:val("aType")||"PENDING",
+    status:val("aStatus")||"UNDER REVIEW",
+    notes:val("aNotes")||"Preliminary intake. Geometry analysis incomplete.",
+    by:WHO, pushedAt:new Date().toISOString()
+  };
+  if(document.getElementById("aNew").checked){ s["new"]=true; }
+  if(db){db.collection("alerts").doc(ref).set(s).then(function(){toast("PUSHED LIVE");});}
+  else{
+    var alerts=jload("gpi_alerts",[]);alerts.push(s);
+    store("gpi_alerts",JSON.stringify(alerts));renderPushed(alerts);toast("QUEUED (LOCAL)");
+  }
+  ["aRef","aName","aRegion","aLat","aLng","aType","aStatus","aNotes"].forEach(function(id){document.getElementById(id).value="";});
 });
+function watchAlerts(){
+  db.collection("alerts").onSnapshot(function(snap){
+    var list=[];snap.forEach(function(d){var o=d.data();o._doc=d.id;list.push(o);});
+    renderPushed(list);
+  });
+}
 
 /* ideas */
 function renderIdeas(list){

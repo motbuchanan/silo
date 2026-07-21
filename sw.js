@@ -1,5 +1,5 @@
 /* GPI console — cache version must match the gpi.html version badge */
-var CACHE = "gpi-ops-v0.2";
+var CACHE = "gpi-ops-v0.4";
 var ASSETS = ["./gpi.html", "./gpi.webmanifest", "./gpi-192.png", "./gpi-512.png"];
 self.addEventListener("install", function(e){
   e.waitUntil(caches.open(CACHE).then(function(c){ return c.addAll(ASSETS); }).then(function(){ return self.skipWaiting(); }));

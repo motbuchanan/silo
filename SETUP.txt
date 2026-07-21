@@ -61,3 +61,48 @@ FILES (all at repo root, no folders):
 7. PLANTED ANOMALY
    VAD-0119 sits at 41.031, -81.207 (rural Portage County near Atwater).
    Adjust in sightings.json to taste.
+
+================================================================
+8. FIRESTORE SETUP (do this once)
+================================================================
+   a. console.firebase.google.com > Add project (NOT garrett-apps).
+      Skip Google Analytics.
+   b. Build > Firestore Database > Create database > Start in
+      PRODUCTION mode > pick a region > Enable.
+   c. Build > Authentication > Get started > Sign-in method >
+      Anonymous > Enable. (The ops console signs in this way; the
+      subject app never authenticates.)
+   d. Firestore > Rules tab > paste the contents of firestore.rules
+      from this repo > Publish.
+   e. Project settings (gear) > scroll to "Your apps" > click the
+      web icon </> > register an app > COPY the firebaseConfig object.
+   f. Paste that object in TWO places, replacing "null":
+        index.html   -> var FIREBASE_CONFIG = null;
+        gpi.html     -> var FIREBASE_CONFIG = null;
+      It should end up looking like:
+        var FIREBASE_CONFIG = { apiKey:"...", authDomain:"...", ... };
+   g. Re-upload both files. Bump gpi.html's version badge and the
+      CACHE string in sw.js together whenever gpi.html changes.
+
+   VERIFY: open gpi.html, log in, the mode line should read
+   "MODE: LIVE — synced as <YOURNAME>." If it says AUTH FAILED, step (c)
+   was missed.
+
+   COLLECTIONS
+     log          subject discovery events (his app writes, you read)
+     alerts       sightings you push live to his app
+     tasks        drop board
+     suggestions  agent idea box
+
+   WHAT LIVE PUSH MEANS
+     The ALERT tab in the console is now a full sighting form. Fill it in,
+     hit PUSH SIGHTING, and the record appears in his registry and on his
+     map within seconds, bell lit, with no repo upload. Pushed records sort
+     above the static registry and can be pulled back by the director.
+
+   SECURITY NOTE
+     Rules stop casual poking: his app can create log entries but never read
+     them, and cannot see tasks or suggestions at all. Anyone who found the
+     config could still sign in anonymously and read those collections. This
+     is game-grade, not bank-grade. Keep nothing in Firestore you would mind
+     him eventually seeing.

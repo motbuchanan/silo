@@ -264,6 +264,8 @@ footer{
 <div id="toast"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
 (function(){
 "use strict";
@@ -291,12 +293,16 @@ function toast(msg){
 document.getElementById("ver").addEventListener("click",function(){toast("SILO "+VERSION);});
 
 /* discovery logging — queue locally, sync later if Firebase configured */
+var DB=null, SUBJECT=load("silo_sid");
+if(!SUBJECT){ SUBJECT="S"+Math.random().toString(36).slice(2,8).toUpperCase(); store("silo_sid",SUBJECT); }
 function logEvent(type, ref){
+  var e={t:type, r:ref||"", s:SUBJECT, at:new Date().toISOString()};
   var q=[];
-  try{ q=JSON.parse(load("silo_q")||"[]"); }catch(e){ q=[]; }
-  q.push({t:type, r:ref||"", at:new Date().toISOString()});
+  try{ q=JSON.parse(load("silo_q")||"[]"); }catch(err){ q=[]; }
+  q.push(e);
   if(q.length>200) q=q.slice(-200);
   store("silo_q", JSON.stringify(q));
+  if(DB){ try{ DB.collection("log").add(e); }catch(err){} }
 }
 logEvent("open");
 
@@ -467,28 +473,68 @@ if(!load("silo_manual_seen")){
   setTimeout(openManual,900);
 }
 
-/* load data */
-fetch("sightings.json").then(function(r){return r.json();}).then(function(j){
-  SIGHTINGS=j.sightings||[];
+/* ---------- data: static registry + live pushes ---------- */
+var STATIC=[], LIVE=[], pinLayer=L.layerGroup().addTo(map), fitted=false;
+
+function rebuild(fit){
+  var seen={}, merged=[];
+  for(var i=0;i<LIVE.length;i++){ if(!seen[LIVE[i].id]){ seen[LIVE[i].id]=1; merged.push(LIVE[i]); } }
+  for(var j=0;j<STATIC.length;j++){ if(!seen[STATIC[j].id]){ seen[STATIC[j].id]=1; merged.push(STATIC[j]); } }
+  merged.sort(function(a,b){ return a.id.localeCompare(b.id); });
+  SIGHTINGS=merged;
   render(SIGHTINGS);
   refreshAlerts();
+  pinLayer.clearLayers();
+  markers={};
   var group=[];
-  for(var i=0;i<SIGHTINGS.length;i++){
+  for(var k=0;k<SIGHTINGS.length;k++){
     (function(s){
-      var m=L.marker([s.lat,s.lng],{icon:s["new"]?pinNew:pinIcon}).addTo(map);
+      if(typeof s.lat!=="number"||typeof s.lng!=="number") return;
+      var m=L.marker([s.lat,s.lng],{icon:s["new"]?pinNew:pinIcon});
       m.bindPopup("<div class='pop-id'>"+esc(s.id)+"</div><div class='pop-name'>"+esc(s.name)+"</div><span class='pop-open' data-open='"+esc(s.id)+"'>OPEN RECORD</span>");
       m.on("popupopen",function(){
         var el=document.querySelector("[data-open='"+s.id+"']");
         if(el){el.addEventListener("click",function(){openSheet(s);});}
       });
+      pinLayer.addLayer(m);
       markers[s.id]=m;
       group.push([s.lat,s.lng]);
-    })(SIGHTINGS[i]);
+    })(SIGHTINGS[k]);
   }
-  if(group.length){map.fitBounds(group,{padding:[24,24]});}
+  if(fit && !fitted && group.length){ map.fitBounds(group,{padding:[24,24]}); fitted=true; }
+}
+
+fetch("sightings.json").then(function(r){return r.json();}).then(function(j){
+  STATIC=j.sightings||[];
+  rebuild(true);
 }).catch(function(){
   document.getElementById("rows").innerHTML="<div class='empty'>REGISTRY UNREACHABLE. CHECK CONNECTION.</div>";
 });
+
+/* ---------- live sync ---------- */
+if(FIREBASE_CONFIG && window.firebase){
+  try{
+    firebase.initializeApp(FIREBASE_CONFIG);
+    DB=firebase.firestore();
+    /* flush anything queued while offline */
+    try{
+      var q=JSON.parse(load("silo_q")||"[]");
+      if(!load("silo_flushed") && q.length){
+        for(var f=0;f<q.length;f++){ DB.collection("log").add(q[f]); }
+        store("silo_flushed","1");
+      }
+    }catch(e){}
+    DB.collection("alerts").onSnapshot(function(snap){
+      var live=[];
+      snap.forEach(function(doc){
+        var a=doc.data();
+        if(a && a.id){ live.push(a); }
+      });
+      LIVE=live;
+      rebuild(false);
+    }, function(){});
+  }catch(e){}
+}
 
 })();
 </script>
