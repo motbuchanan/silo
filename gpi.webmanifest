@@ -1,0 +1,24 @@
+{
+  "name": "Grain Price Index",
+  "short_name": "GPI",
+  "description": "Daily grain commodity reference.",
+  "start_url": "./gpi.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0C120E",
+  "theme_color": "#0C120E",
+  "icons": [
+    {
+      "src": "gpi-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "gpi-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

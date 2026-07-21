@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>SILO · System for Imaging Land Observations</title>
+<meta name="theme-color" content="#0E1410">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+:root{
+  --bg:#0C120E; --panel:#0E1410; --panel-2:#111A13; --line:#223022; --line-dim:#1A241A;
+  --txt:#C8D8C2; --txt-dim:#7B8F77; --txt-faint:#54604E;
+  --alert:#D8837A; --amber:#C9A85C;
+  --mono:'IBM Plex Mono',monospace; --body:'Courier Prime',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{max-width:100%;overflow-x:hidden}
+body{background:var(--bg);color:var(--txt);font-family:var(--body);font-size:15px;line-height:1.5;min-height:100vh}
+.wrap{max-width:760px;margin:0 auto;padding-bottom:70px}
+
+/* header */
+header{
+  position:sticky;top:0;z-index:20;background:var(--panel);
+  border-bottom:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 14px;
+}
+.logo{font-family:var(--mono);font-weight:600;font-size:16px;letter-spacing:.35em;color:var(--txt)}
+.logo small{display:block;font-size:8px;letter-spacing:.18em;color:var(--txt-faint);font-weight:400;margin-top:2px}
+.bell{position:relative;cursor:pointer;-webkit-tap-highlight-color:transparent;padding:4px}
+.bell .dot{
+  position:absolute;top:0;right:0;min-width:14px;height:14px;border-radius:7px;
+  background:var(--alert);color:#1A0E0C;font-family:var(--mono);font-size:9px;font-weight:600;
+  display:flex;align-items:center;justify-content:center;padding:0 3px;
+}
+.bell .dot.zero{display:none}
+
+/* map */
+#map{height:46vh;min-height:260px;background:#131A12;border-bottom:1px solid var(--line)}
+.leaflet-container{font-family:var(--mono)}
+.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:var(--panel);color:var(--txt);border:1px solid var(--line)}
+.leaflet-popup-content{font-family:var(--mono);font-size:12px;margin:10px 12px}
+.pop-id{color:var(--txt-dim);letter-spacing:.1em;font-size:10px}
+.pop-name{font-weight:600;margin:2px 0}
+.pop-open{color:var(--amber);text-decoration:underline;cursor:pointer}
+
+/* toolbar */
+.bar{
+  display:flex;gap:8px;padding:10px 12px;background:var(--panel);
+  border-bottom:1px solid var(--line);align-items:center;
+}
+.bar input{
+  flex:1;background:var(--panel-2);border:1px solid var(--line);border-radius:3px;
+  color:var(--txt);font-family:var(--mono);font-size:13px;padding:8px 10px;outline:none;
+}
+.bar input::placeholder{color:var(--txt-faint)}
+.count{font-family:var(--mono);font-size:11px;color:var(--txt-faint);letter-spacing:.1em;white-space:nowrap}
+
+/* registry */
+.registry{padding:0}
+.rowhead{
+  display:grid;grid-template-columns:86px 1fr 74px;gap:8px;
+  padding:8px 14px;font-family:var(--mono);font-size:10px;letter-spacing:.18em;
+  color:var(--txt-faint);border-bottom:1px solid var(--line);
+}
+.srow{
+  display:grid;grid-template-columns:86px 1fr 74px;gap:8px;align-items:center;
+  padding:11px 14px;border-bottom:1px solid var(--line-dim);
+  font-family:var(--mono);font-size:12px;cursor:pointer;-webkit-tap-highlight-color:transparent;
+}
+.srow:active{background:var(--panel-2)}
+.srow .sid{color:var(--txt-dim);letter-spacing:.06em}
+.srow .snm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.srow .sst{font-size:10px;letter-spacing:.08em;color:var(--txt-faint);text-align:right}
+.srow .sst.new{color:var(--alert);font-weight:600}
+.srow .sst.rev{color:var(--amber)}
+.srow.hiddenrow{background:#160F0E;border:1px solid #3A2320;border-left:3px solid var(--alert)}
+.srow.hiddenrow .sid{color:var(--alert)}
+.empty{padding:24px 14px;font-family:var(--mono);font-size:12px;color:var(--txt-faint);letter-spacing:.08em}
+
+/* detail sheet */
+#sheet{
+  position:fixed;left:0;right:0;bottom:0;z-index:30;
+  background:var(--panel);border-top:2px solid var(--line);
+  transform:translateY(105%);transition:transform .3s ease;
+  max-height:72vh;overflow-y:auto;padding:16px 16px 26px;
+  max-width:760px;margin:0 auto;
+}
+#sheet.open{transform:none}
+#sheet .grab{width:44px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 14px}
+#sheet h3{font-family:var(--mono);font-size:15px;letter-spacing:.06em;margin-bottom:2px}
+#sheet .did{font-family:var(--mono);font-size:11px;color:var(--txt-dim);letter-spacing:.12em;margin-bottom:12px}
+.kv{display:flex;gap:10px;font-family:var(--mono);font-size:12px;margin:5px 0}
+.kv b{flex:0 0 84px;color:var(--txt-faint);font-weight:400;letter-spacing:.08em}
+.kv span{word-break:break-word}
+.notes{margin-top:12px;font-size:14px;color:var(--txt);border-left:2px solid var(--line);padding-left:10px}
+.actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.abtn{
+  font-family:var(--mono);font-size:12px;letter-spacing:.08em;
+  border:1px solid var(--line);border-radius:3px;background:var(--panel-2);color:var(--txt);
+  padding:10px 14px;text-decoration:none;cursor:pointer;-webkit-tap-highlight-color:transparent;
+}
+.abtn:active{background:var(--line-dim)}
+#sheetClose{position:absolute;top:10px;right:12px;font-family:var(--mono);color:var(--txt-faint);background:none;border:none;font-size:16px;cursor:pointer;padding:6px}
+
+/* alert panel */
+#alerts{
+  position:fixed;top:54px;right:8px;z-index:25;width:260px;max-width:86vw;
+  background:var(--panel);border:1px solid var(--line);border-radius:4px;
+  display:none;box-shadow:0 12px 30px rgba(0,0,0,.5);
+}
+#alerts.open{display:block}
+#alerts .ahd{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--txt-faint);padding:10px 12px;border-bottom:1px solid var(--line)}
+#alerts .aln{padding:10px 12px;border-bottom:1px solid var(--line-dim);font-family:var(--mono);font-size:11.5px;cursor:pointer}
+#alerts .aln:active{background:var(--panel-2)}
+#alerts .aln small{display:block;color:var(--txt-faint);margin-top:2px}
+#alerts .none{padding:14px 12px;font-family:var(--mono);font-size:11px;color:var(--txt-faint)}
+
+/* footer */
+footer{
+  padding:20px 14px 8px;font-family:var(--mono);font-size:9.5px;line-height:1.8;
+  color:var(--txt-faint);letter-spacing:.08em;border-top:1px solid var(--line);margin-top:18px;
+}
+#ver{
+  position:fixed;right:10px;bottom:10px;z-index:40;
+  font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--txt-dim);
+  background:var(--panel);border:1px solid var(--line);border-radius:3px;padding:3px 8px;cursor:pointer;
+}
+#toast{
+  position:fixed;left:50%;bottom:52px;transform:translateX(-50%);z-index:41;
+  background:var(--txt);color:var(--bg);font-family:var(--mono);font-size:12px;
+  padding:8px 14px;border-radius:4px;opacity:0;transition:opacity .3s;pointer-events:none;
+}
+#toast.show{opacity:1}
+
+/* field manual */
+#manual{
+  position:fixed;inset:0;z-index:50;background:rgba(6,10,7,.9);display:none;
+  align-items:flex-end;justify-content:center;
+}
+#manual.open{display:flex}
+.man{
+  background:var(--panel);border:1px solid var(--line);border-bottom:none;border-radius:8px 8px 0 0;
+  max-width:640px;width:100%;max-height:86vh;overflow-y:auto;padding:18px 16px 30px;position:relative;
+}
+.man h3{font-family:var(--mono);font-size:12px;letter-spacing:.24em;color:var(--txt);margin-bottom:2px}
+.man .sub{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:var(--txt-faint);margin-bottom:14px}
+.man h5{font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;color:var(--amber);margin:16px 0 6px}
+.man p{font-size:13.5px;color:var(--txt);margin-bottom:8px}
+.man .st{font-family:var(--mono);font-size:11.5px;margin:4px 0;color:var(--txt-dim)}
+.man .st b{font-weight:600;letter-spacing:.06em}
+.man .st .c-log{color:var(--txt)} .man .st .c-unv{color:var(--txt-dim)} .man .st .c-rev{color:var(--amber)} .man .st .c-sea{color:var(--alert)} .man .st .c-wdn{color:var(--txt-faint)}
+.man a{color:var(--amber);text-decoration:none;border-bottom:1px dotted var(--amber)}
+.man .src{font-family:var(--mono);font-size:11.5px;margin:5px 0;word-break:break-word}
+.man .src small{display:block;color:var(--txt-faint);font-size:10px}
+#manClose{position:absolute;top:10px;right:12px;font-family:var(--mono);color:var(--txt-faint);background:none;border:none;font-size:16px;cursor:pointer;padding:6px}
+.manbtn{
+  font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--txt-dim);
+  background:none;border:1px solid var(--line);border-radius:3px;padding:6px 9px;cursor:pointer;margin-right:10px;
+}
+.hdr-r{display:flex;align-items:center}
+@media (prefers-reduced-motion: reduce){ *{transition-duration:.001s !important;animation-duration:.001s !important} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">SILO<small>SYSTEM FOR IMAGING LAND OBSERVATIONS</small></div>
+    <div class="hdr-r">
+    <button class="manbtn" id="btnManual">MANUAL</button>
+    <div class="bell" id="bell" role="button" aria-label="Alerts">
+      <svg width="22" height="22" viewBox="0 0 16 16"><path d="M8 2 a4 4 0 0 1 4 4 v3 l1.5 2 h-11 l1.5 -2 v-3 a4 4 0 0 1 4 -4z M6.5 12 a1.5 1.5 0 0 0 3 0" fill="none" stroke="#C8D8C2" stroke-width="1.2"/></svg>
+      <span class="dot zero" id="dot">0</span>
+    </div>
+    </div>
+  </header>
+
+  <div id="map"></div>
+
+  <div class="bar">
+    <input id="search" type="text" placeholder="SEARCH REGISTRY…" autocomplete="off" autocapitalize="characters">
+    <span class="count" id="count">— RECORDS</span>
+  </div>
+
+  <div class="registry">
+    <div class="rowhead"><span>REF</span><span>DESIGNATION</span><span style="text-align:right">STATUS</span></div>
+    <div id="rows"></div>
+  </div>
+
+  <div id="alerts">
+    <div class="ahd">ALERT FEED</div>
+    <div id="alertList"><div class="none">NO ACTIVE ALERTS</div></div>
+  </div>
+
+  <div id="sheet">
+    <button id="sheetClose" aria-label="Close">✕</button>
+    <div class="grab"></div>
+    <h3 id="shName">—</h3>
+    <div class="did" id="shId">—</div>
+    <div class="kv"><b>DATE</b><span id="shDate">—</span></div>
+    <div class="kv"><b>REGION</b><span id="shRegion">—</span></div>
+    <div class="kv"><b>TYPE</b><span id="shType">—</span></div>
+    <div class="kv"><b>STATUS</b><span id="shStatus">—</span></div>
+    <div class="kv"><b>COORDS</b><span id="shCoords">—</span></div>
+    <div class="notes" id="shNotes">—</div>
+    <div class="actions">
+      <a class="abtn" id="shDir" target="_blank" rel="noopener">GET DIRECTIONS ↗</a>
+      <button class="abtn" id="shZoom">VIEW ON MAP</button>
+    </div>
+  </div>
+
+  <div id="manual">
+    <div class="man">
+      <button id="manClose" aria-label="Close">✕</button>
+      <h3>FIELD MANUAL</h3>
+      <div class="sub">OPERATING INSTRUCTIONS · SILO REGISTRY TERMINAL</div>
+
+      <h5>1 · THE MAP</h5>
+      <p>Each marker is a logged formation. Pinch to zoom the satellite imagery down to field level. Tap a marker, then OPEN RECORD for the full registry entry. Red-ringed markers are new intakes.</p>
+
+      <h5>2 · THE REGISTRY</h5>
+      <p>The list below the map holds every active record: reference number, designation, and status. Tap any row for date, region, formation type, coordinates, and survey notes.</p>
+
+      <h5>3 · SEARCH</h5>
+      <p>The search field filters by reference, name, region, type, or any word appearing in survey notes. Note that the registry index is larger than the default view.</p>
+
+      <h5>4 · ALERTS</h5>
+      <p>The bell lights when a new formation enters the registry. Data refresh runs daily at 0400 UTC. Tap an alert to jump to the record and its map position.</p>
+
+      <h5>5 · FIELD VISITS</h5>
+      <p>GET DIRECTIONS routes to the formation from your position. Most formations sit on private farmland: view from public rights of way, and never enter a crop without the landowner's permission. Harvested fields close for the season.</p>
+
+      <h5>6 · CROSS-REFERENCE SOURCES (EXTERNAL · UNAFFILIATED)</h5>
+      <p>The registry is a filing instrument, not a primary source. Verify entries independently:</p>
+      <div class="src"><a href="https://www.cropcircleconnector.com" target="_blank" rel="noopener">cropcircleconnector.com</a><small>Primary reporting archive since 1995. Most UK intakes originate here.</small></div>
+      <div class="src"><a href="https://circleresearcharchive.com" target="_blank" rel="noopener">circleresearcharchive.com</a><small>Historical research database, free access.</small></div>
+      <div class="src"><a href="http://www.bltresearch.com" target="_blank" rel="noopener">bltresearch.com</a><small>Plant and soil analysis literature (node elongation studies).</small></div>
+      <div class="src"><a href="https://www.cropcirclecenter.com" target="_blank" rel="noopener">cropcirclecenter.com</a><small>Large formation archive with year indexes.</small></div>
+      <div class="src"><a href="https://oldcropcircles.weebly.com" target="_blank" rel="noopener">oldcropcircles.weebly.com</a><small>Pre-1980 historical reports.</small></div>
+      <div class="src"><a href="https://www.reddit.com/r/cropcircles/" target="_blank" rel="noopener">r/cropcircles</a><small>Open discussion and same-day sighting chatter.</small></div>
+
+      <h5>7 · STATUS CODES</h5>
+      <div class="st"><b class="c-log">LOGGED</b> — verified intake, record complete</div>
+      <div class="st"><b class="c-unv">UNVERIFIED</b> — single-source report, retained pending review</div>
+      <div class="st"><b class="c-rev">UNDER REVIEW</b> — active survey, record may change</div>
+      <div class="st"><b class="c-sea">SEALED</b> — access restricted by program office</div>
+      <div class="st"><b class="c-wdn">WITHDRAWN</b> — removed from the active index. Withdrawn references are not listed. They are, however, still numbered.</div>
+    </div>
+  </div>
+
+  <footer>
+    U.S. DEPARTMENT OF AGRICULTURE COOPERATIVE SURVEY INSTRUMENT (UNOFFICIAL MIRROR)<br>
+    FORM SILO-registry-04 · CONTROL NO. 0704-6114 · DATA REFRESH: DAILY 0400 UTC<br>
+    UNAUTHORIZED ACCESS TO ANNEXED MATERIAL IS LOGGED.
+  </footer>
+</div>
+
+<div id="ver">v0.1 · Jul 21</div>
+<div id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+(function(){
+"use strict";
+
+var VERSION = "v0.2 · Jul 21";
+var WITHDRAWN = ["VAD-0102","VAD-0105","VAD-0108","VAD-0112","VAD-0114"];
+
+/* ===== FIREBASE (optional — paste config to activate) =====
+   When null, the app runs fully static and queues discovery
+   events in localStorage under "silo_q".                      */
+var FIREBASE_CONFIG = null;
+/* ========================================================== */
+
+function store(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+function load(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+
+document.getElementById("ver").textContent = VERSION;
+var toastTimer=null;
+function toast(msg){
+  var t=document.getElementById("toast");
+  t.textContent=msg;t.classList.add("show");
+  if(toastTimer)clearTimeout(toastTimer);
+  toastTimer=setTimeout(function(){t.classList.remove("show");},1800);
+}
+document.getElementById("ver").addEventListener("click",function(){toast("SILO "+VERSION);});
+
+/* discovery logging — queue locally, sync later if Firebase configured */
+function logEvent(type, ref){
+  var q=[];
+  try{ q=JSON.parse(load("silo_q")||"[]"); }catch(e){ q=[]; }
+  q.push({t:type, r:ref||"", at:new Date().toISOString()});
+  if(q.length>200) q=q.slice(-200);
+  store("silo_q", JSON.stringify(q));
+}
+logEvent("open");
+
+/* map */
+var map=L.map("map",{zoomControl:true,attributionControl:false}).setView([46,-35],3);
+L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxZoom:18}).addTo(map);
+L.control.attribution({prefix:false}).addAttribution("IMG © Esri").addTo(map);
+
+var pinIcon=L.divIcon({className:"", html:
+  "<svg width='26' height='26' viewBox='0 0 26 26'>"+
+  "<circle cx='13' cy='13' r='11' fill='none' stroke='#C9A85C' stroke-width='1.4' opacity='.85'/>"+
+  "<circle cx='13' cy='13' r='3' fill='#C9A85C'/></svg>",
+  iconSize:[26,26], iconAnchor:[13,13]});
+var pinNew=L.divIcon({className:"", html:
+  "<svg width='30' height='30' viewBox='0 0 30 30'>"+
+  "<circle cx='15' cy='15' r='13' fill='none' stroke='#D8837A' stroke-width='1.6'/>"+
+  "<circle cx='15' cy='15' r='3.4' fill='#D8837A'/></svg>",
+  iconSize:[30,30], iconAnchor:[15,15]});
+
+/* data */
+var SIGHTINGS=[];
+var markers={};
+
+function esc(s){
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+function render(list){
+  var rows=document.getElementById("rows");
+  rows.innerHTML="";
+  document.getElementById("count").textContent=list.length+" RECORDS";
+  if(!list.length){
+    rows.innerHTML="<div class='empty'>NO MATCHING RECORDS.</div>";
+    return;
+  }
+  for(var i=0;i<list.length;i++){
+    (function(s){
+      var d=document.createElement("div");
+      d.className="srow";
+      var st=s.status==="UNDER REVIEW"?"rev":"";
+      var stTxt=esc(s.status);
+      if(s["new"]){st="new";stTxt="NEW ◉";}
+      d.innerHTML="<span class='sid'>"+esc(s.id)+"</span><span class='snm'>"+esc(s.name)+"</span><span class='sst "+st+"'>"+stTxt+"</span>";
+      d.addEventListener("click",function(){openSheet(s);});
+      rows.appendChild(d);
+    })(list[i]);
+  }
+}
+
+/* detail sheet */
+var current=null;
+function openSheet(s){
+  current=s;
+  document.getElementById("shName").textContent=s.name;
+  document.getElementById("shId").textContent=s.id+" · REGISTRY ENTRY";
+  document.getElementById("shDate").textContent=s.date;
+  document.getElementById("shRegion").textContent=s.region;
+  document.getElementById("shType").textContent=s.type;
+  document.getElementById("shStatus").textContent=s.status;
+  document.getElementById("shCoords").textContent=s.lat.toFixed(4)+", "+s.lng.toFixed(4);
+  document.getElementById("shNotes").textContent=s.notes;
+  document.getElementById("shDir").href="https://www.google.com/maps/dir/?api=1&destination="+s.lat+","+s.lng;
+  document.getElementById("sheet").classList.add("open");
+  logEvent("view", s.id);
+}
+document.getElementById("sheetClose").addEventListener("click",function(){
+  document.getElementById("sheet").classList.remove("open");
+});
+document.getElementById("shZoom").addEventListener("click",function(){
+  if(!current)return;
+  document.getElementById("sheet").classList.remove("open");
+  map.setView([current.lat,current.lng],15);
+});
+
+/* alerts */
+var lastSeen=parseInt(load("silo_seen")||"0",10);
+function refreshAlerts(){
+  var news=SIGHTINGS.filter(function(s){return s["new"];});
+  var dot=document.getElementById("dot");
+  var unseen=news.length>lastSeen?news.length-lastSeen:0;
+  dot.textContent=String(unseen);
+  dot.className="dot"+(unseen?"":" zero");
+  var list=document.getElementById("alertList");
+  if(!news.length){list.innerHTML="<div class='none'>NO ACTIVE ALERTS</div>";return;}
+  list.innerHTML="";
+  for(var i=0;i<news.length;i++){
+    (function(s){
+      var a=document.createElement("div");
+      a.className="aln";
+      a.innerHTML="◉ NEW FORMATION LOGGED<small>"+esc(s.id)+" · "+esc(s.region)+"</small>";
+      a.addEventListener("click",function(){
+        document.getElementById("alerts").classList.remove("open");
+        openSheet(s);
+        map.setView([s.lat,s.lng],14);
+      });
+      list.appendChild(a);
+    })(news[i]);
+  }
+}
+document.getElementById("bell").addEventListener("click",function(){
+  var p=document.getElementById("alerts");
+  p.classList.toggle("open");
+  if(p.classList.contains("open")){
+    var news=SIGHTINGS.filter(function(s){return s["new"];});
+    lastSeen=news.length;
+    store("silo_seen",String(lastSeen));
+    refreshAlerts();
+  }
+});
+
+/* search — including the door */
+var ANNEX={
+  id:"ANNEX K", name:"RESTRICTED MATERIAL", status:"SEALED"
+};
+document.getElementById("search").addEventListener("input",function(){
+  var q=this.value.trim().toUpperCase();
+  var list=SIGHTINGS.filter(function(s){
+    return !q ||
+      s.id.toUpperCase().indexOf(q)>=0 ||
+      s.name.toUpperCase().indexOf(q)>=0 ||
+      s.region.toUpperCase().indexOf(q)>=0 ||
+      s.type.toUpperCase().indexOf(q)>=0 ||
+      (s.notes&&s.notes.toUpperCase().indexOf(q)>=0);
+  });
+  render(list);
+  for(var w=0;w<WITHDRAWN.length;w++){
+    if(q===WITHDRAWN[w]||("VAD-"+q===WITHDRAWN[w])||(q.length>=6&&WITHDRAWN[w].indexOf(q)>=0)){
+      (function(wid){
+        var rows2=document.getElementById("rows");
+        var d2=document.createElement("div");
+        d2.className="srow hiddenrow";
+        d2.innerHTML="<span class='sid'>"+esc(wid)+"</span><span class='snm'>RECORD WITHDRAWN</span><span class='sst'>ARCHIVED</span>";
+        d2.addEventListener("click",function(){
+          logEvent("withdrawn_found",wid);
+          toast("RETRIEVING ARCHIVED COPY…");
+          setTimeout(function(){window.location.href="rec.html?id="+wid;},700);
+        });
+        rows2.insertBefore(d2,rows2.firstChild);
+      })(WITHDRAWN[w]);
+      break;
+    }
+  }
+  if(q.indexOf("AX-K")>=0 || q==="ANNEX K" || q==="ANNEXK"){
+    var rows=document.getElementById("rows");
+    var d=document.createElement("div");
+    d.className="srow hiddenrow";
+    d.innerHTML="<span class='sid'>"+esc(ANNEX.id)+"</span><span class='snm'>"+esc(ANNEX.name)+"</span><span class='sst rev'>"+esc(ANNEX.status)+"</span>";
+    d.addEventListener("click",function(){
+      logEvent("annex_k_found");
+      toast("REDIRECTING…");
+      setTimeout(function(){window.location.href="ax-k.html";},700);
+    });
+    rows.insertBefore(d,rows.firstChild);
+  }
+});
+
+/* field manual */
+function openManual(){document.getElementById("manual").classList.add("open");}
+document.getElementById("btnManual").addEventListener("click",function(){logEvent("manual");openManual();});
+document.getElementById("manClose").addEventListener("click",function(){
+  document.getElementById("manual").classList.remove("open");
+});
+document.getElementById("manual").addEventListener("click",function(e){
+  if(e.target===this){this.classList.remove("open");}
+});
+if(!load("silo_manual_seen")){
+  store("silo_manual_seen","1");
+  setTimeout(openManual,900);
+}
+
+/* load data */
+fetch("sightings.json").then(function(r){return r.json();}).then(function(j){
+  SIGHTINGS=j.sightings||[];
+  render(SIGHTINGS);
+  refreshAlerts();
+  var group=[];
+  for(var i=0;i<SIGHTINGS.length;i++){
+    (function(s){
+      var m=L.marker([s.lat,s.lng],{icon:s["new"]?pinNew:pinIcon}).addTo(map);
+      m.bindPopup("<div class='pop-id'>"+esc(s.id)+"</div><div class='pop-name'>"+esc(s.name)+"</div><span class='pop-open' data-open='"+esc(s.id)+"'>OPEN RECORD</span>");
+      m.on("popupopen",function(){
+        var el=document.querySelector("[data-open='"+s.id+"']");
+        if(el){el.addEventListener("click",function(){openSheet(s);});}
+      });
+      markers[s.id]=m;
+      group.push([s.lat,s.lng]);
+    })(SIGHTINGS[i]);
+  }
+  if(group.length){map.fitBounds(group,{padding:[24,24]});}
+}).catch(function(){
+  document.getElementById("rows").innerHTML="<div class='empty'>REGISTRY UNREACHABLE. CHECK CONNECTION.</div>";
+});
+
+})();
+</script>
+</body>
+</html>

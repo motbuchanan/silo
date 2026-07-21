@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Grain Price Index</title>
+<meta name="theme-color" content="#0C120E">
+<link rel="manifest" href="gpi.webmanifest">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0C120E;--panel:#0E1410;--panel2:#111A13;--line:#223022;--linedim:#1A241A;
+  --txt:#C8D8C2;--dim:#7B8F77;--faint:#54604E;--alert:#D8837A;--amber:#C9A85C;--ok:#86C793;
+  --mono:'IBM Plex Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{max-width:100%;overflow-x:hidden}
+body{background:var(--bg);color:var(--txt);font-family:var(--mono);font-size:14px;line-height:1.55;min-height:100vh}
+.wrap{max-width:640px;margin:0 auto;padding-bottom:80px}
+
+/* login */
+#login{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px}
+#login .t{letter-spacing:.3em;font-weight:600;font-size:15px}
+#login .s{font-size:10px;letter-spacing:.18em;color:var(--faint)}
+#login input{
+  width:240px;background:var(--panel2);border:1px solid var(--line);border-radius:3px;
+  color:var(--txt);font-family:var(--mono);font-size:14px;padding:11px 12px;outline:none;text-transform:uppercase;
+  text-align:center;letter-spacing:.12em;
+}
+#login input::placeholder{color:var(--faint);letter-spacing:.14em}
+#login button{
+  width:240px;background:var(--txt);color:var(--bg);border:none;border-radius:3px;
+  font-family:var(--mono);font-weight:600;font-size:13px;letter-spacing:.14em;padding:12px;cursor:pointer;
+}
+#loginErr{color:var(--alert);font-size:11px;letter-spacing:.1em;min-height:1.2em}
+
+/* app */
+#app{display:none}
+header{
+  position:sticky;top:0;z-index:20;background:var(--panel);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;padding:12px 14px;
+}
+header .t{letter-spacing:.24em;font-weight:600;font-size:13px}
+header .t small{display:block;font-size:8px;letter-spacing:.16em;color:var(--faint);font-weight:400}
+header .who{font-size:10px;letter-spacing:.1em;color:var(--amber);text-align:right}
+header .who span{display:block;color:var(--faint)}
+nav{display:flex;background:var(--panel);border-bottom:1px solid var(--line)}
+nav button{
+  flex:1;background:none;border:none;border-bottom:2px solid transparent;color:var(--dim);
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;padding:11px 4px;cursor:pointer;
+}
+nav button.on{color:var(--txt);border-bottom-color:var(--amber)}
+.pane{display:none;padding:14px}
+.pane.on{display:block}
+h4{font-size:10px;letter-spacing:.2em;color:var(--faint);margin:6px 0 12px}
+.mode{font-size:9.5px;letter-spacing:.12em;color:var(--faint);padding:8px 14px;border-bottom:1px solid var(--linedim)}
+.mode b{color:var(--amber);font-weight:400}
+
+.card{background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:12px;margin-bottom:12px}
+.card .id{font-size:10px;color:var(--faint);letter-spacing:.1em}
+.card .ttl{font-weight:600;margin:3px 0 5px}
+.card .dt{font-size:12.5px;color:var(--dim);white-space:pre-wrap;word-break:break-word}
+.card .meta{font-size:10px;color:var(--faint);letter-spacing:.06em;margin-top:8px}
+.card .meta .st-open{color:var(--ok)} .card .meta .st-claimed{color:var(--amber)} .card .meta .st-placed{color:var(--faint)}
+.card .btns{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.b{
+  font-family:var(--mono);font-size:11px;letter-spacing:.08em;border:1px solid var(--line);
+  background:var(--panel);color:var(--txt);border-radius:3px;padding:8px 12px;cursor:pointer;
+}
+.b:active{background:var(--linedim)}
+.b.warn{border-color:#3A2320;color:var(--alert)}
+.empty{color:var(--faint);font-size:11.5px;letter-spacing:.08em;padding:18px 4px}
+
+.logline{border-bottom:1px solid var(--linedim);padding:9px 2px;font-size:12px}
+.logline b{color:var(--amber);font-weight:600}
+.logline small{display:block;color:var(--faint);font-size:10px;margin-top:2px}
+
+textarea,input.f{
+  width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:3px;
+  color:var(--txt);font-family:var(--mono);font-size:13px;padding:10px;outline:none;margin-bottom:10px;
+}
+textarea{min-height:84px;resize:vertical}
+.send{
+  background:var(--txt);color:var(--bg);border:none;border-radius:3px;font-family:var(--mono);
+  font-weight:600;font-size:12px;letter-spacing:.12em;padding:11px 16px;cursor:pointer;
+}
+.hint{font-size:10.5px;color:var(--faint);letter-spacing:.06em;margin:8px 0 0}
+
+/* decoy annex */
+#decoy{display:none;min-height:100vh;padding:26px 16px}
+#decoy .hd{color:var(--faint);font-size:10px;letter-spacing:.22em;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:18px}
+#decoy p{font-size:13px;margin-bottom:14px;white-space:pre-wrap}
+
+#ver{
+  position:fixed;right:10px;bottom:10px;z-index:40;font-size:10px;letter-spacing:.1em;color:var(--dim);
+  background:var(--panel);border:1px solid var(--line);border-radius:3px;padding:3px 8px;cursor:pointer;
+}
+#toast{
+  position:fixed;left:50%;bottom:52px;transform:translateX(-50%);z-index:41;
+  background:var(--txt);color:var(--bg);font-size:12px;padding:8px 14px;border-radius:4px;
+  opacity:0;transition:opacity .3s;pointer-events:none;
+}
+#toast.show{opacity:1}
+@media (prefers-reduced-motion: reduce){*{transition-duration:.001s !important;animation-duration:.001s !important}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="t">GPI</div>
+  <div class="s">GRAIN PRICE INDEX · TERMINAL</div>
+  <input id="ident" type="text" placeholder="IDENT" autocomplete="off">
+  <input id="code" type="password" placeholder="ACCESS CODE" autocomplete="off">
+  <button id="btnLogin">AUTHENTICATE</button>
+  <div id="loginErr"></div>
+</div>
+
+<!-- ANNEX LAYER -->
+<div id="decoy">
+  <div class="hd">ANNEX ACCESS GRANTED · READ ONLY</div>
+  <p>clearance accepted. retrieving annexed material…</p>
+  <p style="color:var(--faint)">[ annex layer — phase 2 content slot. the curated guided-tour material renders here for holders of the annex-level code. ]</p>
+</div>
+
+<!-- CONSOLE -->
+<div id="app">
+<div class="wrap">
+  <header>
+    <div class="t">SILO OPS<small>FIELD OPERATIONS CONSOLE</small></div>
+    <div class="who"><span>OPERATOR</span><b id="whoName">—</b></div>
+  </header>
+  <div class="mode" id="modeLine">MODE: <b>LOCAL</b> — Firestore not configured; data stays on this device.</div>
+  <nav>
+    <button data-pane="drops" class="on">DROPS</button>
+    <button data-pane="log">LOG</button>
+    <button data-pane="alert">ALERT</button>
+    <button data-pane="ideas">IDEAS</button>
+  </nav>
+
+  <div class="pane on" id="pane-drops">
+    <h4>DROP BOARD — YOURS + OPEN FOR CLAIM</h4>
+    <div id="dropList"><div class="empty">NO TASKS POSTED.</div></div>
+    <div id="newTask" style="display:none">
+      <h4 style="margin-top:20px">POST NEW TASK (DIRECTOR)</h4>
+      <input class="f" id="tTitle" placeholder="TITLE (e.g. PLACE CARD AT TRAILHEAD KIOSK)">
+      <textarea id="tDetail" placeholder="DETAIL — what, where, coordinates, window…"></textarea>
+      <input class="f" id="tAssign" placeholder="ASSIGN TO CALLSIGN (blank = open for claim)">
+      <button class="send" id="tPost">POST TASK</button>
+    </div>
+  </div>
+
+  <div class="pane" id="pane-log">
+    <h4>SUBJECT DISCOVERY LOG</h4>
+    <div id="logList"><div class="empty">NO EVENTS. (Live feed activates when Firestore is configured and the subject's app syncs.)</div></div>
+  </div>
+
+  <div class="pane" id="pane-alert">
+    <h4>TRIGGER SIGHTING ALERT</h4>
+    <input class="f" id="aRef" placeholder="REGISTRY REF (e.g. VAD-0120)">
+    <input class="f" id="aRegion" placeholder="REGION (e.g. STARK COUNTY, OHIO)">
+    <button class="send" id="aFire">FIRE ALERT</button>
+    <p class="hint">Queues an alert record. In phase 2 the subject app polls these and lights the bell. Until Firestore is live this stores locally as a rehearsal.</p>
+  </div>
+
+  <div class="pane" id="pane-ideas">
+    <h4>SUGGESTION BOX</h4>
+    <textarea id="sTxt" placeholder="Pitch a beat, a document, a location, a line CHAFF should say…"></textarea>
+    <button class="send" id="sSend">SUBMIT</button>
+    <div id="sList" style="margin-top:16px"></div>
+  </div>
+</div>
+</div>
+
+<div id="ver">ops v0.1 · Jul 21</div>
+<div id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+
+var VERSION="ops v0.1 · Jul 21";
+
+/* ===== FIREBASE (optional — paste config to activate) ===== */
+var FIREBASE_CONFIG=null;
+/* ========================================================== */
+
+/* access hashes (djb2) — codes never appear in source
+   operator / director / decoy                                */
+var H_OPERATOR="ab33a485", H_DIRECTOR="17ddd92c", H_DECOY="751097ea";
+
+function djb2(s){var h=5381;for(var i=0;i<s.length;i++){h=((h<<5)+h+s.charCodeAt(i))>>>0;}return h.toString(16);}
+function store(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+function load(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+function jload(k,d){try{return JSON.parse(load(k)||JSON.stringify(d));}catch(e){return d;}}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+
+document.getElementById("ver").textContent=VERSION;
+var toastTimer=null;
+function toast(m){
+  var t=document.getElementById("toast");t.textContent=m;t.classList.add("show");
+  if(toastTimer)clearTimeout(toastTimer);
+  toastTimer=setTimeout(function(){t.classList.remove("show");},1800);
+}
+document.getElementById("ver").addEventListener("click",function(){toast(VERSION);});
+
+var ROLE=null, WHO=null;
+
+/* login */
+function tryLogin(){
+  var ident=document.getElementById("ident").value.trim().toUpperCase();
+  var code=document.getElementById("code").value.trim().toUpperCase();
+  var err=document.getElementById("loginErr");
+  if(!code){err.textContent="CODE REQUIRED";return;}
+  var h=djb2(code);
+  if(h===H_DECOY){
+    document.getElementById("login").style.display="none";
+    document.getElementById("decoy").style.display="block";
+    return;
+  }
+  if(h===H_OPERATOR||h===H_DIRECTOR){
+    if(!ident){err.textContent="IDENT REQUIRED";return;}
+    ROLE=(h===H_DIRECTOR)?"director":"operator";
+    WHO=ident;
+    store("gpi_who",WHO);store("gpi_role",ROLE);
+    enter();
+    return;
+  }
+  err.textContent="AUTHENTICATION FAILED";
+}
+document.getElementById("btnLogin").addEventListener("click",tryLogin);
+document.getElementById("code").addEventListener("keydown",function(e){if(e.key==="Enter")tryLogin();});
+
+/* session restore */
+(function(){
+  var w=load("gpi_who"),r=load("gpi_role");
+  if(w&&r){WHO=w;ROLE=r;enter();}
+})();
+
+function enter(){
+  document.getElementById("login").style.display="none";
+  document.getElementById("app").style.display="block";
+  document.getElementById("whoName").textContent=WHO+(ROLE==="director"?" ★":"");
+  if(ROLE==="director"){document.getElementById("newTask").style.display="block";}
+  initData();
+}
+
+/* tabs */
+var navBtns=document.querySelectorAll("nav button");
+for(var n=0;n<navBtns.length;n++){
+  (function(b){
+    b.addEventListener("click",function(){
+      for(var i=0;i<navBtns.length;i++){navBtns[i].classList.remove("on");}
+      b.classList.add("on");
+      var panes=document.querySelectorAll(".pane");
+      for(var j=0;j<panes.length;j++){panes[j].classList.remove("on");}
+      document.getElementById("pane-"+b.getAttribute("data-pane")).classList.add("on");
+    });
+  })(navBtns[n]);
+}
+
+/* ---------- data layer: Firestore when configured, local otherwise ---------- */
+var db=null;
+function initData(){
+  if(FIREBASE_CONFIG && window.firebase){
+    try{
+      firebase.initializeApp(FIREBASE_CONFIG);
+      db=firebase.firestore();
+      document.getElementById("modeLine").innerHTML="MODE: <b>LIVE</b> — synced.";
+      watchTasks(); watchLog(); watchIdeas();
+      return;
+    }catch(e){}
+  }
+  renderTasks(jload("gpi_tasks",[]));
+  renderIdeas(jload("gpi_ideas",[]));
+}
+
+/* tasks */
+function renderTasks(tasks){
+  var el=document.getElementById("dropList");
+  var mine=tasks.filter(function(t){
+    return !t.assignedTo || t.assignedTo===WHO || ROLE==="director";
+  });
+  if(!mine.length){el.innerHTML="<div class='empty'>NO TASKS POSTED.</div>";return;}
+  el.innerHTML="";
+  mine.sort(function(a,b){return (b.at||"").localeCompare(a.at||"");});
+  for(var i=0;i<mine.length;i++){
+    (function(t){
+      var c=document.createElement("div");c.className="card";
+      var stCls=t.status==="open"?"st-open":(t.status==="claimed"?"st-claimed":"st-placed");
+      c.innerHTML=
+        "<div class='id'>TASK "+esc(t.id||"—")+"</div>"+
+        "<div class='ttl'>"+esc(t.title)+"</div>"+
+        "<div class='dt'>"+esc(t.detail||"")+"</div>"+
+        "<div class='meta'>STATUS: <span class='"+stCls+"'>"+esc((t.status||"open").toUpperCase())+"</span>"+
+        " · ASSIGNED: "+esc(t.assignedTo||"OPEN")+"</div>";
+      var btns=document.createElement("div");btns.className="btns";
+      if(t.status==="open"){
+        var b1=document.createElement("button");b1.className="b";b1.textContent="CLAIM";
+        b1.addEventListener("click",function(){updateTask(t.id,{status:"claimed",assignedTo:WHO});});
+        btns.appendChild(b1);
+      }
+      if(t.status==="claimed"&&(t.assignedTo===WHO||ROLE==="director")){
+        var b2=document.createElement("button");b2.className="b";b2.textContent="MARK PLACED";
+        b2.addEventListener("click",function(){updateTask(t.id,{status:"placed"});});
+        btns.appendChild(b2);
+      }
+      if(ROLE==="director"){
+        var b3=document.createElement("button");b3.className="b warn";b3.textContent="REMOVE";
+        b3.addEventListener("click",function(){removeTask(t.id);});
+        btns.appendChild(b3);
+      }
+      if(btns.children.length)c.appendChild(btns);
+      el.appendChild(c);
+    })(mine[i]);
+  }
+}
+function updateTask(id,patch){
+  if(db){
+    db.collection("tasks").doc(id).update(patch).then(function(){toast("UPDATED");});
+    return;
+  }
+  var tasks=jload("gpi_tasks",[]);
+  for(var i=0;i<tasks.length;i++){
+    if(tasks[i].id===id){for(var k in patch){tasks[i][k]=patch[k];}}
+  }
+  store("gpi_tasks",JSON.stringify(tasks));
+  renderTasks(tasks);toast("UPDATED");
+}
+function removeTask(id){
+  if(db){db.collection("tasks").doc(id).delete().then(function(){toast("REMOVED");});return;}
+  var tasks=jload("gpi_tasks",[]).filter(function(t){return t.id!==id;});
+  store("gpi_tasks",JSON.stringify(tasks));
+  renderTasks(tasks);toast("REMOVED");
+}
+document.getElementById("tPost").addEventListener("click",function(){
+  var title=document.getElementById("tTitle").value.trim();
+  var detail=document.getElementById("tDetail").value.trim();
+  var assign=document.getElementById("tAssign").value.trim().toUpperCase();
+  if(!title){toast("TITLE REQUIRED");return;}
+  var t={id:"T"+Date.now(),title:title,detail:detail,assignedTo:assign||null,status:"open",at:new Date().toISOString(),by:WHO};
+  if(db){db.collection("tasks").doc(t.id).set(t).then(function(){toast("POSTED");});}
+  else{
+    var tasks=jload("gpi_tasks",[]);tasks.push(t);
+    store("gpi_tasks",JSON.stringify(tasks));renderTasks(tasks);toast("POSTED");
+  }
+  document.getElementById("tTitle").value="";
+  document.getElementById("tDetail").value="";
+  document.getElementById("tAssign").value="";
+});
+function watchTasks(){
+  db.collection("tasks").onSnapshot(function(snap){
+    var tasks=[];snap.forEach(function(d){tasks.push(d.data());});
+    renderTasks(tasks);
+  });
+}
+
+/* discovery log */
+function watchLog(){
+  db.collection("log").orderBy("at","desc").limit(50).onSnapshot(function(snap){
+    var el=document.getElementById("logList");
+    if(snap.empty){el.innerHTML="<div class='empty'>NO EVENTS.</div>";return;}
+    el.innerHTML="";
+    snap.forEach(function(d){
+      var e=d.data();
+      var div=document.createElement("div");div.className="logline";
+      div.innerHTML="<b>"+esc(e.t||"event")+"</b> "+esc(e.r||"")+"<small>"+esc(e.at||"")+"</small>";
+      el.appendChild(div);
+    });
+  });
+}
+
+/* alerts */
+document.getElementById("aFire").addEventListener("click",function(){
+  var ref=document.getElementById("aRef").value.trim().toUpperCase();
+  var region=document.getElementById("aRegion").value.trim();
+  if(!ref){toast("REF REQUIRED");return;}
+  var a={ref:ref,region:region,by:WHO,at:new Date().toISOString()};
+  if(db){db.collection("alerts").add(a).then(function(){toast("ALERT FIRED");});}
+  else{
+    var alerts=jload("gpi_alerts",[]);alerts.push(a);
+    store("gpi_alerts",JSON.stringify(alerts));toast("ALERT QUEUED (LOCAL)");
+  }
+  document.getElementById("aRef").value="";document.getElementById("aRegion").value="";
+});
+
+/* ideas */
+function renderIdeas(list){
+  var el=document.getElementById("sList");
+  el.innerHTML="";
+  list.sort(function(a,b){return (b.at||"").localeCompare(a.at||"");});
+  for(var i=0;i<list.length;i++){
+    var d=document.createElement("div");d.className="logline";
+    d.innerHTML="<b>"+esc(list[i].by||"?")+"</b> "+esc(list[i].text)+"<small>"+esc(list[i].at||"")+"</small>";
+    el.appendChild(d);
+  }
+}
+document.getElementById("sSend").addEventListener("click",function(){
+  var txt=document.getElementById("sTxt").value.trim();
+  if(!txt){toast("EMPTY");return;}
+  var s={by:WHO,text:txt,at:new Date().toISOString()};
+  if(db){db.collection("suggestions").add(s).then(function(){toast("SUBMITTED");});}
+  else{
+    var list=jload("gpi_ideas",[]);list.push(s);
+    store("gpi_ideas",JSON.stringify(list));renderIdeas(list);toast("SUBMITTED");
+  }
+  document.getElementById("sTxt").value="";
+});
+function watchIdeas(){
+  db.collection("suggestions").orderBy("at","desc").limit(50).onSnapshot(function(snap){
+    var list=[];snap.forEach(function(d){list.push(d.data());});
+    renderIdeas(list);
+  });
+}
+
+/* service worker */
+if("serviceWorker" in navigator && window.location.protocol==="https:"){
+  navigator.serviceWorker.register("sw.js",{scope:"./"}).catch(function(){});
+}
+
+})();
+</script>
+</body>
+</html>

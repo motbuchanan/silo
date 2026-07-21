@@ -1,0 +1,205 @@
+{
+  "registry_version": "0.2",
+  "issued": "2026-07-21",
+  "sightings": [
+    {
+      "id": "VAD-0101",
+      "name": "Alton Barnes Pictogram",
+      "date": "1990-07-12",
+      "lat": 51.355,
+      "lng": -1.838,
+      "region": "Wiltshire, UK",
+      "type": "PICTOGRAM",
+      "status": "LOGGED",
+      "notes": "Large linear pictogram, East Field. Widely photographed; appeared on an album cover. Documented in mainstream press at the time."
+    },
+    {
+      "id": "VAD-0104",
+      "name": "Barbury Castle Tetrahedron",
+      "date": "1991-07-17",
+      "lat": 51.488,
+      "lng": -1.777,
+      "region": "Wiltshire, UK",
+      "type": "GEOMETRIC",
+      "status": "LOGGED",
+      "notes": "Triangular arrangement with ratcheted spiral. Frequently cited in geometry analyses of the phenomenon."
+    },
+    {
+      "id": "VAD-0107",
+      "name": "Julia Set",
+      "date": "1996-07-07",
+      "lat": 51.176,
+      "lng": -1.821,
+      "region": "Near Stonehenge, Wiltshire, UK",
+      "type": "FRACTAL",
+      "status": "LOGGED",
+      "notes": "151-circle fractal spiral opposite Stonehenge. Reported to have appeared during daylight hours within a short window. Disputed."
+    },
+    {
+      "id": "VAD-0110",
+      "name": "Milk Hill Galaxy",
+      "date": "2001-08-12",
+      "lat": 51.373,
+      "lng": -1.853,
+      "region": "Wiltshire, UK",
+      "type": "FRACTAL",
+      "status": "LOGGED",
+      "notes": "409 circles, six-arm spiral, approx. 780 ft across. Among the largest formations on record."
+    },
+    {
+      "id": "VAD-0111",
+      "name": "Chilbolton 'Response'",
+      "date": "2001-08-14",
+      "lat": 51.145,
+      "lng": -1.437,
+      "region": "Hampshire, UK",
+      "type": "GLYPH",
+      "status": "LOGGED",
+      "notes": "Rectangular glyph adjacent to Chilbolton radio observatory, resembling a reply to the 1974 Arecibo transmission. Appeared alongside a face glyph."
+    },
+    {
+      "id": "VAD-0113",
+      "name": "Crabwood Face and Disc",
+      "date": "2002-08-15",
+      "lat": 51.062,
+      "lng": -1.36,
+      "region": "Hampshire, UK",
+      "type": "GLYPH",
+      "status": "LOGGED",
+      "notes": "Halftone-style face beside a spiral disc. The disc encodes ASCII when read as binary. Decoded text is publicly documented."
+    },
+    {
+      "id": "VAD-0115",
+      "name": "Barbury Castle Pi",
+      "date": "2008-06-01",
+      "lat": 51.488,
+      "lng": -1.804,
+      "region": "Wiltshire, UK",
+      "type": "MATHEMATICAL",
+      "status": "LOGGED",
+      "notes": "Ratcheted spiral encoding the first ten digits of pi. Independently decoded by multiple analysts."
+    },
+    {
+      "id": "VAD-0116",
+      "name": "Ansty Cube",
+      "date": "2016-08-12",
+      "lat": 51.03,
+      "lng": -2.02,
+      "region": "Wiltshire, UK",
+      "type": "GEOMETRIC",
+      "status": "LOGGED",
+      "notes": "Complex 3D-illusion cube lattice. Late-season formation; heavy drone documentation."
+    },
+    {
+      "id": "VAD-0118",
+      "name": "Red Deer County Event",
+      "date": "2019-09-03",
+      "lat": 52.28,
+      "lng": -113.81,
+      "region": "Alberta, CA",
+      "type": "LODGED CROP",
+      "status": "UNVERIFIED",
+      "notes": "Reported flattening pattern in barley. Single-source report, no aerial documentation recovered. Retained in registry pending review."
+    },
+    {
+      "id": "VAD-0120",
+      "name": "Wiltshire Season Opener",
+      "date": "2026-04-29",
+      "lat": 51.36,
+      "lng": -1.99,
+      "region": "Wiltshire, UK",
+      "type": "GEOMETRIC",
+      "status": "LOGGED",
+      "notes": "First reported UK formation of the 2026 season. Cross-reference external archives for aerial documentation."
+    },
+    {
+      "id": "VAD-0121",
+      "name": "White Sheet Downs",
+      "date": "2026-05-22",
+      "lat": 51.086,
+      "lng": -2.204,
+      "region": "Nr Mere, Wiltshire, UK",
+      "type": "GEOMETRIC",
+      "status": "LOGGED",
+      "notes": "Reported 22 May. Map ref ST7995735447. Documented by independent archives."
+    },
+    {
+      "id": "VAD-0122",
+      "name": "First Broad Drive",
+      "date": "2026-06-15",
+      "lat": 51.103,
+      "lng": -1.923,
+      "region": "Nr Wilton, Wiltshire, UK",
+      "type": "GLYPH",
+      "status": "LOGGED",
+      "notes": "Fourth formation of the 2026 season. Interconnected circles with sphere elements; eye-like triple motif noted in drone coverage."
+    },
+    {
+      "id": "VAD-0123",
+      "name": "Zeals Knoll",
+      "date": "2026-07-05",
+      "lat": 51.08,
+      "lng": -2.28,
+      "region": "Nr Mere, Wiltshire, UK",
+      "type": "GEOMETRIC",
+      "status": "LOGGED",
+      "notes": "Fifth consecutive day of new formations at time of report. Multi-scale nested design."
+    },
+    {
+      "id": "VAD-0124",
+      "name": "Maccoombe Down",
+      "date": "2026-07-07",
+      "lat": 51.33,
+      "lng": -1.6,
+      "region": "Tidcombe, Wiltshire, UK",
+      "type": "GEOMETRIC",
+      "status": "LOGGED",
+      "notes": "Landowner granted public access at time of intake. Verify access status before any field visit."
+    },
+    {
+      "id": "VAD-0125",
+      "name": "Roundway Hill",
+      "date": "2026-07-11",
+      "lat": 51.383,
+      "lng": -1.995,
+      "region": "Nr Devizes, Wiltshire, UK",
+      "type": "GEOMETRIC",
+      "status": "LOGGED",
+      "notes": "Approx. 85 m across, wheat. Map ref SU0085764698. Field since harvested; site access closed."
+    },
+    {
+      "id": "VAD-0126",
+      "name": "Milk Hill 2026",
+      "date": "2026-07-12",
+      "lat": 51.374,
+      "lng": -1.852,
+      "region": "Alton Barnes, Wiltshire, UK",
+      "type": "GEOMETRIC",
+      "status": "LOGGED",
+      "notes": "Approx. 40 m, wheat, summit of Milk Hill. Same hill as the 2001 galaxy formation (VAD-0110). Recurrence at this site is statistically notable."
+    },
+    {
+      "id": "VAD-0127",
+      "name": "Avebury Proximate",
+      "date": "2026-07-14",
+      "lat": 51.428,
+      "lng": -1.854,
+      "region": "Nr Avebury, Wiltshire, UK",
+      "type": "GEOMETRIC",
+      "status": "LOGGED",
+      "notes": "Approx. 70 m, wheat. No public access. Roughly 80 percent of UK formations cluster in Wiltshire, disproportionately near Avebury and Stonehenge. The registry does not currently offer an explanation for this distribution."
+    },
+    {
+      "id": "VAD-0119",
+      "name": "UNCLASSIFIED",
+      "date": "2026-07-17",
+      "lat": 41.031,
+      "lng": -81.207,
+      "region": "Portage County, Ohio, US",
+      "type": "PENDING",
+      "status": "UNDER REVIEW",
+      "notes": "Preliminary intake. Geometry analysis incomplete. Field access restricted pending survey. SURVEY REF AX-K/119.",
+      "new": true
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>document unavailable</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0C120E;--txt:#C8D8C2;--dim:#54604E;--alert:#D8837A;--amber:#C9A85C;--mono:'IBM Plex Mono',monospace}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{max-width:100%;overflow-x:hidden}
+body{background:var(--bg);color:var(--txt);font-family:var(--mono);font-size:13.5px;line-height:1.8;min-height:100vh;padding:26px 16px 60px}
+.doc{max-width:620px;margin:0 auto}
+.hd{color:var(--dim);font-size:10px;letter-spacing:.22em;border-bottom:1px solid #223022;padding-bottom:10px;margin-bottom:18px}
+p{margin:0 0 14px;white-space:pre-wrap;word-break:break-word}
+.g{color:var(--dim)}
+.r{color:var(--alert)}
+.a{color:var(--amber)}
+.glitch{animation:gl 3.5s steps(2) infinite}
+@keyframes gl{0%,92%{opacity:1}94%{opacity:.25}96%{opacity:1}98%{opacity:.4}100%{opacity:1}}
+.blk{background:#1A241A;color:#1A241A;padding:0 5px;border-radius:2px}
+.sig{margin-top:26px;border-top:1px dashed #223022;padding-top:14px;color:var(--amber)}
+.cur{display:inline-block;width:8px;height:13px;background:var(--txt);vertical-align:-2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+@media (prefers-reduced-motion: reduce){*{animation-duration:.001s !important}}
+</style>
+</head>
+<body>
+<div class="doc">
+  <div class="hd">ANNEX K · RECLASSIFICATION PENDING · DO NOT CIRCULATE</div>
+  <p class="g">retrieving 6 attachments…
+attachment 1 of 6 … <span class="r">error 0x41 (withdrawn)</span>
+attachment 2 of 6 … <span class="r">error 0x41 (withdrawn)</span>
+attachment 3 of 6 … <span class="r">error 0x41 (withdrawn)</span>
+attachment 4 of 6 … <span class="r">error 0x41 (withdrawn)</span>
+attachment 5 of 6 … <span class="r">error 0x41 (withdrawn)</span>
+attachment 6 of 6 … ok (partial)</p>
+  <p class="glitch">…survey ref AX-K/119 assigned under expedited intake. geometry consistent with catalog family <span class="blk">██████</span>. recommend field team hold at perimeter until <span class="blk">██████████</span> confirms. repeat: do not enter the formation before the window closes.</p>
+  <p class="g">[remainder of attachment withdrawn 2026-07-19 06:12 UTC by order of <span class="r">DIRECTOR, FIELD OPERATIONS</span>]</p>
+  <p>&nbsp;</p>
+  <p class="sig">you weren't supposed to be able to see this page. that means the search bar isn't as monitored as they think, or it's monitored exactly as much as they think. either way — stop using it.
+
+they pulled five of six attachments the night before the ohio intake went live. ask yourself who files paperwork at six in the morning.
+
+i'll leave the next piece somewhere the system doesn't index. the registry numbers you already have are not all sequential. find the ones that are missing.
+
+— C.</p>
+  <p><span class="cur"></span></p>
+</div>
+<script>
+(function(){
+"use strict";
+try{
+  var q=JSON.parse(localStorage.getItem("silo_q")||"[]");
+  q.push({t:"annex_k_read", r:"AX-K/119", at:new Date().toISOString()});
+  localStorage.setItem("silo_q", JSON.stringify(q));
+}catch(e){}
+})();
+</script>
+</body>
+</html>
