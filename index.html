@@ -319,7 +319,7 @@ footer{
     U.S. DEPARTMENT OF AGRICULTURE COOPERATIVE SURVEY INSTRUMENT (UNOFFICIAL MIRROR)<br>
     FORM SILO-registry-04 · CONTROL NO. 0704-6114 · DATA REFRESH: DAILY 0400 UTC<br>
     UNAUTHORIZED ACCESS TO ANNEXED MATERIAL IS LOGGED.<br>
-    <span id="ver">v0.9 · Jul 22</span>
+    <span id="ver">v0.11 · Jul 22</span>
   </footer>
 </div>
 <div id="toast"></div>
@@ -331,7 +331,7 @@ footer{
 (function(){
 "use strict";
 
-var VERSION = "v0.9 · Jul 22";
+var VERSION = "v0.11 · Jul 22";
 var WITHDRAWN = ["VAD-0102","VAD-0105","VAD-0108","VAD-0112","VAD-0114"];
 
 /* ===== FIREBASE (optional — paste config to activate) =====
@@ -431,7 +431,7 @@ function render(list){
    Search-style URLs are used deliberately: they never 404, they always
    land on genuine third-party material, and nothing is hotlinked. */
 var UNDOCUMENTED = ["VAD-0119"];
-function q(s){ return encodeURIComponent(s); }
+function urlq(s){ return encodeURIComponent(s); }
 function buildRefs(s){
   var box=document.getElementById("shRefs");
   var yr=(s.date||"").slice(0,4);
@@ -446,19 +446,19 @@ function buildRefs(s){
   var label = s.name + " " + yr;
   var h="<h6>EXTERNAL DOCUMENTATION · UNAFFILIATED SOURCES</h6>";
   h+="<a target='_blank' rel='noopener' href='https://www.google.com/search?tbm=isch&q="+
-     q(label+" crop circle")+"'>AERIAL IMAGERY SEARCH ↗<small>photographs of this formation</small></a>";
+     urlq(label+" crop circle")+"'>AERIAL IMAGERY SEARCH ↗<small>photographs of this formation</small></a>";
   h+="<a target='_blank' rel='noopener' href='https://www.google.com/search?q="+
-     q("site:cropcircleconnector.com "+s.name+" "+yr)+"'>CROP CIRCLE CONNECTOR ↗<small>primary reporting archive, 1995 to present</small></a>";
+     urlq("site:cropcircleconnector.com "+s.name+" "+yr)+"'>CROP CIRCLE CONNECTOR ↗<small>primary reporting archive, 1995 to present</small></a>";
   h+="<a target='_blank' rel='noopener' href='https://www.google.com/search?q="+
-     q("site:circleresearcharchive.com "+s.name)+"'>CIRCLE RESEARCH ARCHIVE ↗<small>historical research database</small></a>";
+     urlq("site:circleresearcharchive.com "+s.name)+"'>CIRCLE RESEARCH ARCHIVE ↗<small>historical research database</small></a>";
   if(s.wiki){
     h+="<a target='_blank' rel='noopener' href='https://en.wikipedia.org/wiki/Special:Search?search="+
-       q(s.wiki)+"'>ENCYCLOPEDIA ENTRY ↗<small>"+esc(s.wiki)+"</small></a>";
+       urlq(s.wiki)+"'>ENCYCLOPEDIA ENTRY ↗<small>"+esc(s.wiki)+"</small></a>";
   }
   h+="<a target='_blank' rel='noopener' href='https://www.google.com/search?q="+
-     q(label+" crop circle "+s.region.split(",")[0])+"'>OPEN WEB SEARCH ↗<small>everything else published on this intake</small></a>";
+     urlq(label+" crop circle "+s.region.split(",")[0])+"'>OPEN WEB SEARCH ↗<small>everything else published on this intake</small></a>";
   h+="<a target='_blank' rel='noopener' href='https://www.reddit.com/r/cropcircles/search/?q="+
-     q(s.name)+"&restrict_sr=1'>DISCUSSION THREADS ↗<small>r/cropcircles</small></a>";
+     urlq(s.name)+"&restrict_sr=1'>DISCUSSION THREADS ↗<small>r/cropcircles</small></a>";
   box.innerHTML=h;
 }
 
@@ -653,7 +653,7 @@ document.getElementById("bnAlertX").addEventListener("click",function(){
 initNotify();
 
 /* ---------- data: static registry + live pushes ---------- */
-var STATIC=[], LIVE=[], pinLayer=L.layerGroup().addTo(map), fitted=false;
+var STATIC=[], LIVE=[], pinLayer=L.layerGroup().addTo(map), fitted=false, STATIC_READY=false, PENDING_LIVE=false;
 
 function rebuild(fit){
   var seen={}, merged=[];
@@ -711,14 +711,23 @@ function openHash(){
 }
 fetch("sightings.json").then(function(r){return r.json();}).then(function(j){
   STATIC=j.sightings||[];
+  STATIC_READY=true;
   rebuild(true);
   openHash();
+  if(PENDING_LIVE){ rebuild(false); }
   if(!load("silo_manual_seen") && !window.location.hash){
     store("silo_manual_seen","1");
     setTimeout(openManual,400);
   }
 }).catch(function(){
-  document.getElementById("rows").innerHTML="<div class='empty'>REGISTRY UNREACHABLE. CHECK CONNECTION.</div>";
+  // static file failed — retry once, then fall back to whatever is live
+  fetch("sightings.json?retry=1").then(function(r){return r.json();}).then(function(j){
+    STATIC=j.sightings||[]; STATIC_READY=true; rebuild(true); openHash();
+  }).catch(function(){
+    STATIC_READY=true;
+    if(LIVE.length){ rebuild(false); }
+    else { document.getElementById("rows").innerHTML="<div class='empty'>REGISTRY UNREACHABLE. CHECK CONNECTION.</div>"; }
+  });
 });
 
 /* ---------- live sync ---------- */
@@ -748,7 +757,8 @@ if(FIREBASE_CONFIG && window.firebase){
       });
       store("silo_known", JSON.stringify(known));
       LIVE=live;
-      rebuild(false);
+      if(STATIC_READY){ rebuild(false); }
+      else { PENDING_LIVE=true; }
       for(var n=0;n<fresh.length;n++){
         if(!firstSnap || fresh[n]["new"]){ showAlertNote(fresh[n]); }
       }
