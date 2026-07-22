@@ -246,7 +246,7 @@ textarea{min-height:84px;resize:vertical}
 </div>
 </div>
 
-<div id="ver">ops v0.9 · Jul 22</div>
+<div id="ver">ops v0.12 · Jul 22</div>
 <div id="toast"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -256,7 +256,7 @@ textarea{min-height:84px;resize:vertical}
 (function(){
 "use strict";
 
-var VERSION="ops v0.9 · Jul 22";
+var VERSION="ops v0.12 · Jul 22";
 
 /* ===== FIREBASE (optional — paste config to activate) ===== */
 var FIREBASE_CONFIG = {
@@ -356,7 +356,8 @@ function initData(){
         document.getElementById("modeLine").innerHTML="MODE: <b>LIVE</b> — synced as "+esc(WHO)+".";
         watchTasks(); watchLog(); watchIdeas(); watchAlerts();
       }).catch(function(err){
-        document.getElementById("modeLine").innerHTML="MODE: <b>AUTH FAILED</b> — enable Anonymous sign-in in Firebase Auth.";
+        var code = (err && err.code) ? err.code : "unknown";
+        document.getElementById("modeLine").innerHTML="MODE: <b>AUTH FAILED</b> — "+esc(code);
       });
       return;
     }catch(e){}
