@@ -319,7 +319,7 @@ footer{
     U.S. DEPARTMENT OF AGRICULTURE COOPERATIVE SURVEY INSTRUMENT (UNOFFICIAL MIRROR)<br>
     FORM SILO-registry-04 · CONTROL NO. 0704-6114 · DATA REFRESH: DAILY 0400 UTC<br>
     UNAUTHORIZED ACCESS TO ANNEXED MATERIAL IS LOGGED.<br>
-    <span id="ver">v0.8 · Jul 21</span>
+    <span id="ver">v0.9 · Jul 22</span>
   </footer>
 </div>
 <div id="toast"></div>
@@ -331,13 +331,20 @@ footer{
 (function(){
 "use strict";
 
-var VERSION = "v0.8 · Jul 21";
+var VERSION = "v0.9 · Jul 22";
 var WITHDRAWN = ["VAD-0102","VAD-0105","VAD-0108","VAD-0112","VAD-0114"];
 
 /* ===== FIREBASE (optional — paste config to activate) =====
    When null, the app runs fully static and queues discovery
    events in localStorage under "silo_q".                      */
-var FIREBASE_CONFIG = null;
+var FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBGPskQ2lN9_E0MtZlDP9L29iilS-Nr9VA",
+  authDomain: "silo-7d50e.firebaseapp.com",
+  projectId: "silo-7d50e",
+  storageBucket: "silo-7d50e.firebasestorage.app",
+  messagingSenderId: "22511656686",
+  appId: "1:22511656686:web:daea0b7af5ff6800ed5dff"
+};
 /* ========================================================== */
 
 function store(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }

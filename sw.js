@@ -1,7 +1,7 @@
 /* Shared service worker — SILO + GPI.
    Both pages live at the same origin root, so there can be only ONE
    service worker here. Bump CACHE on every content change. */
-var CACHE = "silo-v0.8";
+var CACHE = "silo-v0.9";
 var SHELL = [
   "./index.html",
   "./sightings.json",

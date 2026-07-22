@@ -246,7 +246,7 @@ textarea{min-height:84px;resize:vertical}
 </div>
 </div>
 
-<div id="ver">ops v0.7 · Jul 21</div>
+<div id="ver">ops v0.9 · Jul 22</div>
 <div id="toast"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -256,10 +256,17 @@ textarea{min-height:84px;resize:vertical}
 (function(){
 "use strict";
 
-var VERSION="ops v0.7 · Jul 21";
+var VERSION="ops v0.9 · Jul 22";
 
 /* ===== FIREBASE (optional — paste config to activate) ===== */
-var FIREBASE_CONFIG=null;
+var FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBGPskQ2lN9_E0MtZlDP9L29iilS-Nr9VA",
+  authDomain: "silo-7d50e.firebaseapp.com",
+  projectId: "silo-7d50e",
+  storageBucket: "silo-7d50e.firebasestorage.app",
+  messagingSenderId: "22511656686",
+  appId: "1:22511656686:web:daea0b7af5ff6800ed5dff"
+};
 /* ========================================================== */
 
 /* access hashes (djb2) — codes never appear in source
