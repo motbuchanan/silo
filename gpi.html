@@ -246,7 +246,7 @@ textarea{min-height:84px;resize:vertical}
 </div>
 </div>
 
-<div id="ver">ops v0.14 · Jul 22</div>
+<div id="ver">ops v0.15 · Jul 22</div>
 <div id="toast"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -256,7 +256,7 @@ textarea{min-height:84px;resize:vertical}
 (function(){
 "use strict";
 
-var VERSION="ops v0.14 · Jul 22";
+var VERSION="ops v0.15 · Jul 22";
 
 /* ===== FIREBASE (optional — paste config to activate) ===== */
 var FIREBASE_CONFIG = {
@@ -349,22 +349,31 @@ var db=null;
 function initData(){
   if(FIREBASE_CONFIG && window.firebase){
     try{
-      firebase.initializeApp(FIREBASE_CONFIG);
+      if(!firebase.apps || !firebase.apps.length){ firebase.initializeApp(FIREBASE_CONFIG); }
+      if(typeof firebase.firestore !== "function"){
+        document.getElementById("modeLine").innerHTML="MODE: <b>AUTH FAILED</b> — firestore SDK not loaded";
+        return;
+      }
+      if(typeof firebase.auth !== "function"){
+        document.getElementById("modeLine").innerHTML="MODE: <b>AUTH FAILED</b> — auth SDK not loaded";
+        return;
+      }
       db=firebase.firestore();
       document.getElementById("modeLine").innerHTML="MODE: <b>LIVE</b> — authenticating…";
       var auth=firebase.auth();
-      auth.signOut().catch(function(){}).then(function(){
-        return auth.signInAnonymously();
-      }).then(function(){
+      auth.signInAnonymously().then(function(){
         document.getElementById("modeLine").innerHTML="MODE: <b>LIVE</b> — synced as "+esc(WHO)+".";
-        watchTasks(); watchLog(); watchIdeas(); watchAlerts();
+        if(db){ watchTasks(); watchLog(); watchIdeas(); watchAlerts(); }
       }).catch(function(err){
         var detail = err ? ((err.code||"")+" "+(err.message||"")).trim() : "unknown";
         if(!detail){ detail = String(err); }
         document.getElementById("modeLine").innerHTML="MODE: <b>AUTH FAILED</b> — "+esc(detail);
       });
       return;
-    }catch(e){}
+    }catch(e){
+      document.getElementById("modeLine").innerHTML="MODE: <b>INIT ERROR</b> — "+esc(e && e.message ? e.message : String(e));
+      return;
+    }
   }
   renderTasks(jload("gpi_tasks",[]));
   renderIdeas(jload("gpi_ideas",[]));
