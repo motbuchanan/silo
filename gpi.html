@@ -224,8 +224,8 @@ textarea{min-height:84px;resize:vertical}
     <input class="f" id="aName" placeholder="DESIGNATION (e.g. UNCLASSIFIED)">
     <input class="f" id="aDate" type="date">
     <input class="f" id="aRegion" placeholder="REGION (e.g. Stark County, Ohio, US)">
-    <input class="f" id="aLat" placeholder="LATITUDE (e.g. 40.8)" inputmode="decimal">
-    <input class="f" id="aLng" placeholder="LONGITUDE (e.g. -81.4)" inputmode="decimal">
+    <input class="f" id="aLat" placeholder="LATITUDE (e.g. 40.8)" inputmode="text" autocomplete="off" autocapitalize="off">
+    <input class="f" id="aLng" placeholder="LONGITUDE (e.g. -81.4)" inputmode="text" autocomplete="off" autocapitalize="off">
     <input class="f" id="aType" placeholder="TYPE (e.g. PENDING)">
     <input class="f" id="aStatus" placeholder="STATUS (e.g. UNDER REVIEW)">
     <textarea id="aNotes" placeholder="SURVEY NOTES — this is where hooks go."></textarea>
@@ -246,7 +246,7 @@ textarea{min-height:84px;resize:vertical}
 </div>
 </div>
 
-<div id="ver">ops v0.15 · Jul 22</div>
+<div id="ver">ops v0.16 · Jul 22</div>
 <div id="toast"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -256,7 +256,7 @@ textarea{min-height:84px;resize:vertical}
 (function(){
 "use strict";
 
-var VERSION="ops v0.15 · Jul 22";
+var VERSION="ops v0.16 · Jul 22";
 
 /* ===== FIREBASE (optional — paste config to activate) ===== */
 var FIREBASE_CONFIG = {
@@ -485,9 +485,12 @@ function renderPushed(list){
     (function(a){
       var d=document.createElement("div");d.className="logline";
       d.innerHTML="<b>"+esc(a.id)+"</b> "+esc(a.name||"")+"<small>"+esc(a.region||"")+" · pushed by "+esc(a.by||"?")+"</small>";
-      if(ROLE==="director"&&db&&a._doc){
+      if(ROLE==="director" && db){
         var b=document.createElement("button");b.className="b warn";b.style.marginTop="6px";b.textContent="PULL BACK";
-        b.addEventListener("click",function(){db.collection("alerts").doc(a._doc).delete().then(function(){toast("PULLED");});});
+        b.addEventListener("click",function(){
+          var docid = a._doc || a.id;
+          db.collection("alerts").doc(docid).delete().then(function(){toast("PULLED");}).catch(function(e){toast("PULL FAILED");});
+        });
         d.appendChild(b);
       }
       el.appendChild(d);
@@ -497,7 +500,7 @@ function renderPushed(list){
 document.getElementById("aFire").addEventListener("click",function(){
   var ref=val("aRef").toUpperCase();
   if(!ref){toast("REF REQUIRED");return;}
-  var lat=parseFloat(val("aLat")), lng=parseFloat(val("aLng"));
+  var lat=parseFloat(val("aLat").replace(/\s+/g,"")), lng=parseFloat(val("aLng").replace(/\s+/g,""));
   if(isNaN(lat)||isNaN(lng)){toast("COORDS REQUIRED");return;}
   var s={
     id:ref,
