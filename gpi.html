@@ -44,12 +44,12 @@ header .t{letter-spacing:.24em;font-weight:600;font-size:13px}
 header .t small{display:block;font-size:8px;letter-spacing:.16em;color:var(--faint);font-weight:400}
 header .who{font-size:10px;letter-spacing:.1em;color:var(--amber);text-align:right}
 header .who span{display:block;color:var(--faint)}
-nav{display:flex;background:var(--panel);border-bottom:1px solid var(--line)}
-nav button{
+#app nav{display:flex;background:var(--panel);border-bottom:1px solid var(--line)}
+#app nav button{
   flex:1;background:none;border:none;border-bottom:2px solid transparent;color:var(--dim);
   font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;padding:11px 4px;cursor:pointer;
 }
-nav button.on{color:var(--txt);border-bottom-color:var(--amber)}
+#app nav button.on{color:var(--txt);border-bottom-color:var(--amber)}
 .pane{display:none;padding:14px}
 .pane.on{display:block}
 h4{font-size:10px;letter-spacing:.2em;color:var(--faint);margin:6px 0 12px}
@@ -87,9 +87,36 @@ textarea{min-height:84px;resize:vertical}
 .hint{font-size:10.5px;color:var(--faint);letter-spacing:.06em;margin:8px 0 0}
 
 /* decoy annex */
-#decoy{display:none;min-height:100vh;padding:26px 16px}
-#decoy .hd{color:var(--faint);font-size:10px;letter-spacing:.22em;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:18px}
-#decoy p{font-size:13px;margin-bottom:14px;white-space:pre-wrap}
+#decoy{display:none;min-height:100vh;padding-bottom:60px}
+#decoy .wrap{max-width:640px;margin:0 auto}
+.dhd{display:flex;align-items:center;justify-content:space-between;padding:14px;border-bottom:1px solid var(--line);background:var(--panel)}
+.dhd .dt{letter-spacing:.22em;font-weight:600;font-size:13px;color:var(--alert)}
+.dhd .dt small{display:block;font-size:8px;letter-spacing:.14em;color:var(--faint);font-weight:400;margin-top:2px}
+.dwarn{font-size:10px;letter-spacing:.1em;color:var(--faint)}
+.dnote{padding:9px 14px;font-size:10.5px;letter-spacing:.08em;color:var(--faint);border-bottom:1px solid var(--linedim)}
+.dnote2{font-size:12px;color:var(--dim);padding:0 0 10px;line-height:1.6}
+.dnav{display:flex;background:var(--panel);border-bottom:1px solid var(--line)}
+.dnav button{flex:1;background:none;border:none;border-bottom:2px solid transparent;color:var(--dim);font-family:var(--mono);font-size:10px;letter-spacing:.1em;padding:11px 2px;cursor:pointer}
+.dnav button.on{color:var(--alert);border-bottom-color:var(--alert)}
+.dpane{display:none;padding:14px}
+.dpane.on{display:block}
+.drec{background:var(--panel2);border:1px solid var(--line);border-left:2px solid var(--line);border-radius:3px;padding:11px;margin-bottom:10px}
+.drec.me{border-left-color:var(--alert)}
+.drec .dcs{font-weight:600;letter-spacing:.12em;font-size:13px}
+.drec .did2{font-size:10px;color:var(--faint);letter-spacing:.1em;margin-top:2px}
+.drec .dln{font-size:11.5px;color:var(--dim);margin-top:6px;line-height:1.6;word-break:break-word}
+.drec .dst{font-size:10px;letter-spacing:.1em;margin-top:7px}
+.dst.act{color:var(--ok)} .dst.term{color:var(--alert)} .dst.pend{color:var(--amber)} .dst.plc{color:var(--faint)}
+.blk2{background:var(--txt);color:var(--txt);border-radius:2px;padding:0 4px;user-select:none}
+.dfoot{font-size:10px;color:var(--faint);letter-spacing:.08em;margin-top:14px;line-height:1.7}
+.dempty{color:var(--faint);font-size:11.5px;padding:14px 2px}
+.slog{border-bottom:1px solid var(--linedim);padding:8px 2px;font-size:11.5px;display:flex;gap:10px}
+.slog b{color:var(--amber);font-weight:600;flex:0 0 auto}
+.slog span{color:var(--dim);flex:1;word-break:break-word}
+.slog small{color:var(--faint);font-size:9.5px;flex:0 0 auto}
+.df{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:3px;color:var(--txt);font-family:var(--mono);font-size:14px;padding:11px;outline:none;text-transform:uppercase;letter-spacing:.1em;margin:8px 0}
+.dsend{background:var(--alert);color:#14100F;border:none;border-radius:3px;font-family:var(--mono);font-weight:600;font-size:12px;letter-spacing:.12em;padding:11px 18px;cursor:pointer}
+#t3msg{color:var(--alert);font-size:11.5px;letter-spacing:.06em;margin-top:12px;line-height:1.7;white-space:pre-wrap}
 
 #ver{
   position:fixed;right:10px;bottom:10px;z-index:40;font-size:10px;letter-spacing:.1em;color:var(--dim);
@@ -118,9 +145,45 @@ textarea{min-height:84px;resize:vertical}
 
 <!-- ANNEX LAYER -->
 <div id="decoy">
-  <div class="hd">ANNEX ACCESS GRANTED · READ ONLY</div>
-  <p>clearance accepted. retrieving annexed material…</p>
-  <p style="color:var(--faint)">[ annex layer — phase 2 content slot. the curated guided-tour material renders here for holders of the annex-level code. ]</p>
+  <div class="wrap">
+    <div class="dhd">
+      <div class="dt">PALE HARVEST<small>ANNEX ACCESS · CLEARANCE TIER II · READ ONLY</small></div>
+      <div class="dwarn" id="dClock">SESSION 00:00</div>
+    </div>
+    <div class="dnote" id="dBoot">establishing annex session…</div>
+    <nav class="dnav">
+      <button data-dp="roster" class="on">ROSTER</button>
+      <button data-dp="manifest">MANIFEST</button>
+      <button data-dp="surv">SURVEILLANCE</button>
+      <button data-dp="tier3">TIER III</button>
+    </nav>
+
+    <div class="dpane on" id="dp-roster">
+      <h4>PERSONNEL — PARTIAL RECOVERY</h4>
+      <div id="rosterList"></div>
+      <p class="dfoot">4 of 11 records recovered. Remaining entries require Tier III.</p>
+    </div>
+
+    <div class="dpane" id="dp-manifest">
+      <h4>FIELD PLACEMENT MANIFEST</h4>
+      <div id="manifestList"></div>
+      <p class="dfoot">Manifest reflects placements logged by field operators. Pending items are not yet recovered.</p>
+    </div>
+
+    <div class="dpane" id="dp-surv">
+      <h4>SUBJECT ACTIVITY — SESSION CAPTURE</h4>
+      <p class="dnote2">Terminal activity is recorded at the registry layer and retained indefinitely. The following is the capture associated with this device.</p>
+      <div id="survList"><div class="dempty">retrieving capture…</div></div>
+    </div>
+
+    <div class="dpane" id="dp-tier3">
+      <h4>TIER III — RESTRICTED</h4>
+      <p class="dnote2">Annex clearance does not extend to Tier III material. A separate authorization is required. Tier III holds the complete roster, the placement history, and the program's active taskings.</p>
+      <input class="df" id="t3code" placeholder="TIER III AUTHORIZATION" autocomplete="off">
+      <button class="dsend" id="t3go">SUBMIT</button>
+      <div id="t3msg"></div>
+    </div>
+  </div>
 </div>
 
 <!-- CONSOLE -->
@@ -183,7 +246,7 @@ textarea{min-height:84px;resize:vertical}
 </div>
 </div>
 
-<div id="ver">ops v0.6 · Jul 21</div>
+<div id="ver">ops v0.7 · Jul 21</div>
 <div id="toast"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -193,7 +256,7 @@ textarea{min-height:84px;resize:vertical}
 (function(){
 "use strict";
 
-var VERSION="ops v0.6 · Jul 21";
+var VERSION="ops v0.7 · Jul 21";
 
 /* ===== FIREBASE (optional — paste config to activate) ===== */
 var FIREBASE_CONFIG=null;
@@ -230,6 +293,7 @@ function tryLogin(){
   if(h===H_DECOY){
     document.getElementById("login").style.display="none";
     document.getElementById("decoy").style.display="block";
+    bootDecoy();
     return;
   }
   if(h===H_OPERATOR||h===H_DIRECTOR){
@@ -260,7 +324,7 @@ function enter(){
 }
 
 /* tabs */
-var navBtns=document.querySelectorAll("nav button");
+var navBtns=document.querySelectorAll("#app nav button");
 for(var n=0;n<navBtns.length;n++){
   (function(b){
     b.addEventListener("click",function(){
@@ -468,6 +532,169 @@ function watchIdeas(){
     renderIdeas(list);
   });
 }
+
+
+/* ================= ANNEX (TIER II) LAYER =================
+   Everything below is what the subject sees after entering the
+   annex code. It is a curated exhibit, not the real console.
+   Edit ROSTER and MANIFEST freely — that is the content dial. */
+
+var ROSTER = [
+  { cs:"CHAFF",  id:"PH-4417", status:"ACTIVE",
+    line:"Analyst, intake review. Flagged twice for unauthorized retrieval of withdrawn material. Retained. Recommendation to terminate was declined at director level without stated reason." },
+  { cs:"HARROW", id:"PH-2210", status:"TERMINATED",
+    line:"Field survey lead, 1981-1994. Access revoked following the Alamosa reclassification. Present whereabouts not held in this file." },
+  { cs:"[REDACTED]", id:"PH-0001", status:"ACTIVE",
+    line:"Director, Field Operations. No personnel record is held at this tier. Signature authority on every withdrawal in the registry." },
+  { cs:"SUBJECT", id:"OBS-119", status:"UNDER OBSERVATION", me:true,
+    line:"Civilian. Not recruited. Opened an unpublished intake record within [REDACTED] hours of its filing and located the sealed annex without assistance. Assessed as persistent. Monitoring authorized. Subject is not aware of this designation." }
+];
+
+var MANIFEST = [
+  { ref:"DR-018", status:"PLACED", when:"2026-06-30",
+    line:"Laminated survey card. Placed at public trailhead kiosk, county park. Recovered by unknown party within 48 hours." },
+  { ref:"DR-021", status:"PLACED", when:"2026-07-09",
+    line:"Sealed container, contents listed as one (1) printed routing slip and one (1) storage device. Placement confirmed. Recovery not confirmed." },
+  { ref:"DR-023", status:"PENDING", when:"UNSCHEDULED",
+    line:"Contents withheld at this tier. Placement coordinates withheld at this tier. Operator assignment withheld at this tier. Item is prepared and awaiting a window." },
+  { ref:"DR-024", status:"WITHHELD", when:"—",
+    line:"[ENTRY EXISTS. NOT RENDERED AT TIER II.]" }
+];
+
+function bootDecoy(){
+  var boot=document.getElementById("dBoot");
+  var steps=[
+    "establishing annex session…",
+    "clearance TIER II accepted",
+    "WARNING: this session is attributable",
+    "recovering partial records…"
+  ];
+  var si=0;
+  var iv=setInterval(function(){
+    si++;
+    if(si>=steps.length){ clearInterval(iv); boot.textContent=steps[steps.length-1]+" complete"; return; }
+    boot.textContent=steps[si];
+  }, 700);
+
+  var t0=Date.now();
+  setInterval(function(){
+    var s=Math.floor((Date.now()-t0)/1000);
+    var m=Math.floor(s/60); s=s%60;
+    document.getElementById("dClock").textContent="SESSION "+(m<10?"0":"")+m+":"+(s<10?"0":"")+s;
+  },1000);
+
+  renderRoster(); renderManifest(); startSurv();
+  noteDecoy("annex_entry");
+}
+
+function noteDecoy(what){
+  var e={t:what, r:"TIER-II", s:"DECOY", at:new Date().toISOString()};
+  if(db){ try{ db.collection("log").add(e); }catch(x){} return; }
+  if(FIREBASE_CONFIG && window.firebase){
+    try{
+      if(!firebase.apps.length){ firebase.initializeApp(FIREBASE_CONFIG); }
+      firebase.firestore().collection("log").add(e);
+    }catch(x){}
+  }
+}
+
+function renderRoster(){
+  var el=document.getElementById("rosterList"); el.innerHTML="";
+  for(var i=0;i<ROSTER.length;i++){
+    var r=ROSTER[i];
+    var cls = r.status==="ACTIVE"?"act":(r.status==="TERMINATED"?"term":"pend");
+    var d=document.createElement("div");
+    d.className="drec"+(r.me?" me":"");
+    d.innerHTML="<div class='dcs'>"+esc(r.cs)+"</div>"+
+      "<div class='did2'>"+esc(r.id)+"</div>"+
+      "<div class='dln'>"+esc(r.line)+"</div>"+
+      "<div class='dst "+cls+"'>"+esc(r.status)+"</div>";
+    el.appendChild(d);
+  }
+}
+
+function renderManifest(){
+  var el=document.getElementById("manifestList"); el.innerHTML="";
+  for(var i=0;i<MANIFEST.length;i++){
+    var m=MANIFEST[i];
+    var cls = m.status==="PENDING"?"pend":(m.status==="WITHHELD"?"term":"plc");
+    var d=document.createElement("div");
+    d.className="drec";
+    d.innerHTML="<div class='dcs'>"+esc(m.ref)+"</div>"+
+      "<div class='did2'>"+esc(m.when)+"</div>"+
+      "<div class='dln'>"+esc(m.line)+"</div>"+
+      "<div class='dst "+cls+"'>"+esc(m.status)+"</div>";
+    el.appendChild(d);
+  }
+}
+
+function startSurv(){
+  var el=document.getElementById("survList");
+  function paint(rows){
+    if(!rows.length){ el.innerHTML="<div class='dempty'>NO CAPTURE ASSOCIATED WITH THIS DEVICE.</div>"; return; }
+    el.innerHTML="";
+    for(var i=0;i<rows.length;i++){
+      var e=rows[i];
+      var d=document.createElement("div"); d.className="slog";
+      d.innerHTML="<b>"+esc(e.t||"event")+"</b><span>"+esc(e.r||"")+"</span><small>"+esc((e.at||"").replace("T"," ").slice(0,16))+"</small>";
+      el.appendChild(d);
+    }
+  }
+  if(FIREBASE_CONFIG && window.firebase){
+    try{
+      if(!firebase.apps.length){ firebase.initializeApp(FIREBASE_CONFIG); }
+      var fdb=firebase.firestore();
+      firebase.auth().signInAnonymously().then(function(){
+        fdb.collection("log").orderBy("at","desc").limit(60).onSnapshot(function(snap){
+          var rows=[]; snap.forEach(function(d){ var o=d.data(); if(o.s!=="DECOY"){ rows.push(o); } });
+          paint(rows);
+        }, function(){ paint(localCapture()); });
+      }).catch(function(){ paint(localCapture()); });
+      return;
+    }catch(x){}
+  }
+  paint(localCapture());
+}
+function localCapture(){
+  var q=[];
+  try{ q=JSON.parse(localStorage.getItem("silo_q")||"[]"); }catch(e){ q=[]; }
+  return q.slice(-60).reverse();
+}
+
+/* tier III door — the second code. Nothing opens it during play. */
+var t3tries=0;
+document.getElementById("t3go").addEventListener("click",function(){
+  var v=document.getElementById("t3code").value.trim().toUpperCase();
+  var m=document.getElementById("t3msg");
+  document.getElementById("t3code").value="";
+  if(!v){ m.textContent="NO INPUT."; return; }
+  t3tries++;
+  noteDecoy("tier3_attempt");
+  if(t3tries===1){ m.textContent="CLEARANCE INSUFFICIENT.\nATTEMPT LOGGED."; return; }
+  if(t3tries===2){ m.textContent="CLEARANCE INSUFFICIENT.\nATTEMPT LOGGED. SECOND FAILURE ON THIS SESSION."; return; }
+  if(t3tries===3){
+    m.textContent="CLEARANCE INSUFFICIENT.\nATTEMPT LOGGED.\n\nTHIS TERMINAL HAS BEEN FLAGGED FOR REVIEW.";
+    return;
+  }
+  m.textContent="stop.\n\nevery one of those goes in a file with your name on it. tier three is not a password you can guess, it is a person who decides. i am not that person and neither are you.\n\ni put what i could reach where you would find it. the manifest is the part that matters. read DR-023 again and think about what \"awaiting a window\" means.\n\n— C.";
+});
+
+/* annex tabs */
+(function(){
+  var btns=document.querySelectorAll("#decoy .dnav button");
+  for(var i=0;i<btns.length;i++){
+    (function(b){
+      b.addEventListener("click",function(){
+        for(var j=0;j<btns.length;j++){ btns[j].classList.remove("on"); }
+        b.classList.add("on");
+        var panes=document.querySelectorAll(".dpane");
+        for(var k=0;k<panes.length;k++){ panes[k].classList.remove("on"); }
+        document.getElementById("dp-"+b.getAttribute("data-dp")).classList.add("on");
+        noteDecoy("annex_tab_"+b.getAttribute("data-dp"));
+      });
+    })(btns[i]);
+  }
+})();
 
 /* service worker */
 if("serviceWorker" in navigator && window.location.protocol==="https:"){

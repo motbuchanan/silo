@@ -149,3 +149,33 @@ FILES (all at repo root, no folders):
 
    To mark a future record as undocumented, add its ref to the
    UNDOCUMENTED array in index.html. Pushed records are automatic.
+
+================================================================
+11. THE ANNEX (DECOY) LAYER — v0.7
+================================================================
+   Entering the annex code at gpi.html no longer shows a placeholder.
+   It opens a four-tab exhibit built for the subject:
+
+     ROSTER       4 of 11 personnel recovered. CHAFF is listed as an
+                  analyst flagged twice for unauthorized retrieval.
+                  HARROW is TERMINATED. The director has no record.
+                  The fourth entry is the subject himself, OBS-119,
+                  "UNDER OBSERVATION", "not aware of this designation."
+     MANIFEST     Four drops. Two placed, one PENDING and prepared and
+                  "awaiting a window", one withheld entirely.
+     SURVEILLANCE His own activity log, live from Firestore, timestamped.
+                  Every record he opened, in order. This is the moment.
+     TIER III     A locked door. Nothing opens it during play.
+
+   Editing content: ROSTER and MANIFEST are plain arrays at the top of
+   the annex section in gpi.html. Add entries as chapters land. The
+   manifest is the lever that moves him physically — a PENDING drop with
+   a hinted window is how you get him to go somewhere.
+
+   Tier III escalation: attempts 1-3 return CLEARANCE INSUFFICIENT and
+   ATTEMPT LOGGED, third adds FLAGGED FOR REVIEW. The fourth attempt
+   drops the mask and CHAFF speaks directly, telling him to stop guessing
+   and to re-read DR-023. Every attempt writes to the log collection, so
+   you see it happen from the console.
+
+   Nothing in the annex touches tasks or suggestions. Those stay yours.
