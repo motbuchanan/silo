@@ -246,7 +246,7 @@ textarea{min-height:84px;resize:vertical}
 </div>
 </div>
 
-<div id="ver">ops v0.13 · Jul 22</div>
+<div id="ver">ops v0.14 · Jul 22</div>
 <div id="toast"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -256,7 +256,7 @@ textarea{min-height:84px;resize:vertical}
 (function(){
 "use strict";
 
-var VERSION="ops v0.13 · Jul 22";
+var VERSION="ops v0.14 · Jul 22";
 
 /* ===== FIREBASE (optional — paste config to activate) ===== */
 var FIREBASE_CONFIG = {
@@ -352,15 +352,15 @@ function initData(){
       firebase.initializeApp(FIREBASE_CONFIG);
       db=firebase.firestore();
       document.getElementById("modeLine").innerHTML="MODE: <b>LIVE</b> — authenticating…";
-      firebase.auth().setPersistence(firebase.auth.Auth.Persistence.NONE).then(function(){
-        return firebase.auth().signInAnonymously();
+      var auth=firebase.auth();
+      auth.signOut().catch(function(){}).then(function(){
+        return auth.signInAnonymously();
       }).then(function(){
         document.getElementById("modeLine").innerHTML="MODE: <b>LIVE</b> — synced as "+esc(WHO)+".";
         watchTasks(); watchLog(); watchIdeas(); watchAlerts();
       }).catch(function(err){
-        var detail = "unknown";
-        if(err){ detail = (err.code || "") + " " + (err.message || ""); }
-        if(!detail.trim()){ detail = String(err); }
+        var detail = err ? ((err.code||"")+" "+(err.message||"")).trim() : "unknown";
+        if(!detail){ detail = String(err); }
         document.getElementById("modeLine").innerHTML="MODE: <b>AUTH FAILED</b> — "+esc(detail);
       });
       return;
