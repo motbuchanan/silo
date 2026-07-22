@@ -246,17 +246,16 @@ textarea{min-height:84px;resize:vertical}
 </div>
 </div>
 
-<div id="ver">ops v0.17 · Jul 22</div>
+<div id="ver">ops v0.20 · Jul 22</div>
 <div id="toast"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script>
 (function(){
 "use strict";
 
-var VERSION="ops v0.17 · Jul 22";
+var VERSION="ops v0.20 · Jul 22";
 
 /* ===== FIREBASE (optional — paste config to activate) ===== */
 var FIREBASE_CONFIG = {
@@ -351,24 +350,13 @@ function initData(){
     try{
       if(!firebase.apps || !firebase.apps.length){ firebase.initializeApp(FIREBASE_CONFIG); }
       if(typeof firebase.firestore !== "function"){
-        document.getElementById("modeLine").innerHTML="MODE: <b>AUTH FAILED</b> — firestore SDK not loaded";
-        return;
-      }
-      if(typeof firebase.auth !== "function"){
-        document.getElementById("modeLine").innerHTML="MODE: <b>AUTH FAILED</b> — auth SDK not loaded";
+        document.getElementById("modeLine").innerHTML="MODE: <b>ERROR</b> — firestore SDK not loaded";
         return;
       }
       db=firebase.firestore();
-      document.getElementById("modeLine").innerHTML="MODE: <b>LIVE</b> — authenticating…";
-      var auth=firebase.auth();
-      auth.signInAnonymously().then(function(){
-        document.getElementById("modeLine").innerHTML="MODE: <b>LIVE</b> — synced as "+esc(WHO)+".";
-        if(db){ watchTasks(); watchLog(); watchIdeas(); watchAlerts(); }
-      }).catch(function(err){
-        var detail = err ? ((err.code||"")+" "+(err.message||"")).trim() : "unknown";
-        if(!detail){ detail = String(err); }
-        document.getElementById("modeLine").innerHTML="MODE: <b>AUTH FAILED</b> — "+esc(detail);
-      });
+      try{ localStorage.removeItem("gpi_alerts"); }catch(e){}
+      document.getElementById("modeLine").innerHTML="MODE: <b>LIVE</b> — synced as "+esc(WHO)+".";
+      watchTasks(); watchLog(); watchIdeas(); watchAlerts();
       return;
     }catch(e){
       document.getElementById("modeLine").innerHTML="MODE: <b>INIT ERROR</b> — "+esc(e && e.message ? e.message : String(e));
@@ -480,16 +468,28 @@ function val(id){return document.getElementById(id).value.trim();}
 function renderPushed(list){
   var el=document.getElementById("aList");
   el.innerHTML="";
+  if(db && list.length){
+    var clr=document.createElement("button");
+    clr.className="b warn";clr.style.marginBottom="10px";clr.textContent="CLEAR ALL PUSHED ("+list.length+")";
+    clr.addEventListener("click",function(){
+      for(var i=0;i<list.length;i++){
+        var docid=list[i]._doc||list[i].id;
+        db.collection("alerts").doc(docid).delete().catch(function(){});
+      }
+      toast("CLEARING…");
+    });
+    el.appendChild(clr);
+  }
   list.sort(function(a,b){return (b.pushedAt||"").localeCompare(a.pushedAt||"");});
   for(var i=0;i<list.length;i++){
     (function(a){
       var d=document.createElement("div");d.className="logline";
       d.innerHTML="<b>"+esc(a.id)+"</b> "+esc(a.name||"")+"<small>"+esc(a.region||"")+" · pushed by "+esc(a.by||"?")+"</small>";
-      if(ROLE==="director" && db){
+      if(db){
         var b=document.createElement("button");b.className="b warn";b.style.marginTop="6px";b.textContent="PULL BACK";
         b.addEventListener("click",function(){
           var docid = a._doc || a.id;
-          db.collection("alerts").doc(docid).delete().then(function(){toast("PULLED");}).catch(function(e){toast("PULL FAILED");});
+          db.collection("alerts").doc(docid).delete().then(function(){toast("PULLED "+docid);}).catch(function(e){toast("FAIL: "+((e&&e.code)||"err"));});
         });
         d.appendChild(b);
       }
@@ -675,12 +675,10 @@ function startSurv(){
     try{
       if(!firebase.apps.length){ firebase.initializeApp(FIREBASE_CONFIG); }
       var fdb=firebase.firestore();
-      firebase.auth().signInAnonymously().then(function(){
-        fdb.collection("log").orderBy("at","desc").limit(60).onSnapshot(function(snap){
-          var rows=[]; snap.forEach(function(d){ var o=d.data(); if(o.s!=="DECOY"){ rows.push(o); } });
-          paint(rows);
-        }, function(){ paint(localCapture()); });
-      }).catch(function(){ paint(localCapture()); });
+      fdb.collection("log").orderBy("at","desc").limit(60).onSnapshot(function(snap){
+        var rows=[]; snap.forEach(function(d){ var o=d.data(); if(o.s!=="DECOY"){ rows.push(o); } });
+        paint(rows);
+      }, function(){ paint(localCapture()); });
       return;
     }catch(x){}
   }
