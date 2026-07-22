@@ -246,7 +246,7 @@ textarea{min-height:84px;resize:vertical}
 </div>
 </div>
 
-<div id="ver">ops v0.16 · Jul 22</div>
+<div id="ver">ops v0.17 · Jul 22</div>
 <div id="toast"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -256,7 +256,7 @@ textarea{min-height:84px;resize:vertical}
 (function(){
 "use strict";
 
-var VERSION="ops v0.16 · Jul 22";
+var VERSION="ops v0.17 · Jul 22";
 
 /* ===== FIREBASE (optional — paste config to activate) ===== */
 var FIREBASE_CONFIG = {
@@ -514,14 +514,21 @@ document.getElementById("aFire").addEventListener("click",function(){
     by:WHO, pushedAt:new Date().toISOString()
   };
   if(document.getElementById("aNew").checked){ s["new"]=true; }
-  if(db){db.collection("alerts").doc(ref).set(s).then(function(){toast("PUSHED LIVE");});}
+  if(db){
+    db.collection("alerts").doc(ref).set(s).then(function(){
+      toast("PUSHED LIVE");
+    }).catch(function(err){
+      toast("PUSH FAILED: "+((err&&err.code)||"error"));
+    });
+  }
   else{
     var alerts=jload("gpi_alerts",[]);alerts.push(s);
-    store("gpi_alerts",JSON.stringify(alerts));renderPushed(alerts);toast("QUEUED (LOCAL)");
+    store("gpi_alerts",JSON.stringify(alerts));renderPushed(alerts);toast("QUEUED (LOCAL) — NOT LIVE");
   }
   ["aRef","aName","aRegion","aLat","aLng","aType","aStatus","aNotes"].forEach(function(id){document.getElementById(id).value="";});
 });
 function watchAlerts(){
+  try{ localStorage.removeItem("gpi_alerts"); }catch(e){}
   db.collection("alerts").onSnapshot(function(snap){
     var list=[];snap.forEach(function(d){var o=d.data();o._doc=d.id;list.push(o);});
     renderPushed(list);
