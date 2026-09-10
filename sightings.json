@@ -492,12 +492,12 @@
    "id": "VAD-0119",
    "name": "UNCLASSIFIED",
    "date": "2026-09-07",
-   "lat": 41.031,
-   "lng": -81.207,
-   "region": "Portage County, Ohio, US",
+   "lat": 41.005,
+   "lng": -81.735,
+   "region": "Wadsworth Township, Medina County, Ohio, US",
    "type": "PENDING",
    "status": "UNDER REVIEW",
-   "notes": "Preliminary intake. Geometry analysis incomplete. Field access restricted pending survey. SURVEY REF AX-K/119.",
+   "notes": "Preliminary intake. Geometry analysis incomplete. Field access restricted pending survey. Formation reported in cropland south of the township line. SURVEY REF AX-K/119.",
    "new": true
   },
   {
