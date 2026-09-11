@@ -23,6 +23,7 @@ p{margin:0 0 14px;white-space:pre-wrap;word-break:break-word}
 .cur{display:inline-block;width:8px;height:13px;background:var(--txt);vertical-align:-2px;animation:blink 1s steps(1) infinite}
 @keyframes blink{50%{opacity:0}}
 @media (prefers-reduced-motion: reduce){*{animation-duration:.001s !important}}
+.refl{color:#D9A441;text-decoration:underline dotted;text-underline-offset:3px;font-weight:600}
 </style>
 </head>
 <body>
@@ -46,6 +47,18 @@ i'll leave the next piece somewhere the system doesn't index. the old intakes ar
 
 — C.</p>
   <p><span class="cur"></span></p>
+  <div id="ret" style="display:none">
+    <p class="g">[attachment 7 of 6 — not indexed — appended after your last read]</p>
+    <p class="sig">you came back. good.
+
+i told you to count forward from 0101 and you didn't, so i'll do it for you: <a class="refl" href="rec.html?id=VAD-0103">0103</a>. it was filed six days before they pulled it, and the note they struck out is the reason your ohio number exists at all.
+
+read it. then read <a class="refl" href="rec.html?id=VAD-0105">0105</a>, and look at the reason code on both.
+
+there's a date in 0103. that's the window. don't waste it.
+
+— C.</p>
+  </div>
 </div>
 <script>
 (function(){
@@ -54,6 +67,9 @@ try{
   var q=JSON.parse(localStorage.getItem("silo_q")||"[]");
   q.push({t:"annex_k_read", r:"AX-K/119", at:new Date().toISOString()});
   localStorage.setItem("silo_q", JSON.stringify(q));
+  var n=(parseInt(localStorage.getItem("silo_axk_visits")||"0",10)||0)+1;
+  localStorage.setItem("silo_axk_visits", String(n));
+  if(n>=2){ document.getElementById("ret").style.display="block"; q.push({t:"annex_k_return", r:"visit "+n, at:new Date().toISOString()}); localStorage.setItem("silo_q", JSON.stringify(q)); }
 }catch(e){}
 })();
 </script>

@@ -93,6 +93,7 @@ header{
 .srow .sst{font-size:10px;letter-spacing:.08em;color:var(--txt-faint);text-align:right}
 .srow .sst.new{color:var(--alert);font-weight:600}
 .srow .sst.rev{color:var(--amber)}
+.wchip{margin-left:8px;color:var(--alert);border:1px solid #3A2320;border-radius:3px;padding:2px 6px;cursor:pointer;font-size:10px;letter-spacing:.1em}
 .srow.hiddenrow{background:#160F0E;border:1px solid #3A2320;border-left:3px solid var(--alert)}
 .srow.hiddenrow .sid{color:var(--alert)}
 .empty{padding:24px 14px;font-family:var(--mono);font-size:12px;color:var(--txt-faint);letter-spacing:.08em}
@@ -237,7 +238,7 @@ footer{
 
   <div class="bar">
     <input id="search" type="text" placeholder="SEARCH REGISTRY…" autocomplete="off" autocapitalize="characters">
-    <span class="count" id="count">— RECORDS</span>
+    <span class="count" id="count">— RECORDS</span><span class="count wchip" id="wchip" title="withdrawn references">6 WITHDRAWN</span>
   </div>
 
   <div class="registry">
@@ -320,7 +321,7 @@ footer{
     U.S. DEPARTMENT OF AGRICULTURE COOPERATIVE SURVEY INSTRUMENT (UNOFFICIAL MIRROR)<br>
     FORM SILO-registry-04 · CONTROL NO. 0704-6114 · DATA REFRESH: DAILY 0400 UTC<br>
     UNAUTHORIZED ACCESS TO ANNEXED MATERIAL IS LOGGED.<br>
-    <span id="ver">v0.22 · Sep 10</span>
+    <span id="ver">v0.23 · Sep 11</span>
   </footer>
 </div>
 <div id="toast"></div>
@@ -332,8 +333,8 @@ footer{
 (function(){
 "use strict";
 
-var VERSION = "v0.22 · Sep 10";
-var WITHDRAWN = ["VAD-0102","VAD-0105","VAD-0108","VAD-0112","VAD-0114"];
+var VERSION = "v0.23 · Sep 11";
+var WITHDRAWN = ["VAD-0102","VAD-0103","VAD-0105","VAD-0108","VAD-0112","VAD-0114"];
 
 /* ===== FIREBASE (optional — paste config to activate) =====
    When null, the app runs fully static and queues discovery
@@ -370,14 +371,15 @@ document.addEventListener("keydown",function(e){
 /* discovery logging — queue locally, sync later if Firebase configured */
 var DB=null, SUBJECT=load("silo_sid");
 if(!SUBJECT){ SUBJECT="S"+Math.random().toString(36).slice(2,8).toUpperCase(); store("silo_sid",SUBJECT); }
+var BOOT_AT=new Date().toISOString();
 function logEvent(type, ref){
   var e={t:type, r:ref||"", s:SUBJECT, at:new Date().toISOString()};
   var q=[];
   try{ q=JSON.parse(load("silo_q")||"[]"); }catch(err){ q=[]; }
+  if(DB){ try{ DB.collection("log").add(e); e.sent=true; }catch(err){} }
   q.push(e);
   if(q.length>200) q=q.slice(-200);
   store("silo_q", JSON.stringify(q));
-  if(DB){ try{ DB.collection("log").add(e); }catch(err){} }
 }
 logEvent("open");
 
@@ -558,6 +560,10 @@ document.getElementById("bell").addEventListener("click",function(){
 var ANNEX={
   id:"ANNEX K", name:"RESTRICTED MATERIAL", status:"SEALED"
 };
+document.getElementById("wchip").addEventListener("click",function(){
+  var sb=document.getElementById("search"); sb.value="WITHDRAWN";
+  sb.dispatchEvent(new Event("input")); sb.scrollIntoView({block:"start",behavior:"smooth"});
+});
 document.getElementById("search").addEventListener("input",function(){
   var q=this.value.trim().toUpperCase();
   var list=SIGHTINGS.filter(function(s){
@@ -568,9 +574,14 @@ document.getElementById("search").addEventListener("input",function(){
       s.type.toUpperCase().indexOf(q)>=0 ||
       (s.notes&&s.notes.toUpperCase().indexOf(q)>=0);
   });
+  if(q==="WITHDRAWN"){ list=[]; }
   render(list);
+  if(q==="WITHDRAWN"){
+    document.getElementById("rows").innerHTML="<div class='empty'>WITHDRAWN REFERENCES ARE NOT LISTED IN THE ACTIVE INDEX. ARCHIVED COPIES MAY EXIST.</div>";
+    logEvent("withdrawn_list");
+  }
   for(var w=0;w<WITHDRAWN.length;w++){
-    if(q===WITHDRAWN[w]||("VAD-"+q===WITHDRAWN[w])||(q.length>=6&&WITHDRAWN[w].indexOf(q)>=0)){
+    if(q==="WITHDRAWN"||q===WITHDRAWN[w]||("VAD-"+q===WITHDRAWN[w])||(q.length>=6&&WITHDRAWN[w].indexOf(q)>=0)){
       (function(wid){
         var rows2=document.getElementById("rows");
         var d2=document.createElement("div");
@@ -581,9 +592,9 @@ document.getElementById("search").addEventListener("input",function(){
           toast("RETRIEVING ARCHIVED COPY…");
           setTimeout(function(){window.location.href="rec.html?id="+wid;},700);
         });
-        rows2.insertBefore(d2,rows2.firstChild);
+        rows2.appendChild(d2);
       })(WITHDRAWN[w]);
-      break;
+      if(q!=="WITHDRAWN") break;
     }
   }
   if(q.indexOf("AX-K")>=0 || q==="ANNEX K" || q==="ANNEXK"){
@@ -768,11 +779,19 @@ if(FIREBASE_CONFIG && window.firebase){
     DB=firebase.firestore();
     /* flush anything queued while offline */
     try{
+      /* flush anything queued by pages without a live connection (annex, dossiers)
+         or logged here while offline. Tracker events sent live carry sent:true. */
       var q=JSON.parse(load("silo_q")||"[]");
-      if(!load("silo_flushed") && q.length){
-        for(var f=0;f<q.length;f++){ DB.collection("log").add(q[f]); }
-        store("silo_flushed","1");
+      var legacy=!!load("silo_flushed");
+      var changed=false;
+      for(var f=0;f<q.length;f++){
+        var ev=q[f];
+        if(ev.sent) continue;
+        if(legacy && ev.s && ev.at && ev.at<BOOT_AT){ ev.sent=true; changed=true; continue; } /* pre-v0.23 tracker events were sent live */
+        DB.collection("log").add(ev); ev.sent=true; changed=true;
       }
+      if(changed){ store("silo_q", JSON.stringify(q)); }
+      if(legacy){ try{ localStorage.removeItem("silo_flushed"); }catch(e){} }
     }catch(e){}
     var known={};
     try{ known=JSON.parse(load("silo_known")||"{}"); }catch(e){ known={}; }
