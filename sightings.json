@@ -620,6 +620,45 @@
    "type": "GEOMETRIC",
    "status": "LOGGED",
    "notes": "Initial formation reported 8 August. A second stage was added to the same formation and reported 29 August, three weeks later. Additions to an existing formation are uncommon. Field access not granted; viewable from the adjacent hill."
+  },
+  {
+   "id": "VAD-0133",
+   "name": "Wayland's Smithy Knot",
+   "date": "2026-07-16",
+   "lat": 51.566,
+   "lng": -1.596,
+   "region": "Nr Ashbury, Oxfordshire, UK",
+   "type": "GEOMETRIC",
+   "status": "LOGGED",
+   "source": "Crop Circle Connector",
+   "sourceUrl": "https://temporarytemples.co.uk/project/crop-circles-2026-season-info",
+   "notes": "Complex knot design inside a containing ring, wheat. Adjacent to the Neolithic long barrow of the same name. Reported 16 July. Added at archive re-index."
+  },
+  {
+   "id": "VAD-0134",
+   "name": "Roundway Second Formation",
+   "date": "2026-07-18",
+   "lat": 51.372,
+   "lng": -1.985,
+   "region": "Nr Devizes, Wiltshire, UK",
+   "type": "GEOMETRIC",
+   "status": "LOGGED",
+   "source": "Crop Circle Connector",
+   "sourceUrl": "https://temporarytemples.co.uk/project/crop-circles-2026-season-info",
+   "notes": "Thirteen-point star with crescent moon, wheat. Second formation on Roundway Down within seven days; see VAD-0125. Added at archive re-index."
+  },
+  {
+   "id": "VAD-0135",
+   "name": "Journet Grass Formation",
+   "date": "2026-06-21",
+   "lat": 46.37,
+   "lng": 0.9,
+   "region": "Journet, Vienne, France",
+   "type": "SIMPLE CIRCLE",
+   "status": "UNVERIFIED",
+   "source": "Crop Circle Connector",
+   "sourceUrl": "https://www.cropcircleconnector.com/2026/rumours2026.html",
+   "notes": "Formation set into grass rather than cereal crop, reported 21 June. Grass formations are unusual and rarely persist. Held UNVERIFIED pending a second source. Added at archive re-index."
   }
  ]
 }

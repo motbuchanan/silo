@@ -26,6 +26,23 @@ html,body{max-width:100%;overflow-x:hidden}
 body{background:var(--bg);color:var(--txt);font-family:var(--body);font-size:15px;line-height:1.5;min-height:100vh}
 .wrap{max-width:760px;margin:0 auto;padding-bottom:40px}
 body.locked{overflow:hidden;touch-action:none}
+#feed{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;background:var(--panel);border-bottom:1px solid var(--line-dim);
+  font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--txt-faint);cursor:pointer}
+#feed .fdot{width:7px;height:7px;border-radius:50%;background:var(--txt-faint)}
+#feed.syncing .fdot{background:var(--amber);animation:fpulse .8s infinite}
+#feed.ok .fdot{background:#5FA36B}
+@keyframes fpulse{0%,100%{opacity:1}50%{opacity:.25}}
+#feedModal{position:fixed;inset:0;z-index:1000;background:rgba(6,10,7,.94);display:none;align-items:center;justify-content:center;padding:18px}
+#feedModal.open{display:flex}
+#feedModal .fm{position:relative;width:100%;max-width:440px;max-height:86vh;overflow-y:auto;background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:18px 16px}
+#feedModal h6{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--txt-faint);margin-bottom:12px}
+#feedClose{position:absolute;top:10px;right:12px;background:none;border:none;color:var(--txt-faint);font-size:16px;cursor:pointer}
+.fsrc{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--line-dim);font-family:var(--mono);font-size:11.5px}
+.fsrc small{display:block;color:var(--txt-faint);font-size:9.5px;letter-spacing:.06em;margin-top:2px}
+.fst{font-size:9.5px;letter-spacing:.12em}.fst.ok{color:#5FA36B}.fst.lim{color:var(--amber)}
+.fnote{font-family:var(--mono);font-size:10px;color:var(--txt-faint);line-height:1.6;margin-top:12px}
+#alerts .aln.ntc{border-left:2px solid var(--amber);cursor:default}
+#alerts .aln.ntc small{white-space:normal;line-height:1.5}
 #scanline{
   display:none;padding:10px 14px;background:#1d2a1c;border-bottom:1px solid var(--amber);
   font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--amber);text-align:center;
@@ -212,6 +229,13 @@ footer{
 <body>
 <div class="wrap">
   <div id="scanline"></div>
+  <div id="feed" role="button"><span id="feedTxt">LINKED SOURCES · 6 · SYNC PENDING</span><span class="fdot"></span></div>
+  <div id="feedModal"><div class="fm">
+    <button id="feedClose">✕</button>
+    <h6>LINKED SOURCES · INTAKE FEED</h6>
+    <div id="feedList"></div>
+    <p class="fnote">The registry polls cooperating archives and public reporting channels. New intakes are logged automatically and flagged for review. Sources are unaffiliated and are not responsible for registry content.</p>
+  </div></div>
   <header>
     <div class="logo">SILO<small>SYSTEM FOR IMAGING LAND OBSERVATIONS</small></div>
     <div class="hdr-r">
@@ -261,6 +285,7 @@ footer{
     <div class="kv"><b>TYPE</b><span id="shType">—</span></div>
     <div class="kv"><b>STATUS</b><span id="shStatus">—</span></div>
     <div class="kv"><b>COORDS</b><span id="shCoords">—</span></div>
+    <div class="kv" id="shSrcRow" style="display:none"><b>SOURCE</b><span id="shSrc">—</span></div>
     <div class="notes" id="shNotes">—</div>
     <div class="actions">
       <a class="abtn" id="shDir" target="_blank" rel="noopener">DIRECTIONS ↗</a>
@@ -321,7 +346,7 @@ footer{
     U.S. DEPARTMENT OF AGRICULTURE COOPERATIVE SURVEY INSTRUMENT (UNOFFICIAL MIRROR)<br>
     FORM SILO-registry-04 · CONTROL NO. 0704-6114 · DATA REFRESH: DAILY 0400 UTC<br>
     UNAUTHORIZED ACCESS TO ANNEXED MATERIAL IS LOGGED.<br>
-    <span id="ver">v0.23 · Sep 11</span>
+    <span id="ver">v0.25 · Sep 11</span>
   </footer>
 </div>
 <div id="toast"></div>
@@ -333,7 +358,7 @@ footer{
 (function(){
 "use strict";
 
-var VERSION = "v0.23 · Sep 11";
+var VERSION = "v0.25 · Sep 11";
 var WITHDRAWN = ["VAD-0102","VAD-0103","VAD-0105","VAD-0108","VAD-0112","VAD-0114"];
 
 /* ===== FIREBASE (optional — paste config to activate) =====
@@ -439,7 +464,14 @@ function buildRefs(s){
   var box=document.getElementById("shRefs");
   var yr=(s.date||"").slice(0,4);
   var pushed = !!s.pushedAt;
-  var undoc = pushed || UNDOCUMENTED.indexOf(s.id)>=0;
+  var undoc = (pushed && !s.sourceUrl) || UNDOCUMENTED.indexOf(s.id)>=0;
+  if(s.sourceUrl){
+    var dom=String(s.sourceUrl).replace(/^https?:\/\//,"").split("/")[0];
+    box.innerHTML="<h6>EXTERNAL DOCUMENTATION · INGESTED</h6>"+
+      "<a target='_blank' rel='noopener' href='"+esc(s.sourceUrl)+"'>SOURCE THREAD ↗<small>"+esc(dom)+(s.source?" · "+esc(s.source):"")+"</small></a>"+
+      "<a target='_blank' rel='noopener' href='https://www.google.com/search?tbm=isch&q="+urlq((s.name||"")+" crop circle "+(s.date||"").slice(0,4))+"'>AERIAL IMAGERY SEARCH ↗<small>photographs of this formation</small></a>";
+    return;
+  }
   if(undoc){
     box.innerHTML="<h6>EXTERNAL DOCUMENTATION</h6>"+
       "<div class='nodoc'>NONE ON FILE. THIS INTAKE HAS NOT BEEN PUBLISHED "+
@@ -489,6 +521,52 @@ document.getElementById("shNotes").addEventListener("click",function(e){
   toast(ref+" · NO ACTIVE RECORD");
 });
 
+
+/* ---------- intake feed (linked sources) ---------- */
+var SOURCES=[
+  {n:"r/cropcircles", d:"public reporting channel", st:"ok"},
+  {n:"Crop Circle Connector", d:"primary reporting archive", st:"ok"},
+  {n:"Circle Research Archive", d:"historical research database", st:"ok"},
+  {n:"NUFORC", d:"public sighting reports, filtered to ground effects", st:"ok"},
+  {n:"Hessdalen AMS", d:"automated measurement station, NO", st:"ok"},
+  {n:"County road & agricultural reports, OH", d:"regional intake channel", st:"lim"}
+];
+var LAST_SYNC=null;
+function hhmm(d){ return (d.getHours()<10?"0":"")+d.getHours()+":"+(d.getMinutes()<10?"0":"")+d.getMinutes(); }
+function feedSet(txt,cls){ var f=document.getElementById("feed"); document.getElementById("feedTxt").textContent=txt; f.className=cls||""; }
+function feedSynced(){ LAST_SYNC=new Date(); feedSet("LINKED SOURCES · "+SOURCES.length+" · LAST SYNC "+hhmm(LAST_SYNC),"ok"); }
+function feedBoot(){
+  var k=0;
+  feedSet("SYNCING · "+SOURCES[0].n+"…","syncing");
+  var iv=setInterval(function(){
+    k++;
+    if(k>=SOURCES.length){ clearInterval(iv); feedSynced(); return; }
+    feedSet("SYNCING · "+SOURCES[k].n+"…","syncing");
+  },420);
+}
+function renderFeedList(){
+  var el=document.getElementById("feedList"); el.innerHTML="";
+  var now=new Date();
+  for(var i=0;i<SOURCES.length;i++){
+    var s=SOURCES[i];
+    var mins=(i*7+3)%23+1;
+    var d=document.createElement("div"); d.className="fsrc";
+    d.innerHTML="<div>"+esc(s.n)+"<small>"+esc(s.d)+" · checked "+mins+" min ago</small></div>"+
+      "<span class='fst "+(s.st==="ok"?"ok":"lim")+"'>"+(s.st==="ok"?"OK":"RATE LIMITED")+"</span>";
+    el.appendChild(d);
+  }
+}
+document.getElementById("feed").addEventListener("click",function(){
+  renderFeedList(); document.getElementById("feedModal").classList.add("open"); lock(true); logEvent("feed_open");
+});
+document.getElementById("feedClose").addEventListener("click",function(){ document.getElementById("feedModal").classList.remove("open"); lock(false); });
+document.getElementById("feedModal").addEventListener("click",function(e){ if(e.target===this){ this.classList.remove("open"); lock(false); } });
+setTimeout(feedBoot,600);
+
+/* system notices pushed from the console (kind:"notice") — shown in the alert feed, never on the map */
+var NOTICES=[];
+function srcLabel(s){ return s.source? "via "+s.source : ""; }
+
 var current=null;
 function openSheet(s){
   current=s;
@@ -499,6 +577,9 @@ function openSheet(s){
   document.getElementById("shType").textContent=s.type;
   document.getElementById("shStatus").textContent=s.status;
   document.getElementById("shCoords").textContent=s.lat.toFixed(4)+", "+s.lng.toFixed(4);
+  var srow=document.getElementById("shSrcRow");
+  if(s.source){ document.getElementById("shSrc").textContent=s.source+(s.pushedAt?" · ingested "+String(s.pushedAt).slice(0,10):" · archive re-index"); srow.style.display="flex"; }
+  else{ srow.style.display="none"; }
   document.getElementById("shNotes").innerHTML=linkRefs(s.notes||"");
   document.getElementById("shDir").href="https://www.google.com/maps/dir/?api=1&destination="+s.lat+","+s.lng;
   document.getElementById("shSat").href="https://www.google.com/maps/@"+s.lat+","+s.lng+",2000m/data=!3m1!1e3";
@@ -523,7 +604,7 @@ document.getElementById("shZoom").addEventListener("click",function(){
 /* alerts */
 var lastSeen=parseInt(load("silo_seen")||"0",10);
 function refreshAlerts(){
-  var news=SIGHTINGS.filter(function(s){return s["new"];});
+  var news=NOTICES.filter(function(n){return n["new"];}).concat(SIGHTINGS.filter(function(s){return s["new"];}));
   var dot=document.getElementById("dot");
   var unseen=news.length>lastSeen?news.length-lastSeen:0;
   dot.textContent=String(unseen);
@@ -534,8 +615,13 @@ function refreshAlerts(){
   for(var i=0;i<news.length;i++){
     (function(s){
       var a=document.createElement("div");
+      if(s.kind==="notice"){
+        a.className="aln ntc";
+        a.innerHTML="▲ SYSTEM NOTICE · "+esc(s.name||"REGISTRY")+"<small>"+esc(s.notes||"")+"</small>";
+        list.appendChild(a); return;
+      }
       a.className="aln";
-      a.innerHTML="◉ NEW FORMATION LOGGED<small>"+esc(s.id)+" · "+esc(s.region)+"</small>";
+      a.innerHTML="◉ NEW FORMATION LOGGED<small>"+esc(s.id)+" · "+esc(s.region)+(s.source?" · "+esc(srcLabel(s)):"")+"</small>";
       a.addEventListener("click",function(){
         document.getElementById("alerts").classList.remove("open");
         map.setView([s.lat,s.lng],14);
@@ -549,7 +635,7 @@ document.getElementById("bell").addEventListener("click",function(){
   var p=document.getElementById("alerts");
   p.classList.toggle("open");
   if(p.classList.contains("open")){
-    var news=SIGHTINGS.filter(function(s){return s["new"];});
+    var news=NOTICES.filter(function(n){return n["new"];}).concat(SIGHTINGS.filter(function(s){return s["new"];}));
     lastSeen=news.length;
     store("silo_seen",String(lastSeen));
     refreshAlerts();
@@ -660,6 +746,7 @@ function showAlertNote(s){
   if(!canNotify()) return;
   var title="SILO — INTAKE ALERT";
   var body=s.id+" logged · "+(s.region||"location pending");
+  if(s.kind==="notice"){ title="SILO — SYSTEM NOTICE"; body=(s.name?s.name+": ":"")+(s.notes||""); }
   var opts={ body:body, icon:"silo-192.png", badge:"silo-192.png",
              tag:s.id, data:{ref:s.id}, vibrate:[200,100,200] };
   try{
@@ -693,7 +780,11 @@ var STATIC=[], LIVE=[], pinLayer=L.layerGroup().addTo(map), fitted=false, STATIC
 
 function rebuild(fit){
   var seen={}, merged=[];
-  for(var i=0;i<LIVE.length;i++){ if(!seen[LIVE[i].id]){ seen[LIVE[i].id]=1; merged.push(LIVE[i]); } }
+  NOTICES=[];
+  for(var i=0;i<LIVE.length;i++){
+    if(LIVE[i].kind==="notice"){ NOTICES.push(LIVE[i]); continue; }
+    if(!seen[LIVE[i].id]){ seen[LIVE[i].id]=1; merged.push(LIVE[i]); }
+  }
   for(var j=0;j<STATIC.length;j++){ if(!seen[STATIC[j].id]){ seen[STATIC[j].id]=1; merged.push(STATIC[j]); } }
   // NEW flags first, then live-pushed newest first, then the archive by ref
   merged.sort(function(a,b){
@@ -807,6 +898,7 @@ if(FIREBASE_CONFIG && window.firebase){
       });
       store("silo_known", JSON.stringify(known));
       LIVE=live;
+      feedSynced();
       if(STATIC_READY){ rebuild(false); }
       else { PENDING_LIVE=true; }
       for(var n=0;n<fresh.length;n++){
