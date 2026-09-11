@@ -261,7 +261,7 @@ textarea{min-height:84px;resize:vertical}
 </div>
 </div>
 
-<div id="ver">ops v0.25 · Sep 11</div>
+<div id="ver">ops v0.26 · Sep 11</div>
 <div id="toast"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -270,7 +270,7 @@ textarea{min-height:84px;resize:vertical}
 (function(){
 "use strict";
 
-var VERSION="ops v0.25 · Sep 11";
+var VERSION="ops v0.26 · Sep 11";
 
 /* ===== FIREBASE (optional — paste config to activate) ===== */
 var FIREBASE_CONFIG = {
@@ -360,6 +360,18 @@ for(var n=0;n<navBtns.length;n++){
 
 /* ---------- data layer: Firestore when configured, local otherwise ---------- */
 var db=null;
+function ensureDb(){
+  if(db) return true;
+  try{
+    if(FIREBASE_CONFIG && window.firebase && typeof firebase.firestore==="function"){
+      if(!firebase.apps || !firebase.apps.length){ firebase.initializeApp(FIREBASE_CONFIG); }
+      db=firebase.firestore();
+      document.getElementById("modeLine").innerHTML="MODE: <b>LIVE</b> — synced as "+esc(WHO)+".";
+      return true;
+    }
+  }catch(e){}
+  return false;
+}
 function initData(){
   if(FIREBASE_CONFIG && window.firebase){
     try{
@@ -520,8 +532,8 @@ document.getElementById("aFire").addEventListener("click",function(){
     var n={ id:ref, kind:"notice", name:val("aName")||"REGISTRY", notes:val("aNotes")||"Scheduled maintenance.", region:"", lat:0, lng:0,
             date:val("aDate")||new Date().toISOString().slice(0,10), type:"ADMINISTRATIVE", status:"NOTICE", by:WHO, pushedAt:new Date().toISOString() };
     if(document.getElementById("aNew").checked){ n["new"]=true; }
-    if(db){ db.collection("alerts").doc(ref).set(n).then(function(){toast("NOTICE PUSHED");}).catch(function(err){toast("PUSH FAILED: "+((err&&err.code)||"error"));}); }
-    else{ toast("NOT LIVE"); }
+    if(ensureDb()){ db.collection("alerts").doc(ref).set(n).then(function(){toast("NOTICE PUSHED");}).catch(function(err){toast("PUSH FAILED: "+((err&&err.code)||"error"));}); }
+    else{ toast("NOT LIVE — reload the console"); return; }
     ["aRef","aName","aNotes","aSrcUrl"].forEach(function(id){document.getElementById(id).value="";});
     return;
   }
@@ -543,7 +555,7 @@ document.getElementById("aFire").addEventListener("click",function(){
   if(src){ s.source=src; }
   if(srcUrl){ s.sourceUrl=srcUrl; }
   if(document.getElementById("aNew").checked){ s["new"]=true; }
-  if(db){
+  if(ensureDb()){
     db.collection("alerts").doc(ref).set(s).then(function(){
       toast("PUSHED LIVE");
     }).catch(function(err){
