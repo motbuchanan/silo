@@ -497,7 +497,7 @@
    "region": "Wadsworth Township, Medina County, Ohio, US",
    "type": "PENDING",
    "status": "UNDER REVIEW",
-   "notes": "Preliminary intake. Geometry analysis incomplete. Field access restricted pending survey. Formation reported in cropland south of the township line. SURVEY REF AX-K/119. UPDATE 09-11: registry cross-check returned a prior intake at this grid, filed 2006 and withdrawn the same week. Archived copy: VAD-0103.",
+   "notes": "Preliminary intake. Geometry analysis incomplete. Field access restricted pending survey. Formation reported in cropland south of the township line. SURVEY REF AX-K/119. UPDATE 09-11: registry cross-check returned a prior intake at this grid, filed 2006 and withdrawn the same week. Archived copy: VAD-0103. Related installation logged in range: VAD-0117.",
    "new": true
   },
   {
@@ -659,6 +659,18 @@
    "source": "Crop Circle Connector",
    "sourceUrl": "https://www.cropcircleconnector.com/2026/rumours2026.html",
    "notes": "Formation set into grass rather than cereal crop, reported 21 June. Grass formations are unusual and rarely persist. Held UNVERIFIED pending a second source. Added at archive re-index."
+  },
+  {
+   "id": "VAD-0117",
+   "name": "RELAY NODE \u2014 WADSWORTH",
+   "date": "2026-08-29",
+   "lat": 41.028,
+   "lng": -81.73,
+   "region": "Wadsworth, Medina County, Ohio, US",
+   "type": "ADMINISTRATIVE",
+   "status": "UNDER REVIEW",
+   "source": "",
+   "notes": "Not a formation. Infrastructure entry. A collection node was brought online at this location on 29 August, within survey range of intake VAD-0119. Node type and operator are withheld at this tier. The registry flags any new fixed installation inside an active survey radius. This one is logged. SURVEY REF AX-K/119."
   }
  ]
 }

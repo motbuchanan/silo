@@ -262,7 +262,7 @@ footer{
 
   <div class="bar">
     <input id="search" type="text" placeholder="SEARCH REGISTRY…" autocomplete="off" autocapitalize="characters">
-    <span class="count" id="count">— RECORDS</span><span class="count wchip" id="wchip" title="withdrawn references">6 WITHDRAWN</span>
+    <span class="count" id="count">— RECORDS</span><span class="count wchip" id="wchip" title="withdrawn references">7 WITHDRAWN</span>
   </div>
 
   <div class="registry">
@@ -346,7 +346,7 @@ footer{
     U.S. DEPARTMENT OF AGRICULTURE COOPERATIVE SURVEY INSTRUMENT (UNOFFICIAL MIRROR)<br>
     FORM SILO-registry-04 · CONTROL NO. 0704-6114 · DATA REFRESH: DAILY 0400 UTC<br>
     UNAUTHORIZED ACCESS TO ANNEXED MATERIAL IS LOGGED.<br>
-    <span id="ver">v0.28 · Sep 11</span>
+    <span id="ver">v0.29 · Sep 12</span>
   </footer>
 </div>
 <div id="toast"></div>
@@ -358,8 +358,8 @@ footer{
 (function(){
 "use strict";
 
-var VERSION = "v0.28 · Sep 11";
-var WITHDRAWN = ["VAD-0102","VAD-0103","VAD-0105","VAD-0108","VAD-0112","VAD-0114"];
+var VERSION = "v0.29 · Sep 12";
+var WITHDRAWN = ["VAD-0102","VAD-0103","VAD-0105","VAD-0108","VAD-0112","VAD-0114","VAD-0117"];
 
 /* ===== FIREBASE (optional — paste config to activate) =====
    When null, the app runs fully static and queues discovery
@@ -459,7 +459,7 @@ function render(list){
 /* external documentation links.
    Search-style URLs are used deliberately: they never 404, they always
    land on genuine third-party material, and nothing is hotlinked. */
-var UNDOCUMENTED = ["VAD-0119"];
+var UNDOCUMENTED = ["VAD-0119","VAD-0117"];
 function urlq(s){ return encodeURIComponent(s); }
 function buildRefs(s){
   var box=document.getElementById("shRefs");
