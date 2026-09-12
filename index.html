@@ -82,11 +82,12 @@ header{
 
 /* toolbar */
 .bar{
-  display:flex;gap:8px;padding:10px 12px;background:var(--panel);
-  border-bottom:1px solid var(--line);align-items:center;
+  display:flex;flex-direction:column;gap:8px;padding:10px 12px;background:var(--panel);
+  border-bottom:1px solid var(--line);
 }
+.bar .counts{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-end}
 .bar input{
-  flex:1;background:var(--panel-2);border:1px solid var(--line);border-radius:3px;
+  width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:3px;
   color:var(--txt);font-family:var(--mono);font-size:13px;padding:8px 10px;outline:none;
 }
 .bar input::placeholder{color:var(--txt-faint)}
@@ -110,7 +111,7 @@ header{
 .srow .sst{font-size:10px;letter-spacing:.08em;color:var(--txt-faint);text-align:right}
 .srow .sst.new{color:var(--alert);font-weight:600}
 .srow .sst.rev{color:var(--amber)}
-.wchip{margin-left:8px;color:var(--alert);border:1px solid #3A2320;border-radius:3px;padding:2px 6px;cursor:pointer;font-size:10px;letter-spacing:.1em}
+.wchip{color:var(--alert);border:1px solid #3A2320;border-radius:3px;padding:2px 6px;cursor:pointer;font-size:10px;letter-spacing:.1em}
 .srow.hiddenrow{background:#160F0E;border:1px solid #3A2320;border-left:3px solid var(--alert)}
 .srow.hiddenrow .sid{color:var(--alert)}
 .empty{padding:24px 14px;font-family:var(--mono);font-size:12px;color:var(--txt-faint);letter-spacing:.08em}
@@ -262,7 +263,10 @@ footer{
 
   <div class="bar">
     <input id="search" type="text" placeholder="SEARCH REGISTRY…" autocomplete="off" autocapitalize="characters">
-    <span class="count" id="count">— RECORDS</span><span class="count wchip" id="wchip" title="withdrawn references">7 WITHDRAWN</span>
+    <div class="counts">
+      <span class="count" id="count">— RECORDS</span>
+      <span class="count wchip" id="wchip" title="withdrawn references">7 WITHDRAWN</span>
+    </div>
   </div>
 
   <div class="registry">
@@ -346,7 +350,7 @@ footer{
     U.S. DEPARTMENT OF AGRICULTURE COOPERATIVE SURVEY INSTRUMENT (UNOFFICIAL MIRROR)<br>
     FORM SILO-registry-04 · CONTROL NO. 0704-6114 · DATA REFRESH: DAILY 0400 UTC<br>
     UNAUTHORIZED ACCESS TO ANNEXED MATERIAL IS LOGGED.<br>
-    <span id="ver">v0.30 · Sep 12</span>
+    <span id="ver">v0.31 · Sep 12</span>
   </footer>
 </div>
 <div id="toast"></div>
@@ -358,7 +362,7 @@ footer{
 (function(){
 "use strict";
 
-var VERSION = "v0.30 · Sep 12";
+var VERSION = "v0.31 · Sep 12";
 var WITHDRAWN = ["VAD-0102","VAD-0103","VAD-0105","VAD-0108","VAD-0112","VAD-0114","VAD-0117"];
 
 /* ===== FIREBASE (optional — paste config to activate) =====
