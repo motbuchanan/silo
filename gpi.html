@@ -129,6 +129,14 @@ textarea{min-height:84px;resize:vertical}
 }
 #toast.show{opacity:1}
 @media (prefers-reduced-motion: reduce){*{transition-duration:.001s !important;animation-duration:.001s !important}}
+
+.logbar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.dchip{background:var(--panel2,#141C15);border:1px solid var(--line,#223022);border-radius:3px;color:var(--dim,#7B8F77);font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;padding:4px 8px;cursor:pointer}
+.dchip.on{border-color:var(--amber,#C9A85C);color:var(--amber,#C9A85C)}
+.dchip.joe{color:#D8837A}.dchip.joe.on{border-color:#D8837A}
+.logline.joe{border-left:2px solid #D8837A;padding-left:8px}
+.sidtag{display:inline-block;font-style:normal;font-size:8.5px;letter-spacing:.06em;color:var(--faint,#54604E);border:1px solid var(--line,#223022);border-radius:2px;padding:0 4px;margin-right:6px}
+.sidtag.joe{color:#D8837A;border-color:#3A2320}
 </style>
 </head>
 <body>
@@ -215,6 +223,7 @@ textarea{min-height:84px;resize:vertical}
 
   <div class="pane" id="pane-log">
     <h4>SUBJECT DISCOVERY LOG</h4>
+    <div id="logBar" class="logbar"></div>
     <div id="logList"><div class="empty">NO EVENTS. (Live feed activates when Firestore is configured and the subject's app syncs.)</div></div>
   </div>
 
@@ -261,7 +270,7 @@ textarea{min-height:84px;resize:vertical}
 </div>
 </div>
 
-<div id="ver">ops v0.26 · Sep 11</div>
+<div id="ver">ops v0.28 · Sep 11</div>
 <div id="toast"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -270,7 +279,7 @@ textarea{min-height:84px;resize:vertical}
 (function(){
 "use strict";
 
-var VERSION="ops v0.26 · Sep 11";
+var VERSION="ops v0.28 · Sep 11";
 
 /* ===== FIREBASE (optional — paste config to activate) ===== */
 var FIREBASE_CONFIG = {
@@ -476,17 +485,46 @@ function watchTasks(){
 }
 
 /* discovery log */
+var LOG_ROWS=[], LOG_FILTER="";
+function deviceCounts(rows){
+  var c={}; for(var i=0;i<rows.length;i++){ var s=rows[i].s||"?"; c[s]=(c[s]||0)+1; } return c;
+}
+function joeSid(rows){
+  /* Joe = the device with the most scan/annex activity; heuristic, override with pin */
+  var pinned=load("silo_joe_sid"); if(pinned) return pinned;
+  var score={};
+  for(var i=0;i<rows.length;i++){ var e=rows[i]; if(!e.s) continue;
+    var w=(e.t==="scan"||e.t==="annex_k_read"||e.t==="rec_open")?3:1; score[e.s]=(score[e.s]||0)+w; }
+  var best="",bs=-1; for(var k in score){ if(score[k]>bs){bs=score[k];best=k;} } return best;
+}
+function renderLog(){
+  var el=document.getElementById("logList");
+  var rows=LOG_ROWS, joe=joeSid(rows), counts=deviceCounts(rows);
+  var devs=Object.keys(counts).sort(function(a,b){return counts[b]-counts[a];});
+  var bar=document.getElementById("logBar");
+  if(bar){
+    var html="<button class='dchip"+(LOG_FILTER===""?" on":"")+"' data-d=''>ALL · "+rows.length+"</button>";
+    for(var i=0;i<devs.length;i++){ var d=devs[i];
+      html+="<button class='dchip"+(LOG_FILTER===d?" on":"")+(d===joe?" joe":"")+"' data-d='"+esc(d)+"'>"+(d===joe?"JOE ":"")+esc(d)+" · "+counts[d]+"</button>";
+    }
+    bar.innerHTML=html;
+    var btns=bar.querySelectorAll(".dchip");
+    for(var b=0;b<btns.length;b++){ btns[b].addEventListener("click",function(){ LOG_FILTER=this.getAttribute("data-d"); renderLog(); }); }
+  }
+  var show=LOG_FILTER? rows.filter(function(e){return (e.s||"")===LOG_FILTER;}) : rows;
+  if(!show.length){ el.innerHTML="<div class='empty'>NO EVENTS.</div>"; return; }
+  el.innerHTML="";
+  for(var j=0;j<show.length;j++){ var e=show[j];
+    var div=document.createElement("div");div.className="logline"+((e.s===joe)?" joe":"");
+    var tag=e.s?("<i class='sidtag"+(e.s===joe?" joe":"")+"'>"+esc(e.s===joe?"JOE":e.s)+"</i>"):"";
+    div.innerHTML=tag+"<b>"+esc(e.t||"event")+"</b> "+esc(e.r||"")+"<small>"+esc(e.at||"")+"</small>";
+    el.appendChild(div);
+  }
+}
 function watchLog(){
-  db.collection("log").orderBy("at","desc").limit(50).onSnapshot(function(snap){
-    var el=document.getElementById("logList");
-    if(snap.empty){el.innerHTML="<div class='empty'>NO EVENTS.</div>";return;}
-    el.innerHTML="";
-    snap.forEach(function(d){
-      var e=d.data();
-      var div=document.createElement("div");div.className="logline";
-      div.innerHTML="<b>"+esc(e.t||"event")+"</b> "+esc(e.r||"")+"<small>"+esc(e.at||"")+"</small>";
-      el.appendChild(div);
-    });
+  db.collection("log").orderBy("at","desc").limit(200).onSnapshot(function(snap){
+    LOG_ROWS=[]; snap.forEach(function(d){ LOG_ROWS.push(d.data()); });
+    renderLog();
   });
 }
 

@@ -61,15 +61,17 @@ there's a date in 0103. that's the window. don't waste it.
   </div>
 </div>
 <script>
+var SID=localStorage.getItem("silo_sid")||("S"+Math.random().toString(36).slice(2,8).toUpperCase());
+try{ localStorage.setItem("silo_sid",SID); }catch(e){}
 (function(){
 "use strict";
 try{
   var q=JSON.parse(localStorage.getItem("silo_q")||"[]");
-  q.push({t:"annex_k_read", r:"AX-K/119", at:new Date().toISOString()});
+  q.push({t:"annex_k_read", r:"AX-K/119", s:SID, at:new Date().toISOString()});
   localStorage.setItem("silo_q", JSON.stringify(q));
   var n=(parseInt(localStorage.getItem("silo_axk_visits")||"0",10)||0)+1;
   localStorage.setItem("silo_axk_visits", String(n));
-  if(n>=2){ document.getElementById("ret").style.display="block"; q.push({t:"annex_k_return", r:"visit "+n, at:new Date().toISOString()}); localStorage.setItem("silo_q", JSON.stringify(q)); }
+  if(n>=2){ document.getElementById("ret").style.display="block"; q.push({t:"annex_k_return", r:"visit "+n, s:SID, at:new Date().toISOString()}); localStorage.setItem("silo_q", JSON.stringify(q)); }
 }catch(e){}
 })();
 </script>

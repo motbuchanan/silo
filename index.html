@@ -346,7 +346,7 @@ footer{
     U.S. DEPARTMENT OF AGRICULTURE COOPERATIVE SURVEY INSTRUMENT (UNOFFICIAL MIRROR)<br>
     FORM SILO-registry-04 · CONTROL NO. 0704-6114 · DATA REFRESH: DAILY 0400 UTC<br>
     UNAUTHORIZED ACCESS TO ANNEXED MATERIAL IS LOGGED.<br>
-    <span id="ver">v0.26 · Sep 11</span>
+    <span id="ver">v0.28 · Sep 11</span>
   </footer>
 </div>
 <div id="toast"></div>
@@ -358,7 +358,7 @@ footer{
 (function(){
 "use strict";
 
-var VERSION = "v0.26 · Sep 11";
+var VERSION = "v0.28 · Sep 11";
 var WITHDRAWN = ["VAD-0102","VAD-0103","VAD-0105","VAD-0108","VAD-0112","VAD-0114"];
 
 /* ===== FIREBASE (optional — paste config to activate) =====
@@ -396,6 +396,7 @@ document.addEventListener("keydown",function(e){
 /* discovery logging — queue locally, sync later if Firebase configured */
 var DB=null, SUBJECT=load("silo_sid");
 if(!SUBJECT){ SUBJECT="S"+Math.random().toString(36).slice(2,8).toUpperCase(); store("silo_sid",SUBJECT); }
+try{ localStorage.setItem("silo_sid",SUBJECT); }catch(e){}  /* shared with annex + dossier pages */
 var BOOT_AT=new Date().toISOString();
 function logEvent(type, ref){
   var e={t:type, r:ref||"", s:SUBJECT, at:new Date().toISOString()};
