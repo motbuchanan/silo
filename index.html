@@ -155,6 +155,13 @@ header{
 #alerts .aln small{display:block;color:var(--txt-faint);margin-top:2px}
 #alerts .none{padding:14px 12px;font-family:var(--mono);font-size:11px;color:var(--txt-faint)}
 
+/* device tag panel (hidden until ver badge tapped 3x) */
+#devtag{display:none;margin-top:10px;padding:10px;border:1px solid var(--line);border-radius:3px;background:var(--panel);text-align:left;max-width:320px}
+#devtag.show{display:block}
+#devtag .dtstate{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--txt-faint);margin-bottom:8px}
+#devtag .dtstate.mine{color:var(--amber)}
+#devtag .dtbtn{display:block;width:100%;margin-top:6px;background:var(--panel-2);border:1px solid var(--line);border-radius:3px;color:var(--txt);font-family:var(--mono);font-size:11px;letter-spacing:.08em;padding:9px;cursor:pointer}
+#devtag .dtbtn:active{background:#1c281d}
 /* footer */
 footer{
   padding:20px 14px 8px;font-family:var(--mono);font-size:9.5px;line-height:1.8;
@@ -350,7 +357,12 @@ footer{
     U.S. DEPARTMENT OF AGRICULTURE COOPERATIVE SURVEY INSTRUMENT (UNOFFICIAL MIRROR)<br>
     FORM SILO-registry-04 · CONTROL NO. 0704-6114 · DATA REFRESH: DAILY 0400 UTC<br>
     UNAUTHORIZED ACCESS TO ANNEXED MATERIAL IS LOGGED.<br>
-    <span id="ver">v0.33 · Sep 13</span>
+    <span id="ver">v0.34 · Sep 13</span>
+    <div id="devtag">
+      <div class="dtstate" id="dtState">DEVICE: PLAYER</div>
+      <button class="dtbtn" id="dtMine">TAG THIS DEVICE AS MINE</button>
+      <button class="dtbtn" id="dtClear">RESET TO PLAYER</button>
+    </div>
   </footer>
 </div>
 <div id="toast"></div>
@@ -362,7 +374,7 @@ footer{
 (function(){
 "use strict";
 
-var VERSION = "v0.33 · Sep 13";
+var VERSION = "v0.34 · Sep 13";
 var WITHDRAWN = ["VAD-0102","VAD-0103","VAD-0105","VAD-0108","VAD-0112","VAD-0114","VAD-0117"];
 
 /* ===== FIREBASE (optional — paste config to activate) =====
@@ -389,7 +401,30 @@ function toast(msg){
   if(toastTimer)clearTimeout(toastTimer);
   toastTimer=setTimeout(function(){t.classList.remove("show");},1800);
 }
-document.getElementById("ver").addEventListener("click",function(){toast("SILO "+VERSION);});
+(function(){
+  var taps=0, t=null, ver=document.getElementById("ver");
+  function refresh(){
+    var role=load("silo_role")||"PLAYER";
+    var st=document.getElementById("dtState");
+    if(role==="BOSS"){ st.textContent="DEVICE: MINE (hidden from log review) · "+SUBJECT; st.classList.add("mine"); }
+    else if(role==="JOE"){ st.textContent="DEVICE: JOE · "+SUBJECT; st.classList.add("mine"); }
+    else{ st.textContent="DEVICE: PLAYER · "+SUBJECT; st.classList.remove("mine"); }
+  }
+  ver.addEventListener("click",function(){
+    taps++; clearTimeout(t); t=setTimeout(function(){taps=0;},1200);
+    if(taps>=3){ taps=0; document.getElementById("devtag").classList.toggle("show"); refresh(); }
+    else { toast("SILO "+VERSION); }
+  });
+  document.getElementById("dtMine").addEventListener("click",function(){ tagDevice("BOSS"); refresh(); });
+  document.getElementById("dtClear").addEventListener("click",function(){
+    try{ localStorage.removeItem("silo_role");
+      var e={t:"mark", r:"PLAYER", s:SUBJECT, at:new Date().toISOString()};
+      if(DB){ DB.collection("log").add(e); }
+      var q=JSON.parse(load("silo_q")||"[]"); q.push(e); store("silo_q",JSON.stringify(q));
+    }catch(x){}
+    toast("DEVICE RESET TO PLAYER"); refresh();
+  });
+})();
 document.addEventListener("keydown",function(e){
   if(e.key==="Escape"){
     if(document.getElementById("manual").classList.contains("open")){closeManual();}
