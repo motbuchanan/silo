@@ -273,7 +273,7 @@ textarea{min-height:84px;resize:vertical}
 </div>
 </div>
 
-<div id="ver">ops v0.32 · Sep 12</div>
+<div id="ver">ops v0.33 · Sep 13</div>
 <div id="toast"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -282,7 +282,7 @@ textarea{min-height:84px;resize:vertical}
 (function(){
 "use strict";
 
-var VERSION="ops v0.32 · Sep 12";
+var VERSION="ops v0.33 · Sep 13";
 
 /* ===== FIREBASE (optional — paste config to activate) ===== */
 var FIREBASE_CONFIG = {
@@ -500,7 +500,9 @@ function deviceRoles(rows){
   }
   return roles;
 }
+var JOE_PINNED="SNGK9EP";  /* confirmed Sep 13: real Joe's device (work PC dark since Fri, personal phone SY8M30C hidden) */
 function joeSid(rows){
+  if(JOE_PINNED) return JOE_PINNED;
   var pinned=load("silo_joe_sid"); if(pinned) return pinned;
   var roles=deviceRoles(rows);
   for(var k in roles){ if(roles[k]==="JOE") return k; }  /* explicit tag wins */
