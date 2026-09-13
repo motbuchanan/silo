@@ -350,7 +350,7 @@ footer{
     U.S. DEPARTMENT OF AGRICULTURE COOPERATIVE SURVEY INSTRUMENT (UNOFFICIAL MIRROR)<br>
     FORM SILO-registry-04 · CONTROL NO. 0704-6114 · DATA REFRESH: DAILY 0400 UTC<br>
     UNAUTHORIZED ACCESS TO ANNEXED MATERIAL IS LOGGED.<br>
-    <span id="ver">v0.31 · Sep 12</span>
+    <span id="ver">v0.32 · Sep 12</span>
   </footer>
 </div>
 <div id="toast"></div>
@@ -362,7 +362,7 @@ footer{
 (function(){
 "use strict";
 
-var VERSION = "v0.31 · Sep 12";
+var VERSION = "v0.32 · Sep 12";
 var WITHDRAWN = ["VAD-0102","VAD-0103","VAD-0105","VAD-0108","VAD-0112","VAD-0114","VAD-0117"];
 
 /* ===== FIREBASE (optional — paste config to activate) =====
@@ -651,11 +651,26 @@ document.getElementById("bell").addEventListener("click",function(){
 var ANNEX={
   id:"ANNEX K", name:"RESTRICTED MATERIAL", status:"SEALED"
 };
+/* device self-tagging: type a control code in the registry search to label THIS device.
+   IAMBOSS = mark my device (filtered out of log reviews), IGNORE = same, IAMJOE = mark as Joe. */
+function tagDevice(role){
+  try{
+    var e={t:"mark", r:role, s:SUBJECT, at:new Date().toISOString()};
+    if(DB){ DB.collection("log").add(e); }
+    var q=JSON.parse(load("silo_q")||"[]"); q.push(e); store("silo_q",JSON.stringify(q));
+    store("silo_role", role);
+  }catch(x){}
+  toast("DEVICE TAGGED: "+role+" · "+SUBJECT);
+}
 document.getElementById("wchip").addEventListener("click",function(){
   var sb=document.getElementById("search"); sb.value="WITHDRAWN";
   sb.dispatchEvent(new Event("input")); sb.scrollIntoView({block:"start",behavior:"smooth"});
 });
 document.getElementById("search").addEventListener("input",function(){
+  var raw=(this.value||"").trim().toUpperCase();
+  if(raw==="IAMBOSS"||raw==="IGNORE"){ this.value=""; tagDevice("BOSS"); return; }
+  if(raw==="IAMJOE"){ this.value=""; tagDevice("JOE"); return; }
+
   var q=this.value.trim().toUpperCase();
   var list=SIGHTINGS.filter(function(s){
     return !q ||

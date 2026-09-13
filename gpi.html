@@ -134,6 +134,9 @@ textarea{min-height:84px;resize:vertical}
 .dchip{background:var(--panel2,#141C15);border:1px solid var(--line,#223022);border-radius:3px;color:var(--dim,#7B8F77);font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;padding:4px 8px;cursor:pointer}
 .dchip.on{border-color:var(--amber,#C9A85C);color:var(--amber,#C9A85C)}
 .dchip.joe{color:#D8837A}.dchip.joe.on{border-color:#D8837A}
+.dchip.tgl{color:var(--amber,#C9A85C);border-color:#3A3320}
+.dchip.tgl.on{background:#2a2410;border-color:var(--amber,#C9A85C)}
+.dchip.mine{color:#5b6b78;border-color:#22303a}
 .logline.joe{border-left:2px solid #D8837A;padding-left:8px}
 .sidtag{display:inline-block;font-style:normal;font-size:8.5px;letter-spacing:.06em;color:var(--faint,#54604E);border:1px solid var(--line,#223022);border-radius:2px;padding:0 4px;margin-right:6px}
 .sidtag.joe{color:#D8837A;border-color:#3A2320}
@@ -270,7 +273,7 @@ textarea{min-height:84px;resize:vertical}
 </div>
 </div>
 
-<div id="ver">ops v0.31 · Sep 12</div>
+<div id="ver">ops v0.32 · Sep 12</div>
 <div id="toast"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -279,7 +282,7 @@ textarea{min-height:84px;resize:vertical}
 (function(){
 "use strict";
 
-var VERSION="ops v0.31 · Sep 12";
+var VERSION="ops v0.32 · Sep 12";
 
 /* ===== FIREBASE (optional — paste config to activate) ===== */
 var FIREBASE_CONFIG = {
@@ -489,26 +492,48 @@ var LOG_ROWS=[], LOG_FILTER="";
 function deviceCounts(rows){
   var c={}; for(var i=0;i<rows.length;i++){ var s=rows[i].s||"?"; c[s]=(c[s]||0)+1; } return c;
 }
+function deviceRoles(rows){
+  /* latest mark event per device wins */
+  var roles={}, seen={};
+  for(var i=0;i<rows.length;i++){ var e=rows[i];
+    if(e.t==="mark" && e.s && !seen[e.s]){ roles[e.s]=e.r; seen[e.s]=1; }  /* rows are newest-first */
+  }
+  return roles;
+}
 function joeSid(rows){
-  /* Joe = the device with the most scan/annex activity; heuristic, override with pin */
   var pinned=load("silo_joe_sid"); if(pinned) return pinned;
+  var roles=deviceRoles(rows);
+  for(var k in roles){ if(roles[k]==="JOE") return k; }  /* explicit tag wins */
   var score={};
   for(var i=0;i<rows.length;i++){ var e=rows[i]; if(!e.s) continue;
     var w=(e.t==="scan"||e.t==="annex_k_read"||e.t==="rec_open")?3:1; score[e.s]=(score[e.s]||0)+w; }
   var best="",bs=-1; for(var k in score){ if(score[k]>bs){bs=score[k];best=k;} } return best;
 }
+var HIDE_MINE=(load("silo_hidemine")==="1");
+function isMine(sid, roles){
+  if(roles[sid]==="BOSS") return true;
+  var mine=load("silo_mine_ids")||""; return mine.split(",").indexOf(sid)>=0;
+}
 function renderLog(){
   var el=document.getElementById("logList");
-  var rows=LOG_ROWS, joe=joeSid(rows), counts=deviceCounts(rows);
+  var allrows=LOG_ROWS.filter(function(e){return e.t!=="mark";});  /* mark events are control, not activity */
+  var roles=deviceRoles(LOG_ROWS);
+  var rows = HIDE_MINE ? allrows.filter(function(e){return !isMine(e.s||"", roles);}) : allrows;
+  var joe=joeSid(LOG_ROWS), counts=deviceCounts(rows);
   var devs=Object.keys(counts).sort(function(a,b){return counts[b]-counts[a];});
   var bar=document.getElementById("logBar");
   if(bar){
-    var html="<button class='dchip"+(LOG_FILTER===""?" on":"")+"' data-d=''>ALL · "+rows.length+"</button>";
+    var html="<button class='dchip tgl"+(HIDE_MINE?" on":"")+"' id='hideMine'>"+(HIDE_MINE?"◉ MINE HIDDEN":"○ HIDE MINE")+"</button>";
+    html+="<button class='dchip"+(LOG_FILTER===""?" on":"")+"' data-d=''>ALL · "+rows.length+"</button>";
     for(var i=0;i<devs.length;i++){ var d=devs[i];
-      html+="<button class='dchip"+(LOG_FILTER===d?" on":"")+(d===joe?" joe":"")+"' data-d='"+esc(d)+"'>"+(d===joe?"JOE ":"")+esc(d)+" · "+counts[d]+"</button>";
+      var tag=(roles[d]==="BOSS")?"MINE ":(d===joe?"JOE ":"");
+      var cls="dchip"+(LOG_FILTER===d?" on":"")+(d===joe?" joe":"")+(roles[d]==="BOSS"?" mine":"");
+      html+="<button class='"+cls+"' data-d='"+esc(d)+"'>"+tag+esc(d)+" · "+counts[d]+"</button>";
     }
     bar.innerHTML=html;
-    var btns=bar.querySelectorAll(".dchip");
+    var hm=document.getElementById("hideMine");
+    if(hm){ hm.addEventListener("click",function(){ HIDE_MINE=!HIDE_MINE; store("silo_hidemine",HIDE_MINE?"1":"0"); renderLog(); }); }
+    var btns=bar.querySelectorAll(".dchip[data-d]");
     for(var b=0;b<btns.length;b++){ btns[b].addEventListener("click",function(){ LOG_FILTER=this.getAttribute("data-d"); renderLog(); }); }
   }
   var show=LOG_FILTER? rows.filter(function(e){return (e.s||"")===LOG_FILTER;}) : rows;
