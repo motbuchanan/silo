@@ -137,6 +137,15 @@ textarea{min-height:84px;resize:vertical}
 .dchip.tgl{color:var(--amber,#C9A85C);border-color:#3A3320}
 .dchip.tgl.on{background:#2a2410;border-color:var(--amber,#C9A85C)}
 .dchip.mine{color:#5b6b78;border-color:#22303a}
+.dchip.mgr{color:var(--amber,#C9A85C);border-color:#3A3320}
+.mgrpanel{display:none;margin:8px 0 12px;padding:12px;border:1px solid var(--line,#223022);border-radius:4px;background:var(--panel2,#141C15)}
+.mgrhint{font-family:var(--mono);font-size:10px;line-height:1.6;color:var(--faint,#54604E);margin-bottom:10px}
+.mgrlist{margin-bottom:8px}
+.mgrrow{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--linedim,#1a241a);font-family:var(--mono);font-size:12px;color:var(--dim,#7B8F77)}
+.mgrx{background:none;border:1px solid #3A2320;border-radius:3px;color:#D8837A;font-family:var(--mono);font-size:9px;letter-spacing:.1em;padding:3px 7px;cursor:pointer}
+.mgrempty{font-family:var(--mono);font-size:11px;color:var(--faint,#54604E)}
+.mgrinput{width:100%;background:var(--panel,#0C120E);border:1px solid var(--line,#223022);border-radius:3px;color:var(--txt,#C8D8C2);font-family:var(--mono);font-size:13px;padding:9px;outline:none;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+.mgrbtn{width:100%;background:var(--amber,#C9A85C);color:#14100F;border:none;border-radius:3px;font-family:var(--mono);font-weight:600;font-size:11px;letter-spacing:.12em;padding:10px;cursor:pointer}
 .logline.joe{border-left:2px solid #D8837A;padding-left:8px}
 .sidtag{display:inline-block;font-style:normal;font-size:8.5px;letter-spacing:.06em;color:var(--faint,#54604E);border:1px solid var(--line,#223022);border-radius:2px;padding:0 4px;margin-right:6px}
 .sidtag.joe{color:#D8837A;border-color:#3A2320}
@@ -227,6 +236,12 @@ textarea{min-height:84px;resize:vertical}
   <div class="pane" id="pane-log">
     <h4>SUBJECT DISCOVERY LOG</h4>
     <div id="logBar" class="logbar"></div>
+    <div id="mgrPanel" class="mgrpanel">
+      <div class="mgrhint">These device IDs are yours and are hidden when MINE HIDDEN is on. Add each device once (personal phone, work phone, work computer). Shift-click or long-press any device chip above to toggle it too.</div>
+      <div id="mgrList" class="mgrlist"></div>
+      <input id="mgrInput" class="mgrinput" placeholder="paste a device ID (e.g. SRIXOIN) and press ADD" autocomplete="off" autocapitalize="characters">
+      <button id="mgrAdd" class="mgrbtn">ADD ID</button>
+    </div>
     <div id="logList"><div class="empty">NO EVENTS. (Live feed activates when Firestore is configured and the subject's app syncs.)</div></div>
   </div>
 
@@ -273,7 +288,7 @@ textarea{min-height:84px;resize:vertical}
 </div>
 </div>
 
-<div id="ver">ops v0.34 · Sep 13</div>
+<div id="ver">ops v0.35 · Sep 15</div>
 <div id="toast"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -282,7 +297,7 @@ textarea{min-height:84px;resize:vertical}
 (function(){
 "use strict";
 
-var VERSION="ops v0.34 · Sep 13";
+var VERSION="ops v0.35 · Sep 15";
 
 /* ===== FIREBASE (optional — paste config to activate) ===== */
 var FIREBASE_CONFIG = {
@@ -395,7 +410,7 @@ function initData(){
       db=firebase.firestore();
       try{ localStorage.removeItem("gpi_alerts"); }catch(e){}
       document.getElementById("modeLine").innerHTML="MODE: <b>LIVE</b> — synced as "+esc(WHO)+".";
-      watchTasks(); watchLog(); watchIdeas(); watchAlerts();
+      watchTasks(); watchLog(); watchIdeas(); watchAlerts(); pullMineFromCloud();
       return;
     }catch(e){
       document.getElementById("modeLine").innerHTML="MODE: <b>INIT ERROR</b> — "+esc(e && e.message ? e.message : String(e));
@@ -512,9 +527,31 @@ function joeSid(rows){
   var best="",bs=-1; for(var k in score){ if(score[k]>bs){bs=score[k];best=k;} } return best;
 }
 var HIDE_MINE=(load("silo_hidemine")==="1");
+var MINE_IDS = (load("silo_mine_ids")||"").split(",").filter(function(x){return x;});
+function saveMine(){
+  store("silo_mine_ids", MINE_IDS.join(","));
+  if(db){ try{ db.collection("config").doc("mine_ids").set({ids:MINE_IDS, at:new Date().toISOString()}); }catch(e){} }
+}
+function toggleMine(id){
+  var i=MINE_IDS.indexOf(id);
+  if(i>=0){ MINE_IDS.splice(i,1); toast("REMOVED FROM MINE: "+id); }
+  else { MINE_IDS.push(id); toast("ADDED TO MINE: "+id); }
+  saveMine(); renderLog();
+}
+function pullMineFromCloud(){
+  if(!db) return;
+  try{ db.collection("config").doc("mine_ids").get().then(function(d){
+    if(d.exists){ var ids=(d.data()||{}).ids||[]; 
+      // merge cloud + local
+      for(var i=0;i<ids.length;i++){ if(MINE_IDS.indexOf(ids[i])<0) MINE_IDS.push(ids[i]); }
+      store("silo_mine_ids", MINE_IDS.join(",")); renderLog();
+    }
+  }); }catch(e){}
+}
 function isMine(sid, roles){
   if(roles[sid]==="BOSS") return true;
-  var mine=load("silo_mine_ids")||""; return mine.split(",").indexOf(sid)>=0;
+  if(MINE_IDS.indexOf(sid)>=0) return true;
+  return false;
 }
 function renderLog(){
   var el=document.getElementById("logList");
@@ -532,11 +569,28 @@ function renderLog(){
       var cls="dchip"+(LOG_FILTER===d?" on":"")+(d===joe?" joe":"")+(roles[d]==="BOSS"?" mine":"");
       html+="<button class='"+cls+"' data-d='"+esc(d)+"'>"+tag+esc(d)+" · "+counts[d]+"</button>";
     }
+    html+="<button class='dchip mgr' id='mgrBtn'>⚙ MY DEVICES ("+MINE_IDS.length+")</button>";
     bar.innerHTML=html;
+    var mgr=document.getElementById("mgrBtn");
+    if(mgr){ mgr.addEventListener("click",function(){ var p=document.getElementById("mgrPanel"); p.style.display=(p.style.display==="block"?"none":"block"); renderMgr(); }); }
     var hm=document.getElementById("hideMine");
     if(hm){ hm.addEventListener("click",function(){ HIDE_MINE=!HIDE_MINE; store("silo_hidemine",HIDE_MINE?"1":"0"); renderLog(); }); }
     var btns=bar.querySelectorAll(".dchip[data-d]");
-    for(var b=0;b<btns.length;b++){ btns[b].addEventListener("click",function(){ LOG_FILTER=this.getAttribute("data-d"); renderLog(); }); }
+    for(var b=0;b<btns.length;b++){
+      var btn=btns[b];
+      btn.addEventListener("click",function(ev){
+        var d=this.getAttribute("data-d");
+        if(ev.shiftKey && d){ toggleMine(d); return; }   /* shift-click toggles "mine" */
+        LOG_FILTER=d; renderLog();
+      });
+      // long-press (touch) also toggles mine, for phones
+      (function(el){
+        var t=null, did=el.getAttribute("data-d");
+        el.addEventListener("touchstart",function(){ if(!did)return; t=setTimeout(function(){ toggleMine(did); },600); },{passive:true});
+        el.addEventListener("touchend",function(){ if(t)clearTimeout(t); });
+        el.addEventListener("touchmove",function(){ if(t)clearTimeout(t); });
+      })(btn);
+    }
   }
   var show=LOG_FILTER? rows.filter(function(e){return (e.s||"")===LOG_FILTER;}) : rows;
   if(!show.length){ el.innerHTML="<div class='empty'>NO EVENTS.</div>"; return; }
@@ -548,6 +602,25 @@ function renderLog(){
     el.appendChild(div);
   }
 }
+function renderMgr(){
+  var el=document.getElementById("mgrList"); if(!el) return;
+  if(!MINE_IDS.length){ el.innerHTML="<div class='mgrempty'>No devices marked yet.</div>"; return; }
+  el.innerHTML="";
+  for(var i=0;i<MINE_IDS.length;i++){ (function(id){
+    var row=document.createElement("div"); row.className="mgrrow";
+    row.innerHTML="<span>"+esc(id)+"</span>";
+    var x=document.createElement("button"); x.className="mgrx"; x.textContent="REMOVE";
+    x.addEventListener("click",function(){ toggleMine(id); renderMgr(); });
+    row.appendChild(x); el.appendChild(row);
+  })(MINE_IDS[i]); }
+}
+document.addEventListener("click",function(e){
+  if(e.target && e.target.id==="mgrAdd"){
+    var inp=document.getElementById("mgrInput"); var v=(inp.value||"").trim().toUpperCase();
+    if(v && MINE_IDS.indexOf(v)<0){ MINE_IDS.push(v); saveMine(); }
+    inp.value=""; renderMgr(); renderLog();
+  }
+});
 function watchLog(){
   db.collection("log").orderBy("at","desc").limit(200).onSnapshot(function(snap){
     LOG_ROWS=[]; snap.forEach(function(d){ LOG_ROWS.push(d.data()); });
