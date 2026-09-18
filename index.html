@@ -82,10 +82,10 @@ header{
 
 /* toolbar */
 .bar{
-  display:flex;flex-direction:column;gap:8px;padding:10px 12px;background:var(--panel);
+  display:flex;flex-direction:column;padding:10px 12px;background:var(--panel);
   border-bottom:1px solid var(--line);
 }
-.bar .counts{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end}
+.bar .counts{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;margin-top:8px}
 .bar .counts .count{margin-left:8px}
 .bar input{
   width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:3px;
@@ -153,6 +153,15 @@ header{
 .kv{display:flex;font-family:var(--mono);font-size:12px;margin:5px 0}
 .kv b{flex:0 0 84px;margin-right:10px;color:var(--txt-faint);font-weight:400;letter-spacing:.08em}
 .kv span{word-break:break-word}
+.hero{position:relative;width:100%;aspect-ratio:4/3;background:#131A12;border:1px solid var(--line);border-radius:4px;overflow:hidden;margin:10px 0 12px}
+@supports not (aspect-ratio:4/3){.hero{height:240px}}
+.hero .tiles{position:absolute;top:0;left:0;right:0;bottom:0;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}
+.hero .tiles img{width:100%;height:100%;object-fit:cover;display:block}
+.hero #shPhoto{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:none}
+.hero .cap{position:absolute;left:0;right:0;bottom:0;background:rgba(6,10,7,.78);color:var(--txt-dim);font-family:var(--mono);font-size:10px;letter-spacing:.12em;padding:6px 10px}
+.card .chero{width:100%;aspect-ratio:16/9;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;overflow:hidden;border-radius:4px;border:1px solid var(--line);margin-bottom:10px;background:#131A12}
+@supports not (aspect-ratio:16/9){.card .chero{height:180px}}
+.card .chero img{width:100%;height:100%;object-fit:cover;display:block}
 .notes{margin-top:12px;font-size:14px;color:var(--txt);border-left:2px solid var(--line);padding-left:10px}
 .links{margin-top:14px}
 .links h6{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--txt-faint);margin-bottom:8px}
@@ -260,6 +269,29 @@ footer{
 }
 .hdr-r{display:flex;align-items:center}
 @media (prefers-reduced-motion: reduce){ *{transition-duration:.001s !important;animation-duration:.001s !important} }
+/* v0.39 gallery + theories */
+.gallery{display:grid;grid-template-columns:1fr 1fr;grid-gap:10px;padding:4px 12px 12px}
+.gcell{background:var(--panel);border:1px solid var(--line);border-radius:6px;overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;position:relative}
+.gcell:active{background:var(--panel-2)}
+.gcell.new{border-color:var(--amber)}
+.gcell .gth{width:100%;height:110px;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;overflow:hidden;background:#131A12}
+.gcell .gth img{width:100%;height:100%;object-fit:cover;display:block}
+.gcell .gnm{font-size:13.5px;font-weight:600;line-height:1.25;padding:8px 9px 2px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.gcell .gmeta{font-family:var(--mono);font-size:10px;color:var(--txt-dim);letter-spacing:.06em;padding:0 9px 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gcell .gst{position:absolute;top:6px;left:6px;font-family:var(--mono);font-size:9px;letter-spacing:.1em;padding:3px 6px;background:rgba(12,18,14,.85);color:var(--txt-faint);border-radius:3px}
+.gcell .gst.new{color:#14100F;background:var(--amber);font-weight:700}
+.gcell .gst.rev{color:var(--amber)}
+.gallery .srow.hiddenrow{grid-column:1 / -1}
+.gallery .empty{grid-column:1 / -1}
+.actions.big{display:grid;grid-template-columns:1fr 1fr;grid-gap:10px;margin:14px 0 16px}
+.actions.big .abtn{margin:0;text-align:center;padding:15px 8px;font-size:13px;font-weight:600}
+.abtn.hot{background:var(--amber);color:#14100F;border-color:var(--amber);font-weight:700}
+.theories{padding:4px 12px 12px}
+.topic{background:var(--panel);border:1px solid var(--line);border-radius:6px;overflow:hidden;margin-bottom:12px}
+.topic img{display:none;width:100%;max-height:200px;object-fit:cover;border-bottom:1px solid var(--line)}
+.topic .tt{font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:var(--amber);padding:12px 14px 4px}
+.topic .tb{font-size:14px;line-height:1.5;padding:0 14px 6px}
+.topic .actions{padding:0 14px 14px;margin-top:6px}
 </style>
 </head>
 <body>
@@ -273,9 +305,9 @@ footer{
     <p class="fnote">The registry polls cooperating archives and public reporting channels. New intakes are logged automatically and flagged for review. Sources are unaffiliated and are not responsible for registry content.</p>
   </div></div>
   <header>
-    <div class="logo">SILO<small>SYSTEM FOR IMAGING LAND OBSERVATIONS</small></div>
+    <div class="logo">SILO<small>CROP CIRCLE TRACKER</small></div>
     <div class="hdr-r">
-    <button class="manbtn" id="btnManual">MANUAL</button>
+    <button class="manbtn" id="btnManual">HELP</button>
     <div class="bell" id="bell" role="button" aria-label="Alerts">
       <svg width="22" height="22" viewBox="0 0 16 16"><path d="M8 2 a4 4 0 0 1 4 4 v3 l1.5 2 h-11 l1.5 -2 v-3 a4 4 0 0 1 4 -4z M6.5 12 a1.5 1.5 0 0 0 3 0" fill="none" stroke="#C8D8C2" stroke-width="1.2"/></svg>
       <span class="dot zero" id="dot">0</span>
@@ -284,12 +316,12 @@ footer{
   </header>
 
   <div class="banner" id="bnInstall">
-    <b>INSTALL</b><span class="sp">Add SILO to your home screen for offline registry access.</span>
+    <b>INSTALL</b><span class="sp">Add SILO to your home screen so it opens like an app.</span>
     <button id="bnInstallGo">INSTALL</button>
     <button class="x" id="bnInstallX">✕</button>
   </div>
   <div class="banner" id="bnAlert">
-    <b>INTAKE ALERTS</b><span class="sp">Get notified when a new formation is logged.</span>
+    <b>INTAKE ALERTS</b><span class="sp">Get notified when a new crop circle is reported.</span>
     <button id="bnAlertGo">ENABLE</button>
     <button class="x" id="bnAlertX">✕</button>
   </div>
@@ -298,21 +330,23 @@ footer{
 
   <div id="stream" class="stream"></div>
 
-  <button id="regToggle" class="regtoggle">FULL REGISTRY · <span id="regCount">—</span> RECORDS <span class="caret">▾</span></button>
-  <div id="regwrap" class="regwrap">
+  <button id="regToggle" class="regtoggle open">ALL FORMATIONS · <span id="regCount">—</span> ON FILE <span class="caret">▾</span></button>
+  <div id="regwrap" class="regwrap open">
   <div class="bar">
-    <input id="search" type="text" placeholder="SEARCH REGISTRY…" autocomplete="off" autocapitalize="characters">
+    <input id="search" type="text" placeholder="SEARCH BY NAME, PLACE, OR YEAR…" autocomplete="off" autocapitalize="characters">
     <div class="counts">
-      <span class="count" id="count">— RECORDS</span>
+      <span class="count" id="count">— FORMATIONS</span>
       <span class="count wchip" id="wchip" title="withdrawn references">7 WITHDRAWN</span>
     </div>
   </div>
 
   <div class="registry">
-    <div class="rowhead"><span>REF</span><span>DESIGNATION</span><span style="text-align:right">STATUS</span></div>
-    <div id="rows"></div>
+    <div id="rows" class="gallery"></div>
   </div>
   </div>
+
+  <button id="thToggle" class="regtoggle">THEORIES &amp; RESEARCH · WHAT PEOPLE THINK IS GOING ON <span class="caret">▾</span></button>
+  <div id="thwrap" class="regwrap"><div id="theories" class="theories"></div></div>
 
   <div id="alerts">
     <div class="ahd">ALERT FEED</div>
@@ -324,20 +358,24 @@ footer{
     <div class="grab"></div>
     <h3 id="shName">—</h3>
     <div class="did" id="shId">—</div>
+    <div class="hero" id="shHero"><div class="tiles" id="shTiles"></div><img id="shPhoto" alt=""><div class="cap" id="shCap"></div></div>
     <div class="kv"><b>DATE</b><span id="shDate">—</span></div>
     <div class="kv"><b>REGION</b><span id="shRegion">—</span></div>
     <div class="kv"><b>TYPE</b><span id="shType">—</span></div>
     <div class="kv"><b>STATUS</b><span id="shStatus">—</span></div>
     <div class="kv"><b>COORDS</b><span id="shCoords">—</span></div>
     <div class="kv" id="shSrcRow" style="display:none"><b>SOURCE</b><span id="shSrc">—</span></div>
+    <div class="actions big">
+      <a class="abtn hot" id="shPhotos" target="_blank" rel="noopener">PHOTOS ↗</a>
+      <a class="abtn hot" id="shVideos" target="_blank" rel="noopener">VIDEOS ↗</a>
+      <a class="abtn" id="shRead" target="_blank" rel="noopener">READ MORE ↗</a>
+      <a class="abtn" id="shEarth" target="_blank" rel="noopener">GOOGLE EARTH ↗</a>
+      <a class="abtn" id="shDir" target="_blank" rel="noopener">DIRECTIONS ↗</a>
+      <button class="abtn" id="shZoom">SHOW ON MAP</button>
+      <a class="abtn" id="shSat" target="_blank" rel="noopener" style="display:none">SATELLITE ↗</a>
+    </div>
     <div class="notes" id="shNotes">—</div>
     <div id="shLinks" class="links"></div>
-    <div class="actions">
-      <a class="abtn" id="shDir" target="_blank" rel="noopener">DIRECTIONS ↗</a>
-      <a class="abtn" id="shSat" target="_blank" rel="noopener">SATELLITE ↗</a>
-      <a class="abtn" id="shEarth" target="_blank" rel="noopener">GOOGLE EARTH ↗</a>
-      <button class="abtn" id="shZoom">VIEW ON MAP</button>
-    </div>
     <div class="refs" id="shRefs"></div>
     <button class="abtn" id="shCloseBig" style="width:100%;margin-top:16px;padding:16px;font-size:14px">CLOSE RECORD</button>
   </div>
@@ -345,17 +383,17 @@ footer{
   <div id="manual">
     <div class="man">
       <button id="manClose" aria-label="Close">✕</button>
-      <h3>HOW THIS WORKS</h3>
-      <div class="sub">SILO REGISTRY TERMINAL</div>
-      <h5>1 · CARDS</h5>
-      <p>New intakes, notices, and recovered files arrive as cards at the top of the screen. Each card has one button. Tap it.</p>
-      <h5>2 · RECORDS</h5>
-      <p>A record shows the date, region, coordinates, and survey notes. Under the notes, LINKED FILES lists anything attached to that record. Tap a linked file to read it. CLOSE RECORD at the bottom takes you back.</p>
-      <h5>3 · NEAR YOU</h5>
-      <p>The last card is always the formation logged nearest you. It stays there.</p>
-      <h5>4 · THE FULL REGISTRY</h5>
-      <p>Every record on file is under FULL REGISTRY. You do not need it to follow new intakes.</p>
-      <p class="st">Status codes: <b class="c-log">LOGGED</b> verified. <b class="c-unv">UNVERIFIED</b> single source. <b class="c-rev">UNDER REVIEW</b> active survey. <b class="c-wdn">WITHDRAWN</b> removed from the index but still numbered.</p>
+      <h3>HOW TO USE THIS</h3>
+      <div class="sub">SILO · CROP CIRCLE TRACKER</div>
+      <h5>1 · NEW REPORTS</h5>
+      <p>New crop circles show up as cards at the top. Tap OPEN RECORD to see where it is and what is known about it.</p>
+      <h5>2 · PHOTOS AND VIDEOS</h5>
+      <p>Inside any record, tap PHOTOS to see pictures of that formation, VIDEOS for drone footage and documentaries, and READ MORE for articles. GOOGLE EARTH shows the actual field from above.</p>
+      <h5>3 · ALL FORMATIONS</h5>
+      <p>Scroll down for every crop circle on file, with a satellite picture of each field. Use the search box to find one by name, place, or year.</p>
+      <h5>4 · THEORIES &amp; RESEARCH</h5>
+      <p>The bottom section covers the big questions: who or what makes them, the hoaxers, the ones nobody has explained, and the researchers who studied the plants and soil.</p>
+      <p class="st">Status codes: <b class="c-log">LOGGED</b> confirmed. <b class="c-unv">UNVERIFIED</b> one report only. <b class="c-rev">UNDER REVIEW</b> being looked into. <b class="c-wdn">WITHDRAWN</b> removed from the list.</p>
       <button class="abtn" id="manBegin" style="width:100%;margin-top:20px;padding:16px;font-size:14px">CLOSE</button>
     </div>
   </div>
@@ -364,7 +402,7 @@ footer{
     U.S. DEPARTMENT OF AGRICULTURE COOPERATIVE SURVEY INSTRUMENT (UNOFFICIAL MIRROR)<br>
     FORM SILO-registry-04 · CONTROL NO. 0704-6114 · DATA REFRESH: DAILY 0400 UTC<br>
     UNAUTHORIZED ACCESS TO ANNEXED MATERIAL IS LOGGED.<br>
-    <span id="ver">v0.37 · Sep 18</span>
+    <span id="ver">v0.39 · Sep 18</span>
     <div id="devtag">
       <div class="dtstate" id="dtState">DEVICE: PLAYER</div>
       <button class="dtbtn" id="dtMine">TAG THIS DEVICE AS MINE</button>
@@ -381,7 +419,7 @@ footer{
 (function(){
 "use strict";
 
-var VERSION = "v0.37 · Sep 18";
+var VERSION = "v0.39 · Sep 18";
 var WITHDRAWN = ["VAD-0102","VAD-0103","VAD-0105","VAD-0108","VAD-0112","VAD-0114","VAD-0117"];
 
 /* ===== FIREBASE (optional — paste config to activate) =====
@@ -482,24 +520,90 @@ function esc(s){
 function render(list){
   var rows=document.getElementById("rows");
   rows.innerHTML="";
-  document.getElementById("count").textContent=list.length+" RECORDS";
+  document.getElementById("count").textContent=list.length+" FORMATIONS";
   if(!list.length){
-    rows.innerHTML="<div class='empty'>NO MATCHING RECORDS.</div>";
+    rows.innerHTML="<div class='empty'>NO MATCHING FORMATIONS.</div>";
     return;
   }
-  for(var i=0;i<list.length;i++){
+  var sorted=list.slice().sort(function(a,b){ return (b.date||"").localeCompare(a.date||""); });
+  for(var i=0;i<sorted.length;i++){
     (function(s){
       var d=document.createElement("div");
-      d.className="srow";
+      d.className="gcell"+(s["new"]?" new":"");
       var st=s.status==="UNDER REVIEW"?"rev":"";
       var stTxt=esc(s.status);
-      if(s["new"]){st="new";stTxt="NEW ◉";}
-      d.innerHTML="<span class='sid'>"+esc(s.id)+"</span><span class='snm'>"+esc(s.name)+"</span><span class='sst "+st+"'>"+stTxt+"</span>";
-      d.addEventListener("click",function(){openSheet(s);});
+      if(s["new"]){st="new";stTxt="NEW";}
+      var yr=(s.date||"").slice(0,4);
+      var place=(s.region||"").split(",")[0];
+      d.innerHTML="<div class='gth'></div><div class='gnm'>"+esc(s.name)+"</div><div class='gmeta'>"+esc(yr)+(place?" · "+esc(place):"")+"</div><div class='gst "+st+"'>"+stTxt+"</div>";
+      fillTiles(d.firstChild, s.lat, s.lng, 15);
+      d.addEventListener("click",function(){ logEvent("gallery_open",s.id); openSheet(s); });
       rows.appendChild(d);
-    })(list[i]);
+    })(sorted[i]);
   }
 }
+
+/* theories & research */
+var TOPICS=[
+  {t:"THE MOWING-DEVIL, 1678",wiki:"Mowing-Devil",yt:"mowing devil 1678 crop circle",
+   b:"The oldest known crop circle. A pamphlet from Hertfordshire, England, says a farmer refused to pay a mower, swore the Devil could mow it instead, and woke to find the oats cut in perfect circles overnight."},
+  {t:"DOUG &amp; DAVE, 1991",wiki:"Doug Bower and Dave Chorley",yt:"doug bower dave chorley crop circle confession",
+   b:"Two men from Southampton claimed they made hundreds of circles with a plank and a rope starting in 1978. Skeptics say case closed. Believers say they could not have made the ones that appeared after they retired."},
+  {t:"LEY LINES &amp; WILTSHIRE",wiki:"Ley line",yt:"ley lines crop circles wiltshire stonehenge avebury",
+   b:"Most of the world's crop circles appear in one county in England, around Stonehenge, Avebury, and Silbury Hill. Researchers point to ancient energy lines running through the area. Skeptics point to soft chalk soil and a lot of tourists."},
+  {t:"MILK HILL, 2001",wiki:"Milk Hill",yt:"milk hill 2001 crop circle 409 circles",
+   b:"409 circles in a spiral galaxy pattern, 800 feet across, appeared in one night on the highest hill in Wiltshire. Still the largest formation ever recorded. Nobody has ever claimed it."},
+  {t:"THE CHILBOLTON REPLY, 2001",wiki:"Arecibo message",yt:"chilbolton crop circle arecibo reply 2001",
+   b:"In 1974 scientists beamed a coded message toward the stars from the Arecibo telescope. In 2001 a near-copy of it appeared in a field next to the Chilbolton radio telescope, with the human figure and DNA changed, next to a face."},
+  {t:"THE CRABWOOD ALIEN, 2002",wiki:"Crop circle",yt:"crabwood crop circle 2002 alien disc message",
+   b:"A giant alien face holding a disc appeared near Winchester. The disc was decoded as binary text: BEWARE THE BEARERS OF FALSE GIFTS AND THEIR BROKEN PROMISES. MUCH PAIN BUT STILL TIME."},
+  {t:"PLASMA VORTEX THEORY",wiki:"Terence Meaden",yt:"plasma vortex crop circle theory meaden",
+   b:"Physicist Terence Meaden argued that spinning columns of charged air form on hillsides and flatten the crop in one sweep. It explains simple circles. It does not explain the pictures."},
+  {t:"BLT RESEARCH &amp; THE PLANT EVIDENCE",wiki:"Crop circle",yt:"BLT research levengood crop circle node bending",
+   b:"Biophysicist W.C. Levengood published studies claiming the stalks in real formations show blown-out nodes and altered seeds, as if cooked from the inside by microwaves. Hoaxed circles do not show it."},
+  {t:"RENDLESHAM FOREST, 1980",wiki:"Rendlesham Forest incident",yt:"rendlesham forest incident documentary",
+   b:"US Air Force personnel at a base in England reported a craft landing in the woods over three nights, leaving burn marks and radiation readings. Britain's most documented UFO case, often tied to nearby circle activity."},
+  {t:"THE HESSDALEN LIGHTS",wiki:"Hessdalen lights",yt:"hessdalen lights norway unexplained",
+   b:"A valley in Norway where glowing balls of light have been filmed and measured by scientists for decades. Similar lights have been filmed over Wiltshire fields the night before formations appeared."},
+  {t:"THE TULLY SAUCER NEST, 1966",wiki:"Tully, Queensland",yt:"tully saucer nest 1966 australia",
+   b:"A farmer in Queensland, Australia saw a disc rise out of a swamp and found the reeds swirled flat in a perfect circle. The case that gave the modern era its start, years before England."},
+  {t:"THE CIRCLEMAKERS",wiki:"Crop circle",yt:"circlemakers john lundberg making crop circles at night",
+   b:"A team of artists who openly make formations for ads and films, sometimes with permission and sometimes not. Watch how they work, then decide what you think about the rest."}
+];
+function wikiThumb(title, img){
+  if(!window.fetch) return;
+  try{
+    fetch("https://en.wikipedia.org/api/rest_v1/page/summary/"+encodeURIComponent(title.replace(/ /g,"_")))
+    .then(function(r){ return r.ok? r.json():null; })
+    .then(function(j){
+      if(!j||!j.thumbnail||!j.thumbnail.source) return;
+      img.onload=function(){ img.style.display="block"; };
+      img.src=j.thumbnail.source.replace(/\/\d+px-/,"/480px-");
+    }).catch(function(){});
+  }catch(e){}
+}
+function renderTheories(){
+  var box=document.getElementById("theories"); if(!box||box.childNodes.length) return;
+  for(var k=0;k<TOPICS.length;k++){ (function(tp){
+    var d=document.createElement("div"); d.className="topic";
+    d.innerHTML="<img alt=''><div class='tt'>"+tp.t+"</div><div class='tb'>"+tp.b+"</div>";
+    var row=document.createElement("div"); row.className="actions";
+    var v=document.createElement("a"); v.className="abtn hot"; v.target="_blank"; v.rel="noopener"; v.textContent="VIDEOS ↗";
+    v.href="https://www.youtube.com/results?search_query="+urlq(tp.yt);
+    var r=document.createElement("a"); r.className="abtn"; r.target="_blank"; r.rel="noopener"; r.textContent="READ MORE ↗";
+    r.href="https://en.wikipedia.org/wiki/Special:Search?search="+urlq(tp.wiki);
+    v.addEventListener("click",function(){ logEvent("topic_video",tp.t); });
+    r.addEventListener("click",function(){ logEvent("topic_read",tp.t); });
+    row.appendChild(v); row.appendChild(r); d.appendChild(row);
+    wikiThumb(tp.wiki, d.firstChild);
+    box.appendChild(d);
+  })(TOPICS[k]); }
+}
+document.getElementById("thToggle").addEventListener("click",function(){
+  var w=document.getElementById("thwrap"), on=!w.classList.contains("open");
+  w.classList[on?"add":"remove"]("open"); this.classList[on?"add":"remove"]("open");
+  if(on){ renderTheories(); logEvent("theories_open"); }
+});
 
 /* detail sheet */
 /* external documentation links.
@@ -514,33 +618,33 @@ function buildRefs(s){
   var undoc = (pushed && !s.sourceUrl) || UNDOCUMENTED.indexOf(s.id)>=0;
   if(s.sourceUrl){
     var dom=String(s.sourceUrl).replace(/^https?:\/\//,"").split("/")[0];
-    box.innerHTML="<h6>EXTERNAL DOCUMENTATION · INGESTED</h6>"+
-      "<a target='_blank' rel='noopener' href='"+esc(s.sourceUrl)+"'>SOURCE THREAD ↗<small>"+esc(dom)+(s.source?" · "+esc(s.source):"")+"</small></a>"+
-      "<a target='_blank' rel='noopener' href='https://www.google.com/search?tbm=isch&q="+urlq((s.name||"")+" crop circle "+(s.date||"").slice(0,4))+"'>AERIAL IMAGERY SEARCH ↗<small>photographs of this formation</small></a>";
+    box.innerHTML="<h6>SOURCES</h6>"+
+      "<a target='_blank' rel='noopener' href='"+esc(s.sourceUrl)+"'>ORIGINAL REPORT ↗<small>"+esc(dom)+(s.source?" · "+esc(s.source):"")+"</small></a>"+
+      "<a target='_blank' rel='noopener' href='https://www.google.com/search?tbm=isch&q="+urlq((s.name||"")+" crop circle "+(s.date||"").slice(0,4))+"'>MORE PHOTOS ↗<small>image search for this formation</small></a>";
     return;
   }
   if(undoc){
-    box.innerHTML="<h6>EXTERNAL DOCUMENTATION</h6>"+
-      "<div class='nodoc'>NONE ON FILE. THIS INTAKE HAS NOT BEEN PUBLISHED "+
-      "TO ANY COOPERATING ARCHIVE. DO NOT CIRCULATE PENDING SURVEY.</div>";
+    box.innerHTML="<h6>SOURCES</h6>"+
+      "<div class='nodoc'>NOTHING PUBLISHED YET. THIS REPORT CAME IN THROUGH THE FEED AND "+
+      "NO SITE OR NEWS OUTLET HAS COVERED IT. CHECK BACK.</div>";
     return;
   }
   var label = s.name + " " + yr;
-  var h="<h6>EXTERNAL DOCUMENTATION · UNAFFILIATED SOURCES</h6>";
+  var h="<h6>MORE ON THIS FORMATION</h6>";
   h+="<a target='_blank' rel='noopener' href='https://www.google.com/search?tbm=isch&q="+
-     urlq(label+" crop circle")+"'>AERIAL IMAGERY SEARCH ↗<small>photographs of this formation</small></a>";
+     urlq(label+" crop circle")+"'>MORE PHOTOS ↗<small>image search for this formation</small></a>";
   h+="<a target='_blank' rel='noopener' href='https://www.google.com/search?q="+
-     urlq("site:cropcircleconnector.com "+s.name+" "+yr)+"'>CROP CIRCLE CONNECTOR ↗<small>primary reporting archive, 1995 to present</small></a>";
+     urlq("site:cropcircleconnector.com "+s.name+" "+yr)+"'>CROP CIRCLE CONNECTOR ↗<small>the main reporting site, 1995 to now</small></a>";
   h+="<a target='_blank' rel='noopener' href='https://www.google.com/search?q="+
-     urlq("site:circleresearcharchive.com "+s.name)+"'>CIRCLE RESEARCH ARCHIVE ↗<small>historical research database</small></a>";
+     urlq("site:circleresearcharchive.com "+s.name)+"'>CIRCLE RESEARCH ARCHIVE ↗<small>older formations and research</small></a>";
   if(s.wiki){
     h+="<a target='_blank' rel='noopener' href='https://en.wikipedia.org/wiki/Special:Search?search="+
-       urlq(s.wiki)+"'>ENCYCLOPEDIA ENTRY ↗<small>"+esc(s.wiki)+"</small></a>";
+       urlq(s.wiki)+"'>WIKIPEDIA ↗<small>"+esc(s.wiki)+"</small></a>";
   }
   h+="<a target='_blank' rel='noopener' href='https://www.google.com/search?q="+
-     urlq(label+" crop circle "+s.region.split(",")[0])+"'>OPEN WEB SEARCH ↗<small>everything else published on this intake</small></a>";
+     urlq(label+" crop circle "+s.region.split(",")[0])+"'>WEB SEARCH ↗<small>everything else written about it</small></a>";
   h+="<a target='_blank' rel='noopener' href='https://www.reddit.com/r/cropcircles/search/?q="+
-     urlq(s.name)+"&restrict_sr=1'>DISCUSSION THREADS ↗<small>r/cropcircles</small></a>";
+     urlq(s.name)+"&restrict_sr=1'>DISCUSSION ↗<small>r/cropcircles on reddit</small></a>";
   box.innerHTML=h;
 }
 
@@ -646,10 +750,12 @@ function makeCard(it){
   }
   var isHere=(it.k==="here");
   d.className="card "+(isHere?"here":(o["new"]?"new":"rec"));
-  var kicker=isHere?"NEAR YOU · ON FILE":(o["new"]?"NEW FORMATION LOGGED":"FORMATION LOGGED");
+  var kicker=isHere?"REPORTED NEAR YOU · WADSWORTH":(o["new"]?"NEW CROP CIRCLE REPORTED":"CROP CIRCLE REPORTED");
   d.innerHTML="<div class='ck'>"+kicker+" · "+esc(fmtDate(o.date))+"</div>"+
     "<div class='ct'>"+esc(o.name||o.id)+"</div>"+
-    "<div class='cs'>"+esc(o.id)+" · "+esc(o.region||"")+(o.source?" · via "+esc(o.source):"")+"</div>";
+    "<div class='cs'>"+(isHere?"A formation was reported in this field. Nothing has been published on it yet. ":"")+esc(o.id)+" · "+esc(o.region||"")+(o.source?" · via "+esc(o.source):"")+"</div>";
+  var ch=document.createElement("div"); ch.className="chero"; fillTiles(ch,o.lat,o.lng,16);
+  d.insertBefore(ch, d.firstChild);
   var b=document.createElement("button"); b.className="cb"; b.textContent="OPEN RECORD";
   b.addEventListener("click",function(){ logEvent("card_open",o.id); map.setView([o.lat,o.lng],13); openSheet(o); });
   d.appendChild(b); return d;
@@ -657,6 +763,40 @@ function makeCard(it){
 function srcLabel(s){ return s.source? "via "+s.source : ""; }
 
 var current=null;
+/* satellite tiles of the actual field (same imagery the map uses) */
+function tileUrls(lat,lng,z){
+  var n=Math.pow(2,z), la=lat*Math.PI/180;
+  var fx=(lng+180)/360*n, fy=(1-Math.log(Math.tan(la)+1/Math.cos(la))/Math.PI)/2*n;
+  var x=Math.floor(fx), y=Math.floor(fy);
+  var x0=(fx-x<0.5)?x-1:x, y0=(fy-y<0.5)?y-1:y;
+  var u=function(xx,yy){ return "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/"+z+"/"+yy+"/"+xx; };
+  return [u(x0,y0),u(x0+1,y0),u(x0,y0+1),u(x0+1,y0+1)];
+}
+function fillTiles(box,lat,lng,z){
+  box.innerHTML="";
+  if(typeof lat!=="number"||typeof lng!=="number") return;
+  var urls=tileUrls(lat,lng,z);
+  for(var k=0;k<4;k++){ var im=document.createElement("img"); im.src=urls[k]; im.alt=""; im.loading="lazy"; box.appendChild(im); }
+}
+function fillHero(s){
+  var photo=document.getElementById("shPhoto"), cap=document.getElementById("shCap"), tiles=document.getElementById("shTiles");
+  photo.style.display="none"; photo.src="";
+  fillTiles(tiles, s.lat, s.lng, 16);
+  var undoc = !!s.pushedAt || UNDOCUMENTED.indexOf(s.id)>=0;
+  cap.textContent = undoc ? "SATELLITE VIEW OF THE FIELD · IMAGERY IS OLDER THAN THE REPORT" : "SATELLITE VIEW OF THE FIELD";
+  if(s.wiki && window.fetch){
+    try{
+      fetch("https://en.wikipedia.org/api/rest_v1/page/summary/"+encodeURIComponent(s.wiki.replace(/ /g,"_")))
+      .then(function(r){ return r.ok? r.json():null; })
+      .then(function(j){
+        if(!j||!j.thumbnail||!j.thumbnail.source) return;
+        if(current!==s) return;
+        photo.onload=function(){ photo.style.display="block"; cap.textContent="PHOTO · "+(j.title||s.wiki).toUpperCase(); };
+        photo.src=j.thumbnail.source.replace(/\/\d+px-/,"/640px-");
+      }).catch(function(){});
+    }catch(e){}
+  }
+}
 function buildLinks(s){
   var box=document.getElementById("shLinks"); if(!box) return;
   var txt=s.notes||"", seen={}, items=[];
@@ -692,7 +832,7 @@ function buildLinks(s){
 function openSheet(s){
   current=s;
   document.getElementById("shName").textContent=s.name;
-  document.getElementById("shId").textContent=s.id+" · REGISTRY ENTRY";
+  document.getElementById("shId").textContent=s.id+" · REPORT";
   document.getElementById("shDate").textContent=s.date;
   document.getElementById("shRegion").textContent=s.region;
   document.getElementById("shType").textContent=s.type;
@@ -701,11 +841,18 @@ function openSheet(s){
   var srow=document.getElementById("shSrcRow");
   if(s.source){ document.getElementById("shSrc").textContent=s.source+(s.pushedAt?" · ingested "+String(s.pushedAt).slice(0,10):" · archive re-index"); srow.style.display="flex"; }
   else{ srow.style.display="none"; }
+  fillHero(s);
   document.getElementById("shNotes").innerHTML=linkRefs(s.notes||"");
   buildLinks(s);
   document.getElementById("shDir").href="https://www.google.com/maps/dir/?api=1&destination="+s.lat+","+s.lng;
   document.getElementById("shSat").href="https://www.google.com/maps/@"+s.lat+","+s.lng+",2000m/data=!3m1!1e3";
   document.getElementById("shEarth").href="https://earth.google.com/web/@"+s.lat+","+s.lng+",0a,2000d,35y,0h,0t,0r";
+  var yr0=(s.date||"").slice(0,4), q0=(s.name||"")+" crop circle "+yr0;
+  document.getElementById("shPhotos").href="https://www.google.com/search?tbm=isch&q="+urlq(q0);
+  document.getElementById("shVideos").href="https://www.youtube.com/results?search_query="+urlq(q0);
+  document.getElementById("shRead").href= s.wiki
+    ? "https://en.wikipedia.org/wiki/Special:Search?search="+urlq(s.wiki)
+    : "https://www.google.com/search?q="+urlq(q0+" "+(s.region||"").split(",")[0]);
   buildRefs(s);
   document.getElementById("sheet").classList.add("open");
   document.getElementById("sheet").scrollTop=0;
@@ -718,6 +865,9 @@ function closeSheet(){
 }
 document.getElementById("sheetClose").addEventListener("click",closeSheet);
 document.getElementById("shCloseBig").addEventListener("click",closeSheet);
+["shPhotos","shVideos","shRead","shEarth","shDir"].forEach(function(id){
+  document.getElementById(id).addEventListener("click",function(){ if(current){ logEvent("act_"+id.slice(2).toLowerCase(), current.id); } });
+});
 document.getElementById("shZoom").addEventListener("click",function(){
   if(!current)return;
   closeSheet();
