@@ -250,6 +250,7 @@ textarea{min-height:84px;resize:vertical}
     <select class="f" id="aKind">
       <option value="sighting">KIND: SIGHTING (map + registry)</option>
       <option value="notice">KIND: SYSTEM NOTICE (alert feed only, no map)</option>
+      <option value="file">KIND: FILE CARD (a card with one READ button that opens a page)</option>
     </select>
     <select class="f" id="aSource">
       <option value="">SOURCE: none (reads as an unpublished intake)</option>
@@ -288,7 +289,7 @@ textarea{min-height:84px;resize:vertical}
 </div>
 </div>
 
-<div id="ver">ops v0.35 · Sep 15</div>
+<div id="ver">ops v0.36 · Sep 18</div>
 <div id="toast"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -297,7 +298,7 @@ textarea{min-height:84px;resize:vertical}
 (function(){
 "use strict";
 
-var VERSION="ops v0.35 · Sep 15";
+var VERSION="ops v0.36 · Sep 18";
 
 /* ===== FIREBASE (optional — paste config to activate) ===== */
 var FIREBASE_CONFIG = {
@@ -649,7 +650,7 @@ function renderPushed(list){
   for(var i=0;i<list.length;i++){
     (function(a){
       var d=document.createElement("div");d.className="logline";
-      d.innerHTML="<b>"+esc(a.id)+"</b> "+esc(a.name||"")+"<small>"+(a.kind==="notice"?"SYSTEM NOTICE":esc(a.region||""))+(a.source?" · via "+esc(a.source):"")+" · pushed by "+esc(a.by||"?")+"</small>";
+      d.innerHTML="<b>"+esc(a.id)+"</b> "+esc(a.name||"")+"<small>"+(a.kind==="notice"?"SYSTEM NOTICE":(a.kind==="file"?"FILE CARD → "+esc(a.url||""):esc(a.region||"")))+(a.source?" · via "+esc(a.source):"")+" · pushed by "+esc(a.by||"?")+"</small>";
       if(db){
         var b=document.createElement("button");b.className="b warn";b.style.marginTop="6px";b.textContent="PULL BACK";
         b.addEventListener("click",function(){
@@ -665,6 +666,18 @@ function renderPushed(list){
 document.getElementById("aFire").addEventListener("click",function(){
   var kind=document.getElementById("aKind").value;
   var ref=val("aRef").toUpperCase();
+  if(kind==="file"){
+    var url=val("aSrcUrl");
+    if(!url){ toast("FILE CARD NEEDS A LINK in the SOURCE URL box (e.g. rec.html?id=VAD-0103)"); return; }
+    if(!ref){ var d1=new Date(); ref="FILE-"+d1.toISOString().slice(2,10).replace(/-/g,"")+"-"+(d1.getHours()<10?"0":"")+d1.getHours()+(d1.getMinutes()<10?"0":"")+d1.getMinutes(); }
+    var fc={ id:ref, kind:"file", name:val("aName")||"ARCHIVED COPY RECOVERED", notes:val("aNotes")||"A withdrawn record was recovered and attached.", url:url,
+             region:"", lat:0, lng:0, date:val("aDate")||new Date().toISOString().slice(0,10), type:"ADMINISTRATIVE", status:"FILE", by:WHO, pushedAt:new Date().toISOString() };
+    if(document.getElementById("aNew").checked){ fc["new"]=true; }
+    if(ensureDb()){ db.collection("alerts").doc(ref).set(fc).then(function(){toast("FILE CARD PUSHED");}).catch(function(err){toast("PUSH FAILED: "+((err&&err.code)||"error"));}); }
+    else{ toast("NOT LIVE — reload the console"); return; }
+    ["aRef","aName","aNotes","aSrcUrl"].forEach(function(id){document.getElementById(id).value="";});
+    return;
+  }
   if(kind==="notice"){
     if(!ref){ var d0=new Date(); ref="SYS-"+d0.toISOString().slice(2,10).replace(/-/g,"")+"-"+(d0.getHours()<10?"0":"")+d0.getHours()+(d0.getMinutes()<10?"0":"")+d0.getMinutes(); }
     var n={ id:ref, kind:"notice", name:val("aName")||"REGISTRY", notes:val("aNotes")||"Scheduled maintenance.", region:"", lat:0, lng:0,

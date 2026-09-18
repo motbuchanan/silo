@@ -69,7 +69,7 @@ header{
 
 /* map */
 #map{
-  height:46vh;min-height:260px;background:#131A12;border-bottom:1px solid var(--line);
+  height:30vh;min-height:180px;background:#131A12;border-bottom:1px solid var(--line);
   position:relative;z-index:0;isolation:isolate;
 }
 .leaflet-pane,.leaflet-top,.leaflet-bottom,.leaflet-control{z-index:auto !important}
@@ -93,6 +93,27 @@ header{
 .bar input::placeholder{color:var(--txt-faint)}
 .count{font-family:var(--mono);font-size:11px;color:var(--txt-faint);letter-spacing:.1em;white-space:nowrap}
 
+/* stream (Joe's front page) */
+.stream{padding:12px 12px 4px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:16px 16px 14px;margin-bottom:12px}
+.card.new{border-color:var(--amber)}
+.card.ntc{border-left:3px solid var(--amber)}
+.card.file{border-left:3px solid var(--alert)}
+.card.here{border-style:dashed}
+.card .ck{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--txt-faint);margin-bottom:6px}
+.card.new .ck{color:var(--amber)}
+.card.file .ck{color:var(--alert)}
+.card .ct{font-size:19px;font-weight:600;line-height:1.25;margin-bottom:4px}
+.card .cs{font-family:var(--mono);font-size:12px;color:var(--txt-dim);letter-spacing:.04em;line-height:1.5;margin-bottom:12px}
+.card .cb{display:block;width:100%;text-align:center;background:var(--amber);color:#14100F;border:none;border-radius:4px;font-family:var(--mono);font-weight:700;font-size:15px;letter-spacing:.12em;padding:15px;cursor:pointer;text-decoration:none;-webkit-tap-highlight-color:transparent}
+.card.file .cb{background:var(--alert)}
+.card .cb:active{opacity:.85}
+.card.ntc .cs{margin-bottom:0}
+.regtoggle{display:block;width:calc(100% - 24px);margin:6px 12px 10px;background:var(--panel-2);border:1px solid var(--line);border-radius:4px;color:var(--txt-dim);font-family:var(--mono);font-size:12px;letter-spacing:.14em;padding:14px;cursor:pointer}
+.regtoggle .caret{display:inline-block;margin-left:6px;transition:transform .2s}
+.regwrap{display:none}
+.regwrap.open{display:block}
+.regtoggle.open .caret{transform:rotate(180deg)}
 /* registry */
 .registry{padding:0}
 .rowhead{
@@ -205,6 +226,12 @@ footer{
 .refs a small{display:block;color:var(--txt-faint);font-size:9.5px;letter-spacing:.06em;margin-top:2px}
 .refs .nodoc{font-family:var(--mono);font-size:11px;color:var(--alert);letter-spacing:.06em;padding:6px 0}
 
+/* full registry: collapsed by default */
+document.getElementById("regToggle").addEventListener("click",function(){
+  var w=document.getElementById("regwrap"), on=!w.classList.contains("open");
+  w.classList[on?"add":"remove"]("open"); this.classList[on?"add":"remove"]("open");
+  if(on){ logEvent("registry_open"); }
+});
 /* field manual */
 #manual{
   position:fixed;inset:0;z-index:1000;background:rgba(6,10,7,.94);display:none;
@@ -268,6 +295,10 @@ footer{
 
   <div id="map"></div>
 
+  <div id="stream" class="stream"></div>
+
+  <button id="regToggle" class="regtoggle">FULL REGISTRY · <span id="regCount">—</span> RECORDS <span class="caret">▾</span></button>
+  <div id="regwrap" class="regwrap">
   <div class="bar">
     <input id="search" type="text" placeholder="SEARCH REGISTRY…" autocomplete="off" autocapitalize="characters">
     <div class="counts">
@@ -279,6 +310,7 @@ footer{
   <div class="registry">
     <div class="rowhead"><span>REF</span><span>DESIGNATION</span><span style="text-align:right">STATUS</span></div>
     <div id="rows"></div>
+  </div>
   </div>
 
   <div id="alerts">
@@ -305,6 +337,7 @@ footer{
       <button class="abtn" id="shZoom">VIEW ON MAP</button>
     </div>
     <div class="refs" id="shRefs"></div>
+    <button class="abtn" id="shCloseBig" style="width:100%;margin-top:16px;padding:16px;font-size:14px">CLOSE RECORD</button>
   </div>
 
   <div id="manual">
@@ -357,7 +390,7 @@ footer{
     U.S. DEPARTMENT OF AGRICULTURE COOPERATIVE SURVEY INSTRUMENT (UNOFFICIAL MIRROR)<br>
     FORM SILO-registry-04 · CONTROL NO. 0704-6114 · DATA REFRESH: DAILY 0400 UTC<br>
     UNAUTHORIZED ACCESS TO ANNEXED MATERIAL IS LOGGED.<br>
-    <span id="ver">v0.35 · Sep 15</span>
+    <span id="ver">v0.36 · Sep 18</span>
     <div id="devtag">
       <div class="dtstate" id="dtState">DEVICE: PLAYER</div>
       <button class="dtbtn" id="dtMine">TAG THIS DEVICE AS MINE</button>
@@ -374,7 +407,7 @@ footer{
 (function(){
 "use strict";
 
-var VERSION = "v0.35 · Sep 15";
+var VERSION = "v0.36 · Sep 18";
 var WITHDRAWN = ["VAD-0102","VAD-0103","VAD-0105","VAD-0108","VAD-0112","VAD-0114","VAD-0117"];
 
 /* ===== FIREBASE (optional — paste config to activate) =====
@@ -604,7 +637,49 @@ document.getElementById("feedModal").addEventListener("click",function(e){ if(e.
 setTimeout(feedBoot,600);
 
 /* system notices pushed from the console (kind:"notice") — shown in the alert feed, never on the map */
-var NOTICES=[];
+var NOTICES=[], FILES=[];
+var HERE_ID="VAD-0119";  /* the anchor card: the formation near him, always at the bottom of the stream */
+function fmtDate(s){ return (s||"").slice(0,10); }
+function renderStream(){
+  var el=document.getElementById("stream"); if(!el) return;
+  var items=[];
+  for(var n=0;n<NOTICES.length;n++){ items.push({k:"ntc", at:NOTICES[n].pushedAt||NOTICES[n].date||"", o:NOTICES[n]}); }
+  for(var f=0;f<FILES.length;f++){ items.push({k:"file", at:FILES[f].pushedAt||FILES[f].date||"", o:FILES[f]}); }
+  for(var r=0;r<SIGHTINGS.length;r++){ var s=SIGHTINGS[r];
+    if(s.id===HERE_ID) continue;
+    if(s["new"]||s.pushedAt){ items.push({k:"rec", at:s.pushedAt||s.date||"", o:s}); }
+  }
+  items.sort(function(a,b){ return (b.at||"").localeCompare(a.at||""); });
+  el.innerHTML="";
+  for(var i=0;i<items.length;i++){ el.appendChild(makeCard(items[i])); }
+  var here=null; for(var h=0;h<SIGHTINGS.length;h++){ if(SIGHTINGS[h].id===HERE_ID){ here=SIGHTINGS[h]; break; } }
+  if(here){ el.appendChild(makeCard({k:"here", at:"", o:here})); }
+  var rc=document.getElementById("regCount"); if(rc){ rc.textContent=String(SIGHTINGS.length); }
+}
+function makeCard(it){
+  var d=document.createElement("div"), o=it.o;
+  if(it.k==="ntc"){
+    d.className="card ntc";
+    d.innerHTML="<div class='ck'>SYSTEM NOTICE · "+esc(fmtDate(o.pushedAt||o.date))+"</div><div class='ct'>"+esc(o.name||"REGISTRY")+"</div><div class='cs'>"+esc(o.notes||"")+"</div>";
+    return d;
+  }
+  if(it.k==="file"){
+    d.className="card file";
+    d.innerHTML="<div class='ck'>RECOVERED FILE · "+esc(fmtDate(o.pushedAt||o.date))+"</div><div class='ct'>"+esc(o.name||"ARCHIVED COPY")+"</div><div class='cs'>"+esc(o.notes||"")+"</div>";
+    var a=document.createElement("a"); a.className="cb"; a.href=o.url||"#"; a.textContent=o.button||"READ";
+    a.addEventListener("click",function(){ logEvent("card_file",o.id||o.url||""); });
+    d.appendChild(a); return d;
+  }
+  var isHere=(it.k==="here");
+  d.className="card "+(isHere?"here":(o["new"]?"new":"rec"));
+  var kicker=isHere?"NEAR YOU · ON FILE":(o["new"]?"NEW FORMATION LOGGED":"FORMATION LOGGED");
+  d.innerHTML="<div class='ck'>"+kicker+" · "+esc(fmtDate(o.date))+"</div>"+
+    "<div class='ct'>"+esc(o.name||o.id)+"</div>"+
+    "<div class='cs'>"+esc(o.id)+" · "+esc(o.region||"")+(o.source?" · via "+esc(o.source):"")+"</div>";
+  var b=document.createElement("button"); b.className="cb"; b.textContent="OPEN RECORD";
+  b.addEventListener("click",function(){ logEvent("card_open",o.id); map.setView([o.lat,o.lng],13); openSheet(o); });
+  d.appendChild(b); return d;
+}
 function srcLabel(s){ return s.source? "via "+s.source : ""; }
 
 var current=null;
@@ -635,6 +710,7 @@ function closeSheet(){
   lock(false);
 }
 document.getElementById("sheetClose").addEventListener("click",closeSheet);
+document.getElementById("shCloseBig").addEventListener("click",closeSheet);
 document.getElementById("shZoom").addEventListener("click",function(){
   if(!current)return;
   closeSheet();
@@ -835,9 +911,10 @@ var STATIC=[], LIVE=[], pinLayer=L.layerGroup().addTo(map), fitted=false, STATIC
 
 function rebuild(fit){
   var seen={}, merged=[];
-  NOTICES=[];
+  NOTICES=[]; FILES=[];
   for(var i=0;i<LIVE.length;i++){
     if(LIVE[i].kind==="notice"){ NOTICES.push(LIVE[i]); continue; }
+    if(LIVE[i].kind==="file"){ FILES.push(LIVE[i]); continue; }
     if(!seen[LIVE[i].id]){ seen[LIVE[i].id]=1; merged.push(LIVE[i]); }
   }
   for(var j=0;j<STATIC.length;j++){ if(!seen[STATIC[j].id]){ seen[STATIC[j].id]=1; merged.push(STATIC[j]); } }
@@ -850,6 +927,7 @@ function rebuild(fit){
   });
   SIGHTINGS=merged;
   render(SIGHTINGS);
+  renderStream();
   refreshAlerts();
   pinLayer.clearLayers();
   markers={};
@@ -903,10 +981,7 @@ fetch("sightings.json").then(function(r){return r.json();}).then(function(j){
   rebuild(true);
   openHash();
   if(PENDING_LIVE){ rebuild(false); }
-  if(!load("silo_manual_seen") && !window.location.hash){
-    store("silo_manual_seen","1");
-    setTimeout(openManual,400);
-  }
+  /* first-run manual no longer auto-opens; it confused the subject. The header button still opens it. */
 }).catch(function(){
   // static file failed — retry once, then fall back to whatever is live
   fetch("sightings.json?retry=1").then(function(r){return r.json();}).then(function(j){
