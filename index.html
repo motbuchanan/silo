@@ -32,7 +32,7 @@ body.locked{overflow:hidden;touch-action:none}
 #feed.syncing .fdot{background:var(--amber);animation:fpulse .8s infinite}
 #feed.ok .fdot{background:#5FA36B}
 @keyframes fpulse{0%,100%{opacity:1}50%{opacity:.25}}
-#feedModal{position:fixed;inset:0;z-index:1000;background:rgba(6,10,7,.94);display:none;align-items:center;justify-content:center;padding:18px}
+#feedModal{position:fixed;top:0;left:0;right:0;bottom:0;z-index:1000;background:rgba(6,10,7,.94);display:none;align-items:center;justify-content:center;padding:18px}
 #feedModal.open{display:flex}
 #feedModal .fm{position:relative;width:100%;max-width:440px;max-height:86vh;overflow-y:auto;background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:18px 16px}
 #feedModal h6{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--txt-faint);margin-bottom:12px}
@@ -85,7 +85,8 @@ header{
   display:flex;flex-direction:column;gap:8px;padding:10px 12px;background:var(--panel);
   border-bottom:1px solid var(--line);
 }
-.bar .counts{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-end}
+.bar .counts{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end}
+.bar .counts .count{margin-left:8px}
 .bar input{
   width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:3px;
   color:var(--txt);font-family:var(--mono);font-size:13px;padding:8px 10px;outline:none;
@@ -149,12 +150,18 @@ header{
 #sheet .grab{width:44px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 14px}
 #sheet h3{font-family:var(--mono);font-size:15px;letter-spacing:.06em;margin-bottom:2px}
 #sheet .did{font-family:var(--mono);font-size:11px;color:var(--txt-dim);letter-spacing:.12em;margin-bottom:12px}
-.kv{display:flex;gap:10px;font-family:var(--mono);font-size:12px;margin:5px 0}
-.kv b{flex:0 0 84px;color:var(--txt-faint);font-weight:400;letter-spacing:.08em}
+.kv{display:flex;font-family:var(--mono);font-size:12px;margin:5px 0}
+.kv b{flex:0 0 84px;margin-right:10px;color:var(--txt-faint);font-weight:400;letter-spacing:.08em}
 .kv span{word-break:break-word}
 .notes{margin-top:12px;font-size:14px;color:var(--txt);border-left:2px solid var(--line);padding-left:10px}
+.links{margin-top:14px}
+.links h6{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--txt-faint);margin-bottom:8px}
+.links .lk{display:block;width:100%;text-align:left;background:var(--panel-2);border:1px solid var(--amber);border-radius:4px;color:var(--txt);font-family:var(--mono);font-size:13px;letter-spacing:.06em;padding:14px 12px;margin-bottom:8px;cursor:pointer;text-decoration:none}
+.links .lk b{color:var(--amber);display:block;font-size:11px;letter-spacing:.14em;margin-bottom:3px}
+.links .lk.wdn{border-color:var(--alert)} .links .lk.wdn b{color:var(--alert)}
 .notes a.refl{color:var(--amber);text-decoration:underline dotted;text-underline-offset:3px;cursor:pointer;font-weight:600}
-.actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.actions{display:flex;margin-top:16px;flex-wrap:wrap}
+.actions .abtn{margin:0 10px 10px 0}
 .abtn{
   font-family:var(--mono);font-size:12px;letter-spacing:.08em;
   border:1px solid var(--line);border-radius:3px;background:var(--panel-2);color:var(--txt);
@@ -202,13 +209,13 @@ footer{
 
 /* install + alert banners */
 .banner{
-  display:none;align-items:center;gap:10px;padding:11px 13px;
+  display:none;align-items:center;padding:11px 13px;
   background:var(--panel-2);border-bottom:1px solid var(--line);
   font-family:var(--mono);font-size:11.5px;color:var(--txt-dim);
 }
 .banner.show{display:flex}
 .banner b{color:var(--txt);font-weight:600;letter-spacing:.06em}
-.banner .sp{flex:1}
+.banner .sp{margin:0 10px;flex:1}
 .banner button{
   font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;
   border:1px solid var(--amber);color:var(--amber);background:none;
@@ -226,15 +233,9 @@ footer{
 .refs a small{display:block;color:var(--txt-faint);font-size:9.5px;letter-spacing:.06em;margin-top:2px}
 .refs .nodoc{font-family:var(--mono);font-size:11px;color:var(--alert);letter-spacing:.06em;padding:6px 0}
 
-/* full registry: collapsed by default */
-document.getElementById("regToggle").addEventListener("click",function(){
-  var w=document.getElementById("regwrap"), on=!w.classList.contains("open");
-  w.classList[on?"add":"remove"]("open"); this.classList[on?"add":"remove"]("open");
-  if(on){ logEvent("registry_open"); }
-});
 /* field manual */
 #manual{
-  position:fixed;inset:0;z-index:1000;background:rgba(6,10,7,.94);display:none;
+  position:fixed;top:0;left:0;right:0;bottom:0;z-index:1000;background:rgba(6,10,7,.94);display:none;
   align-items:flex-end;justify-content:center;
 }
 #manual.open{display:flex}
@@ -252,7 +253,7 @@ document.getElementById("regToggle").addEventListener("click",function(){
 .man a{color:var(--amber);text-decoration:none;border-bottom:1px dotted var(--amber)}
 .man .src{font-family:var(--mono);font-size:11.5px;margin:5px 0;word-break:break-word}
 .man .src small{display:block;color:var(--txt-faint);font-size:10px}
-#manClose{position:absolute;top:10px;right:12px;font-family:var(--mono);color:var(--txt-faint);background:none;border:none;font-size:16px;cursor:pointer;padding:6px}
+#manClose{position:absolute;top:6px;right:6px;font-family:var(--mono);color:var(--txt);background:var(--panel-2);border:1px solid var(--line);border-radius:4px;font-size:18px;cursor:pointer;padding:10px 14px}
 .manbtn{
   font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--txt-dim);
   background:none;border:1px solid var(--line);border-radius:3px;padding:6px 9px;cursor:pointer;margin-right:10px;
@@ -330,6 +331,7 @@ document.getElementById("regToggle").addEventListener("click",function(){
     <div class="kv"><b>COORDS</b><span id="shCoords">—</span></div>
     <div class="kv" id="shSrcRow" style="display:none"><b>SOURCE</b><span id="shSrc">—</span></div>
     <div class="notes" id="shNotes">—</div>
+    <div id="shLinks" class="links"></div>
     <div class="actions">
       <a class="abtn" id="shDir" target="_blank" rel="noopener">DIRECTIONS ↗</a>
       <a class="abtn" id="shSat" target="_blank" rel="noopener">SATELLITE ↗</a>
@@ -343,46 +345,18 @@ document.getElementById("regToggle").addEventListener("click",function(){
   <div id="manual">
     <div class="man">
       <button id="manClose" aria-label="Close">✕</button>
-      <h3>FIELD MANUAL</h3>
-      <div class="sub">OPERATING INSTRUCTIONS · SILO REGISTRY TERMINAL</div>
-
-      <h5>1 · THE MAP</h5>
-      <p>Each marker is a logged formation. Pinch to zoom the satellite imagery down to field level. Tap a marker, then OPEN RECORD for the full registry entry. Red-ringed markers are new intakes.</p>
-      <p>Coordinates are given to four decimal places so that any entry can be independently checked against public satellite imagery and against the external archives listed in section 6. Historic intakes reach back to 1966 and span six continents; the registry is not a UK-only instrument, whatever the distribution suggests.</p>
-
-      <h5>2 · THE REGISTRY</h5>
-      <p>The list below the map holds every active record: reference number, designation, and status. Tap any row for date, region, formation type, coordinates, and survey notes.</p>
-
-      <h5>3 · SEARCH</h5>
-      <p>The search field filters by reference, name, region, type, or any word appearing in survey notes. Note that the registry index is larger than the default view.</p>
-
-      <h5>4 · ALERTS</h5>
-      <p>The bell lights when a new formation enters the registry. Data refresh runs daily at 0400 UTC. Tap an alert to jump to the record and its map position.</p>
-
-      <h5>4b · INSTALLATION</h5>
-      <p>Install SILO to your home screen when prompted. The registry then works without a connection and intake alerts can reach you directly. Enable alerts when asked, or you will only see new intakes when you happen to open the terminal.</p>
-
-      <h5>5 · FIELD VISITS</h5>
-      <p>GET DIRECTIONS routes to the formation from your position. Most formations sit on private farmland: view from public rights of way, and never enter a crop without the landowner's permission. Harvested fields close for the season.</p>
-
-      <h5>6 · CROSS-REFERENCE SOURCES (EXTERNAL · UNAFFILIATED)</h5>
-      <p>The registry is a filing instrument, not a primary source. Every record carries an EXTERNAL DOCUMENTATION block at the bottom of its entry: aerial imagery, archive listings, encyclopedia entries, and open discussion. Use them. A record that cannot be corroborated outside this system should be treated with more interest, not less.</p>
-      <p>General archives:</p>
-      <div class="src"><a href="https://www.cropcircleconnector.com" target="_blank" rel="noopener">cropcircleconnector.com</a><small>Primary reporting archive since 1995. Most UK intakes originate here.</small></div>
-      <div class="src"><a href="https://circleresearcharchive.com" target="_blank" rel="noopener">circleresearcharchive.com</a><small>Historical research database, free access.</small></div>
-      <div class="src"><a href="http://www.bltresearch.com" target="_blank" rel="noopener">bltresearch.com</a><small>Plant and soil analysis literature (node elongation studies).</small></div>
-      <div class="src"><a href="https://www.cropcirclecenter.com" target="_blank" rel="noopener">cropcirclecenter.com</a><small>Large formation archive with year indexes.</small></div>
-      <div class="src"><a href="https://oldcropcircles.weebly.com" target="_blank" rel="noopener">oldcropcircles.weebly.com</a><small>Pre-1980 historical reports.</small></div>
-      <div class="src"><a href="https://www.reddit.com/r/cropcircles/" target="_blank" rel="noopener">r/cropcircles</a><small>Open discussion and same-day sighting chatter.</small></div>
-
-      <h5>7 · STATUS CODES</h5>
-      <div class="st"><b class="c-log">LOGGED</b> — verified intake, record complete</div>
-      <div class="st"><b class="c-unv">UNVERIFIED</b> — single-source report, retained pending review</div>
-      <div class="st"><b class="c-rev">UNDER REVIEW</b> — active survey, record may change</div>
-      <div class="st"><b class="c-rev">RECLASSIFIED</b> — origin established after intake; record retained as a control case</div>
-      <div class="st"><b class="c-sea">SEALED</b> — access restricted by program office</div>
-      <div class="st"><b class="c-wdn">WITHDRAWN</b> — removed from the active index. Withdrawn references are not listed. They are, however, still numbered.</div>
-      <button class="abtn" id="manBegin" style="width:100%;margin-top:20px;padding:14px">BEGIN</button>
+      <h3>HOW THIS WORKS</h3>
+      <div class="sub">SILO REGISTRY TERMINAL</div>
+      <h5>1 · CARDS</h5>
+      <p>New intakes, notices, and recovered files arrive as cards at the top of the screen. Each card has one button. Tap it.</p>
+      <h5>2 · RECORDS</h5>
+      <p>A record shows the date, region, coordinates, and survey notes. Under the notes, LINKED FILES lists anything attached to that record. Tap a linked file to read it. CLOSE RECORD at the bottom takes you back.</p>
+      <h5>3 · NEAR YOU</h5>
+      <p>The last card is always the formation logged nearest you. It stays there.</p>
+      <h5>4 · THE FULL REGISTRY</h5>
+      <p>Every record on file is under FULL REGISTRY. You do not need it to follow new intakes.</p>
+      <p class="st">Status codes: <b class="c-log">LOGGED</b> verified. <b class="c-unv">UNVERIFIED</b> single source. <b class="c-rev">UNDER REVIEW</b> active survey. <b class="c-wdn">WITHDRAWN</b> removed from the index but still numbered.</p>
+      <button class="abtn" id="manBegin" style="width:100%;margin-top:20px;padding:16px;font-size:14px">CLOSE</button>
     </div>
   </div>
 
@@ -390,7 +364,7 @@ document.getElementById("regToggle").addEventListener("click",function(){
     U.S. DEPARTMENT OF AGRICULTURE COOPERATIVE SURVEY INSTRUMENT (UNOFFICIAL MIRROR)<br>
     FORM SILO-registry-04 · CONTROL NO. 0704-6114 · DATA REFRESH: DAILY 0400 UTC<br>
     UNAUTHORIZED ACCESS TO ANNEXED MATERIAL IS LOGGED.<br>
-    <span id="ver">v0.36 · Sep 18</span>
+    <span id="ver">v0.37 · Sep 18</span>
     <div id="devtag">
       <div class="dtstate" id="dtState">DEVICE: PLAYER</div>
       <button class="dtbtn" id="dtMine">TAG THIS DEVICE AS MINE</button>
@@ -407,7 +381,7 @@ document.getElementById("regToggle").addEventListener("click",function(){
 (function(){
 "use strict";
 
-var VERSION = "v0.36 · Sep 18";
+var VERSION = "v0.37 · Sep 18";
 var WITHDRAWN = ["VAD-0102","VAD-0103","VAD-0105","VAD-0108","VAD-0112","VAD-0114","VAD-0117"];
 
 /* ===== FIREBASE (optional — paste config to activate) =====
@@ -683,6 +657,38 @@ function makeCard(it){
 function srcLabel(s){ return s.source? "via "+s.source : ""; }
 
 var current=null;
+function buildLinks(s){
+  var box=document.getElementById("shLinks"); if(!box) return;
+  var txt=s.notes||"", seen={}, items=[];
+  var m, re=/\b(VAD-\d{4})\b/g;
+  while((m=re.exec(txt))){ if(m[1]!==s.id && !seen[m[1]]){ seen[m[1]]=1; items.push(m[1]); } }
+  var hasAnnex=/\bAX-K\b|\bANNEX K\b/.test(txt);
+  box.innerHTML="";
+  if(!items.length && !hasAnnex) return;
+  var h=document.createElement("h6"); h.textContent="LINKED FILES"; box.appendChild(h);
+  if(hasAnnex){
+    var a=document.createElement("a"); a.className="lk wdn"; a.href="ax-k.html";
+    a.innerHTML="<b>SEALED · ANNEX K</b>Restricted attachment referenced by this record";
+    a.addEventListener("click",function(){ logEvent("link_btn","AX-K"); });
+    box.appendChild(a);
+  }
+  for(var k=0;k<items.length;k++){ (function(ref){
+    var rec=null; for(var q=0;q<SIGHTINGS.length;q++){ if(SIGHTINGS[q].id===ref){ rec=SIGHTINGS[q]; break; } }
+    var wdn=WITHDRAWN.indexOf(ref)>=0;
+    var el=document.createElement(rec?"button":"a"); el.className="lk"+(wdn&&!rec?" wdn":"");
+    if(rec){
+      el.innerHTML="<b>"+esc(ref)+(rec.type==="ADMINISTRATIVE"?" · INFRASTRUCTURE":" · RECORD")+"</b>"+esc(rec.name||"");
+      el.addEventListener("click",function(){ logEvent("link_btn",ref); map.setView([rec.lat,rec.lng],13); openSheet(rec); });
+    } else if(wdn){
+      el.href="rec.html?id="+ref;
+      el.innerHTML="<b>"+esc(ref)+" · WITHDRAWN</b>Archived copy recovered. Tap to read.";
+      el.addEventListener("click",function(){ logEvent("link_btn",ref); });
+    } else {
+      el.href="#"; el.innerHTML="<b>"+esc(ref)+"</b>No active record";
+    }
+    box.appendChild(el);
+  })(items[k]); }
+}
 function openSheet(s){
   current=s;
   document.getElementById("shName").textContent=s.name;
@@ -696,6 +702,7 @@ function openSheet(s){
   if(s.source){ document.getElementById("shSrc").textContent=s.source+(s.pushedAt?" · ingested "+String(s.pushedAt).slice(0,10):" · archive re-index"); srow.style.display="flex"; }
   else{ srow.style.display="none"; }
   document.getElementById("shNotes").innerHTML=linkRefs(s.notes||"");
+  buildLinks(s);
   document.getElementById("shDir").href="https://www.google.com/maps/dir/?api=1&destination="+s.lat+","+s.lng;
   document.getElementById("shSat").href="https://www.google.com/maps/@"+s.lat+","+s.lng+",2000m/data=!3m1!1e3";
   document.getElementById("shEarth").href="https://earth.google.com/web/@"+s.lat+","+s.lng+",0a,2000d,35y,0h,0t,0r";
@@ -828,6 +835,12 @@ document.getElementById("search").addEventListener("input",function(){
   }
 });
 
+/* full registry: collapsed by default */
+document.getElementById("regToggle").addEventListener("click",function(){
+  var w=document.getElementById("regwrap"), on=!w.classList.contains("open");
+  w.classList[on?"add":"remove"]("open"); this.classList[on?"add":"remove"]("open");
+  if(on){ logEvent("registry_open"); }
+});
 /* field manual */
 function lock(on){
   document.body.classList[on?"add":"remove"]("locked");
