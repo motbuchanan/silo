@@ -153,6 +153,10 @@ header{
 .kv{display:flex;font-family:var(--mono);font-size:12px;margin:5px 0}
 .kv b{flex:0 0 84px;margin-right:10px;color:var(--txt-faint);font-weight:400;letter-spacing:.08em}
 .kv span{word-break:break-word}
+.coordbox{border:1px solid var(--line);border-radius:4px;background:var(--panel-2);padding:10px 12px;margin:10px 0 4px}
+.coordbox .cl{font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--txt-faint);margin-bottom:4px}
+.coordbox .cv{font-family:var(--mono);font-size:20px;font-weight:600;letter-spacing:.04em;margin-bottom:10px;word-break:break-word}
+.coordbox .abtn{display:block;width:100%;text-align:center;padding:12px;font-size:12px}
 .hero{position:relative;width:100%;aspect-ratio:4/3;background:#131A12;border:1px solid var(--line);border-radius:4px;overflow:hidden;margin:10px 0 12px}
 @supports not (aspect-ratio:4/3){.hero{height:240px}}
 .hero .tiles{position:absolute;top:0;left:0;right:0;bottom:0;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}
@@ -363,7 +367,7 @@ footer{
     <div class="kv"><b>REGION</b><span id="shRegion">—</span></div>
     <div class="kv"><b>TYPE</b><span id="shType">—</span></div>
     <div class="kv"><b>STATUS</b><span id="shStatus">—</span></div>
-    <div class="kv"><b>COORDS</b><span id="shCoords">—</span></div>
+    <div class="coordbox"><div class="cl">COORDINATES · LATITUDE, LONGITUDE</div><div class="cv" id="shCoords">—</div><button class="abtn" id="shCopy">COPY COORDINATES</button></div>
     <div class="kv" id="shSrcRow" style="display:none"><b>SOURCE</b><span id="shSrc">—</span></div>
     <div class="actions big">
       <a class="abtn hot" id="shPhotos" target="_blank" rel="noopener">PHOTOS ↗</a>
@@ -402,7 +406,7 @@ footer{
     U.S. DEPARTMENT OF AGRICULTURE COOPERATIVE SURVEY INSTRUMENT (UNOFFICIAL MIRROR)<br>
     FORM SILO-registry-04 · CONTROL NO. 0704-6114 · DATA REFRESH: DAILY 0400 UTC<br>
     UNAUTHORIZED ACCESS TO ANNEXED MATERIAL IS LOGGED.<br>
-    <span id="ver">v0.39 · Sep 18</span>
+    <span id="ver">v0.40 · Sep 18</span>
     <div id="devtag">
       <div class="dtstate" id="dtState">DEVICE: PLAYER</div>
       <button class="dtbtn" id="dtMine">TAG THIS DEVICE AS MINE</button>
@@ -419,7 +423,7 @@ footer{
 (function(){
 "use strict";
 
-var VERSION = "v0.39 · Sep 18";
+var VERSION = "v0.40 · Sep 18";
 var WITHDRAWN = ["VAD-0102","VAD-0103","VAD-0105","VAD-0108","VAD-0112","VAD-0114","VAD-0117"];
 
 /* ===== FIREBASE (optional — paste config to activate) =====
@@ -625,8 +629,9 @@ function buildRefs(s){
   }
   if(undoc){
     box.innerHTML="<h6>SOURCES</h6>"+
-      "<div class='nodoc'>NOTHING PUBLISHED YET. THIS REPORT CAME IN THROUGH THE FEED AND "+
-      "NO SITE OR NEWS OUTLET HAS COVERED IT. CHECK BACK.</div>";
+      "<div class='nodoc'>NO PHOTOS OF THIS ONE EXIST ANYWHERE YET. IT CAME IN THROUGH THE FEED AND "+
+      "NO SITE OR NEWS OUTLET HAS COVERED IT. THE COORDINATES ABOVE ARE ALL THERE IS. "+
+      "GOOGLE EARTH SHOWS THE FIELD, BUT THE IMAGERY IS OLDER THAN THE REPORT.</div>";
     return;
   }
   var label = s.name + " " + yr;
@@ -753,7 +758,7 @@ function makeCard(it){
   var kicker=isHere?"REPORTED NEAR YOU · WADSWORTH":(o["new"]?"NEW CROP CIRCLE REPORTED":"CROP CIRCLE REPORTED");
   d.innerHTML="<div class='ck'>"+kicker+" · "+esc(fmtDate(o.date))+"</div>"+
     "<div class='ct'>"+esc(o.name||o.id)+"</div>"+
-    "<div class='cs'>"+(isHere?"A formation was reported in this field. Nothing has been published on it yet. ":"")+esc(o.id)+" · "+esc(o.region||"")+(o.source?" · via "+esc(o.source):"")+"</div>";
+    "<div class='cs'>"+(isHere?"A formation was reported in this field. No photos exist yet. ":"")+esc(o.id)+" · "+esc(o.region||"")+(o.source?" · via "+esc(o.source):"")+(isHere&&typeof o.lat==="number"?"<br>COORDINATES "+o.lat.toFixed(4)+", "+o.lng.toFixed(4):"")+"</div>";
   var ch=document.createElement("div"); ch.className="chero"; fillTiles(ch,o.lat,o.lng,16);
   d.insertBefore(ch, d.firstChild);
   var b=document.createElement("button"); b.className="cb"; b.textContent="OPEN RECORD";
@@ -865,6 +870,15 @@ function closeSheet(){
 }
 document.getElementById("sheetClose").addEventListener("click",closeSheet);
 document.getElementById("shCloseBig").addEventListener("click",closeSheet);
+document.getElementById("shCopy").addEventListener("click",function(){
+  if(!current) return;
+  var txt=current.lat.toFixed(4)+", "+current.lng.toFixed(4);
+  var ok=false;
+  try{ var ta=document.createElement("textarea"); ta.value=txt; ta.setAttribute("readonly",""); ta.style.position="absolute"; ta.style.left="-9999px"; document.body.appendChild(ta); ta.select(); ok=document.execCommand("copy"); document.body.removeChild(ta); }catch(e){}
+  if(!ok && navigator.clipboard){ try{ navigator.clipboard.writeText(txt); ok=true; }catch(e){} }
+  toast(ok?"COPIED: "+txt:txt);
+  logEvent("copy_coords", current.id);
+});
 ["shPhotos","shVideos","shRead","shEarth","shDir"].forEach(function(id){
   document.getElementById(id).addEventListener("click",function(){ if(current){ logEvent("act_"+id.slice(2).toLowerCase(), current.id); } });
 });
