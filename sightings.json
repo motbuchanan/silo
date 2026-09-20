@@ -662,7 +662,7 @@
   },
   {
    "id": "VAD-0117",
-   "name": "RELAY NODE \u2014 WADSWORTH",
+   "name": "RELAY NODE — WADSWORTH",
    "date": "2026-08-29",
    "lat": 41.0265,
    "lng": -81.7365,
@@ -671,6 +671,27 @@
    "status": "UNDER REVIEW",
    "source": "",
    "notes": "Not a formation. Infrastructure entry. A collection node was brought online at this location on 29 August, within survey range of intake VAD-0119. Node type and operator are withheld at this tier. The registry flags any new fixed installation inside an active survey radius. This one is logged. SURVEY REF AX-K/119."
+  },
+  {
+   "id": "VAD-0136",
+   "name": "OCTAGON APPROACH",
+   "date": "2026-09-19",
+   "lat": 40.061,
+   "lng": -82.478,
+   "region": "Licking County, Ohio, US",
+   "type": "PENDING",
+   "status": "UNVERIFIED",
+   "source": "feed",
+   "notes": "Single report received through the feed, 19 September. Cropland west of the Newark Earthworks, inside the sight line of the Octagon's northern moonrise axis. No imagery submitted. No second source. Registry cross-check flags this as the third Ohio intake logged within an earthwork alignment: see VAD-0060 (Serpent Mound, 2003) and the archived record VAD-0103. Nearest active intake: VAD-0119.",
+   "new": true
+  },
+  {
+   "id": "SYS-260920-0700",
+   "kind": "notice",
+   "name": "PATTERN REVIEW · OHIO CLUSTER",
+   "date": "2026-09-20",
+   "notes": "Automated cross-check of Ohio intakes returned a non-random result. Four records (VAD-0060, VAD-0061, VAD-0119, VAD-0136) fall within sight lines of pre-Columbian earthworks. Orientation data for VAD-0119 is withheld pending survey. Review queued. Archived reference: VAD-0103.",
+   "new": true
   }
  ]
 }

@@ -406,7 +406,7 @@ footer{
     U.S. DEPARTMENT OF AGRICULTURE COOPERATIVE SURVEY INSTRUMENT (UNOFFICIAL MIRROR)<br>
     FORM SILO-registry-04 · CONTROL NO. 0704-6114 · DATA REFRESH: DAILY 0400 UTC<br>
     UNAUTHORIZED ACCESS TO ANNEXED MATERIAL IS LOGGED.<br>
-    <span id="ver">v0.40 · Sep 18</span>
+    <span id="ver">v0.41 · Sep 20</span>
     <div id="devtag">
       <div class="dtstate" id="dtState">DEVICE: PLAYER</div>
       <button class="dtbtn" id="dtMine">TAG THIS DEVICE AS MINE</button>
@@ -423,7 +423,7 @@ footer{
 (function(){
 "use strict";
 
-var VERSION = "v0.40 · Sep 18";
+var VERSION = "v0.41 · Sep 20";
 var WITHDRAWN = ["VAD-0102","VAD-0103","VAD-0105","VAD-0108","VAD-0112","VAD-0114","VAD-0117"];
 
 /* ===== FIREBASE (optional — paste config to activate) =====
@@ -549,6 +549,10 @@ function render(list){
 
 /* theories & research */
 var TOPICS=[
+  {t:"THE OHIO EARTHWORKS",wiki:"Hopewell Ceremonial Earthworks",yt:"newark earthworks octagon serpent mound crop circle ohio",
+   b:"Ohio has more ancient earthworks than anywhere else in North America: Serpent Mound, the Newark Octagon, the Hopewell circles, listed as a UNESCO World Heritage site in 2023. Both confirmed Ohio crop circles from 2003 appeared next to mound sites. The registry does not say why."},
+  {t:"THE MOON AND THE OCTAGON",wiki:"Newark Earthworks",yt:"newark octagon lunar standstill moonrise alignment",
+   b:"The Newark Octagon's walls line up with the moon's northernmost rise, which only happens once every 18.6 years. The builders tracked it two thousand years ago with no writing and no telescopes. The current alignment window closes in late 2026."},
   {t:"THE MOWING-DEVIL, 1678",wiki:"Mowing-Devil",yt:"mowing devil 1678 crop circle",
    b:"The oldest known crop circle. A pamphlet from Hertfordshire, England, says a farmer refused to pay a mower, swore the Devil could mow it instead, and woke to find the oats cut in perfect circles overnight."},
   {t:"DOUG &amp; DAVE, 1991",wiki:"Doug Bower and Dave Chorley",yt:"doug bower dave chorley crop circle confession",
@@ -613,7 +617,7 @@ document.getElementById("thToggle").addEventListener("click",function(){
 /* external documentation links.
    Search-style URLs are used deliberately: they never 404, they always
    land on genuine third-party material, and nothing is hotlinked. */
-var UNDOCUMENTED = ["VAD-0119","VAD-0117"];
+var UNDOCUMENTED = ["VAD-0119","VAD-0117","VAD-0136"];
 function urlq(s){ return encodeURIComponent(s); }
 function buildRefs(s){
   var box=document.getElementById("shRefs");
@@ -1094,7 +1098,12 @@ function rebuild(fit){
     if(LIVE[i].kind==="file"){ FILES.push(LIVE[i]); continue; }
     if(!seen[LIVE[i].id]){ seen[LIVE[i].id]=1; merged.push(LIVE[i]); }
   }
-  for(var j=0;j<STATIC.length;j++){ if(!seen[STATIC[j].id]){ seen[STATIC[j].id]=1; merged.push(STATIC[j]); } }
+  for(var j=0;j<STATIC.length;j++){
+    if(seen[STATIC[j].id]) continue; seen[STATIC[j].id]=1;
+    if(STATIC[j].kind==="notice"){ NOTICES.push(STATIC[j]); continue; }
+    if(STATIC[j].kind==="file"){ FILES.push(STATIC[j]); continue; }
+    merged.push(STATIC[j]);
+  }
   // NEW flags first, then live-pushed newest first, then the archive by ref
   merged.sort(function(a,b){
     var an=a["new"]?1:0, bn=b["new"]?1:0; if(an!==bn) return bn-an;
