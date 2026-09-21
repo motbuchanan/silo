@@ -1,6 +1,6 @@
 # SILO — Handoff / Re-entry Doc
 
-**Version at handoff:** v0.40 · Sep 18 2026 · Written Sep 19 2026
+**Version at handoff:** v0.42 · Sep 21 2026 · Written Sep 21 2026
 
 ---
 
@@ -13,32 +13,43 @@ SILO is a consensual ARG (alternate reality game) Mot built for his coworker **J
 - **Authoritative files:** the deploy files ARE the source of truth. Working copy lives at `/home/claude/silo/repo/`. Mot uploads from his phone to the repo.
 - **Backend:** Firebase project `silo-7d50e`, Firestore, **no auth** (open rules). Live and proven.
 
-**As of Sep 18–19:** the project **pivoted to face value.** Joe repeatedly could not navigate the ARG interface ("what is this even supposed to be?"), so v0.39–0.40 rebuilt the front end as a straightforward crop-circle research app (photo gallery, PHOTOS/VIDEOS/READ MORE buttons, a THEORIES & RESEARCH section). The hidden story is all still in place underneath, dormant, to see if Joe ever stumbles onto it.
+**As of Sep 18–20:** the project **pivoted to face value.** Joe repeatedly could not navigate the ARG interface ("what is this even supposed to be?"), so v0.39–0.40 rebuilt the front end as a straightforward crop-circle research app (photo gallery, PHOTOS/VIDEOS/READ MORE buttons, a THEORIES & RESEARCH section). The hidden story is all still in place underneath, dormant, to see if Joe ever stumbles onto it. The pivot is working: Joe installed the app icon, uses it daily, and by Sep 20 was researching the Ohio-earthworks thread on his own (Serpent Mound photos, then googling crop-circle-AI conspiracy material) and texting Mot about it. **Story content now ships as episodic pushes/file uploads that read as "the feed updating," never as Mot.**
 
 ---
 
 ## 2 · Current state
 
-**v0.40 · Sep 18** is the live/latest version. All three version strings synced: `index.html` (v0.40 · Sep 18), `gpi.html` (ops v0.40 · Sep 18), `sw.js` (silo-v0.40).
+**v0.42 · Sep 21** is the latest version (built Sep 21; may not be uploaded/live yet, verify the live badge after upload). All three version strings synced: `index.html` (v0.42 · Sep 21), `gpi.html` (ops v0.42 · Sep 21), `sw.js` (silo-v0.42). **v0.41 was confirmed byte-identical to the live `main` branch at the start of the v0.42 session** (fetched from the raw GitHub mirror; the `motbuchanan.github.io` Pages host is not reachable from the build sandbox, so the raw mirror is the reconciliation source). Joe was on v0.39 as of his last logged session.
 
-**Shipped in the pivot (v0.39 → v0.40):**
+**v0.42 · Sep 21 (the Report-a-Sighting loop, open-ended play):**
+- **Joe's app:** a face-value `＋ REPORT A SIGHTING` button below the stream opens an intake form (what/where/when/details). On submit it writes a `t:"report"` event into the **existing open `log` collection** (no new Firestore rule, no upload needed), shows a confirmation with a reference number (`INTAKE-YYMMDD-XXXX`), and keeps a local `YOUR REPORTS` list (`silo_reports`) that reads `UNDER REVIEW`. Always confirms to Joe even offline (queued in `silo_q`).
+- **Ops console:** new **INTAKE tab** (DROPS · LOG · INTAKE · ALERT · IDEAS) that surfaces `t:"report"` events. Each has **PROMOTE → ALERT** (prefills the push form: name, region, date, notes; leaves coords + REF blank for Mot; marks the intake `promoted:true`) and **DISMISS** (deletes the log doc). `report` events are filtered out of the discovery LOG view. `watchLog` now captures `_doc` (the Firestore doc id) so promote/dismiss can target the row.
+- **The loop:** Joe submits → appears in INTAKE → Mot promotes it a week later → it reappears in Joe's registry as a logged intake ("the system answered him"). This is the low-maintenance engine for open-ended play: Joe feeds it, Mot reacts. Mode is now **open-ended, no finale** (Mot's call Sep 21): update from time to time to keep him happy; the Nov 25 Octagon thread is one live optional payoff, not a climax.
+- New log event types to watch: `report` (a submission), `report_open` (opened the form), `report_submit` (submitted). All from Joe's device `SNGK9EP`.
+- Verified: 21/21 headless Playwright checks (stubbed Firestore so nothing touched Joe's real log) covering submit → log write → confirmation → INTAKE render → PROMOTE prefill → promoted flag → DISMISS delete. Gates green (node --check, 0 Jekyll, balanced `</script>`, no JS-in-style, no new `inset:`/flex `gap:`, three versions equal).
+
+**Shipped in the pivot (v0.39 → v0.41):**
 - Header tagline → "CROP CIRCLE TRACKER". MANUAL button → HELP with plain-English text.
 - Full registry → **2-column photo gallery**, newest first, each cell a satellite tile thumbnail. Search placeholder "SEARCH BY NAME, PLACE, OR YEAR…". Gallery open by default.
 - Every record's detail sheet leads with **big action buttons**: PHOTOS (Google Images), VIDEOS (YouTube), READ MORE (Wikipedia if the record has a `wiki` field, else Google), GOOGLE EARTH, DIRECTIONS, SHOW ON MAP.
-- New collapsible **THEORIES & RESEARCH** section: 12 curated topic cards (Mowing-Devil 1678, Doug & Dave, ley lines/Wiltshire, Milk Hill 2001, Chilbolton reply, Crabwood 2002, plasma vortex/Meaden, BLT/Levengood, Rendlesham 1980, Hessdalen, Tully 1966, Circlemakers), each with a Wikipedia thumbnail + VIDEOS/READ MORE.
-- v0.40 added a **prominent COORDINATES block** on every record (large mono numbers + full-width COPY COORDINATES button) after Joe said he couldn't find the lat/long. The planted Wadsworth record now says plainly "No photos of this one exist anywhere yet… the coordinates above are all there is."
+- Collapsible **THEORIES & RESEARCH** section, now **14** topic cards. v0.41 added two at the top aimed at Joe's current thread: THE OHIO EARTHWORKS (Hopewell Ceremonial Earthworks / UNESCO 2023) and THE MOON AND THE OCTAGON (Newark Octagon lunar standstill, window closing late 2026). Others: Mowing-Devil 1678, Doug & Dave, ley lines/Wiltshire, Milk Hill 2001, Chilbolton reply, Crabwood 2002, plasma vortex/Meaden, BLT/Levengood, Rendlesham 1980, Hessdalen, Tully 1966, Circlemakers.
+- v0.40 added a **prominent COORDINATES block** on every record (large mono numbers + full-width COPY COORDINATES button, execCommand fallback for old Chrome, logs `copy_coords`). The planted Wadsworth record says plainly "No photos of this one exist anywhere yet… the coordinates above are all there is."
+- **v0.41 story beat (the Ohio cluster), shipped as static content in `sightings.json` — no console push needed:**
+  - New record **VAD-0136 "OCTAGON APPROACH"** (Licking County, Sep 19, UNVERIFIED, in `UNDOCUMENTED` so it shows "no photos exist yet"). Its notes carry tappable refs + LINKED FILES buttons to VAD-0060 (Serpent Mound), VAD-0103 (withdrawn dossier), VAD-0119 (Wadsworth).
+  - New notice **`SYS-260920-0700` "PATTERN REVIEW · OHIO CLUSTER"** — reads as an automated cross-check flagging four Ohio records on earthwork sight lines; references VAD-0103.
+- **Engine change (v0.41):** static records with `kind:"notice"` or `kind:"file"` now route into the notice/file streams (previously only live-pushed records did). This is why a story beat can now ship as a plain `sightings.json` edit + file upload, not only a Firestore push.
 - Card kickers reworded to "NEW CROP CIRCLE REPORTED".
 
-**Verified (headless Playwright, routed stubs):** 59 gallery cells render with tile thumbs, PHOTOS/VIDEOS/READ MORE hrefs correct on VAD-0001 and VAD-0119, coords block + COPY works (toast "COPIED: 41.0050, -81.7350"), THEORIES toggle renders 12 cards with Wikipedia thumbnails, manual opens/closes, no horizontal scroll at 390px, zero page errors. Gates green: `node --check`, 0 Jekyll tokens, no JS-in-`<style>`, no `inset:`/flex `gap:`.
+**Verified (headless Playwright, routed stubs):** 60 gallery cells, stream shows the two new cards in order (SYSTEM NOTICE → OCTAGON APPROACH → NEAR YOU anchor), bell shows 3 unread, VAD-0136 links resolve to 0060/0103/0119, VAD-0136 shows "no photos exist yet", 14 topic cards with thumbnails, coords COPY works, zero page errors. Gates green: `node --check`, 0 Jekyll tokens, no JS-in-`<style>`, no `inset:`/flex `gap:`, all three versions equal.
 
-**Untested on Joe's actual device:** the v0.40 coordinates block and the "no photos exist" copy. Joe was last seen on v0.39.
+**Untested on Joe's device:** everything from v0.40 on (coords block, the Ohio cluster). Joe was last logged on v0.39.
 
-**Joe's real progress (from the gpi.html LOG tab, device `SNGK9EP`):**
-- First-ever dossier reads happened Sep 18: he opened VAD-0103 and VAD-0105 via the LINKED FILES buttons. Eight days in, the big buttons finally got him there.
-- Has read the annex (AX-K) four times, opened the tower record (VAD-0117 RELAY NODE) and tapped PHOTOS on it.
-- Texted Mot: cool pictures come up, but can't find the Wadsworth circle or its lat/long → drove v0.40.
-- **Sep 18–19: Joe got the app icon onto his home screen** (PWA install). This solves the recurring lost-link problem that was actually killing the project — he kept uninstalling and losing the texted link. He now has a permanent door.
-- Has NOT mentioned the annex, tower, dossiers, or CHAFF to Mot. Story still uncaught.
+**Joe's real progress (from the gpi.html LOG tab, device `SNGK9EP`, ~101 events):**
+- **Sep 18: first-ever dossier reads** — opened VAD-0103 and VAD-0105 via the LINKED FILES buttons (eight days in; the big buttons finally got him there). Has read the annex (AX-K) four times.
+- **Sep 18–19: installed the app icon** on his home screen (PWA install). Solves the lost-link problem that was actually killing the project. Permanent door now.
+- **Sep 19–20: on the Ohio-earthworks thread on his own** — opened VAD-0060 Serpent Mound, tapped PHOTOS on it twice across two sessions, then (Sun ~10:55am) had a Google AI result open about an "AI detecting escalating intelligence in crop circles / DeepMind" creepypasta, which he'd searched himself (that framing is NOT from SILO). Texted Mot the debunk screenshot. This is what v0.41's Ohio cluster is built to feed.
+- No `copy_coords` yet → probably still on v0.39.
+- Has NOT mentioned the annex, tower, dossiers, or CHAFF to Mot. Story still uncaught (as intended).
 
 ---
 
@@ -62,13 +73,14 @@ SILO is a consensual ARG (alternate reality game) Mot built for his coworker **J
 
 ## 4 · Open items
 
-No blocking item. The project is in a healthy "let it breathe" state. Ordered next steps when Mot wants to move:
+No blocking item. Ordered next steps when Mot wants to move:
 
-1. **Sit on new code for a few days.** Joe just got stable (icon installed, using it at face value). Pushing a new *version* right now risks a version mismatch while he's finally comfortable. Let him use v0.40.
-2. **Story beats go through Firestore, not code.** New sightings, notices, and FILE CARDs (annex/dossier/tower deliveries) push live from the gpi.html ALERT tab and reach Joe's installed icon over the network regardless of cache. That's the channel to use.
-3. **Watch the log for `copy_coords` / `act_dir` on VAD-0119** — tells whether Joe grabbed the Wadsworth coordinates or drove out.
-4. **Chapter 2 is staged but not triggered:** VAD-0103 dossier (Newark Octagon Earthworks / Nov 25 2026 lunar alignment) is readable; the DR-3 "record withdrawn" QR card (ch2-drop.pdf) is meant to be placed only after the log shows Joe found 0103 on his own. He has now read 0103, so this card is unlocked when Mot wants.
-5. **Real-world to-dos still open:** pin the texted link in Joe's messages app (partly moot now that he has the icon); the reprinted DR-1 bench card is optional now.
+1. **Upload v0.41** (index.html, sightings.json, gpi.html, sw.js — or the zip). This is the one immediate to-do: the Ohio cluster is built but not yet confirmed live. After upload, verify the footer badge reads v0.41.
+2. **Then watch the log for the follow-through** on the cluster: `gallery_open`/`view VAD-0136`, `link_btn VAD-0060`, and especially **`rec_open VAD-0103`** (him following the drawn line into the Chapter-2 dossier). Also `copy_coords`/`act_dir` on VAD-0119 or VAD-0136 (grabbing coordinates / driving out).
+3. **Two channels for story beats now, both reach the installed icon:** (a) live Firestore push from the gpi.html ALERT tab (sighting / SYSTEM NOTICE / FILE CARD), instant, no upload; (b) a static edit to `sightings.json` (records, or `kind:"notice"`/`kind:"file"` entries) shipped as a file upload — reads as "the feed updating." v0.41's cluster used (b). Prefer (a) for one-off timely beats, (b) for permanent additions.
+4. **Chapter 2 is staged and now actively seeded:** VAD-0103 dossier (Newark Octagon Earthworks / Nov 25 2026 lunar alignment) is readable and the v0.41 cluster points straight at it. The DR-3 "record withdrawn" QR card (ch2-drop.pdf) can be placed by the agent once the log shows Joe reached 0103 through the app.
+5. **Pacing:** one beat every 2–3 weeks; dead time is the mechanism. Don't stack beats on top of the fresh cluster.
+6. **Real-world to-dos:** the reprinted DR-1 bench card and pinning the texted link are both moot now that Joe has the icon.
 
 ---
 
@@ -83,6 +95,7 @@ No blocking item. The project is in a healthy "let it breathe" state. Ordered ne
 - **JS inserted into `<style>`** (v0.36): anchoring a patch on the comment `/* field manual */`, which exists in BOTH the CSS and the JS, put script inside the style block and silently broke all later CSS. **Standing gate: after any patch, check for `getElementById`/`addEventListener` inside the `<style>` block.**
 - **Data-URI/word-collision in string replace:** a `.replace('QR', …)` once hit the literal word "QR" in a note. Anchor replacements on unique strings and assert occurrence counts before replacing (the pivot script uses `assert i.count(old)==1`).
 - **Service worker is already correct** — `skipWaiting()` in install, `clients.claim()` in activate, network-first fetch. Installed devices pick up new versions on next online navigation. The residual risk is only offline or a browser that hasn't re-checked sw.js yet; network-first keeps HTML fresh regardless. Do NOT "fix" this into cache-first.
+- **`gpi.html` resets `db` to null right after a session-restore (v0.42 finding).** The session-restore IIFE runs `enter() → initData()` (which assigns `db`) *before* the `var db=null;` line executes, so `var db=null` then clobbers it. The onSnapshot listeners registered during that brief window keep firing (they hold their own collection ref), but any later access through the module `db` var is null until `ensureDb()` re-establishes it. This is why every write path (the ALERT push, and now PROMOTE/DISMISS in the INTAKE tab) must call `ensureDb()` rather than touching `db` directly. Do not "simplify" those back to raw `db`. Fresh login (via the form) does not hit this; only the restored-session path does.
 
 **Validation gates (run before every ship):** extract inline JS → `node --check`; assert 0 Jekyll tokens (`{{`, `{%`) and 0 unescaped `</script`; check no JS in `<style>`; no `inset:`/flex `gap:`; all three version strings bumped and equal; Playwright headless smoke with routed stubs for cdnjs (Leaflet — serve the REAL leaflet.js from npm, a thin stub breaks `map.attributionControl`), gstatic (fake firebase), arcgisonline (fake tile PNG), Wikipedia API. Chromium at `/opt/pw-browsers/chromium`.
 
@@ -94,16 +107,17 @@ Working dir: `/home/claude/silo/repo/` — deployed copies + zip go to `/mnt/use
 
 | File | Role |
 |---|---|
-| `index.html` | Joe's tracker (v0.40). Firebase config baked in. |
-| `gpi.html` | Ops console (v0.40). Director/agent/decoy codes; ALERT push (sighting/notice/file card); LOG tab with device tagging, Joe pinned, HIDE MINE. |
-| `sightings.json` | 59 records. VAD-0117 RELAY NODE at 41.0265,-81.7365; VAD-0119 (planted Wadsworth) at 41.005,-81.735; 13 records carry a `wiki` field. |
+| `index.html` | Joe's tracker (v0.42). Firebase config baked in. Report-a-Sighting button + intake form write `t:"report"` to the log collection. |
+| `gpi.html` | Ops console (v0.42). Director/agent/decoy codes; ALERT push (sighting/notice/file card); LOG tab with device tagging, Joe pinned, HIDE MINE; **INTAKE tab** (promote/dismiss submissions). |
+| `sightings.json` | 61 entries = 59 formation records + 1 planted record (VAD-0136) + 1 static notice (`SYS-260920-0700`, `kind:"notice"`). VAD-0117 RELAY NODE at 41.0265,-81.7365; VAD-0119 (planted Wadsworth) at 41.005,-81.735; VAD-0136 (planted, Licking Co) at 40.061,-82.478; 13+ records carry a `wiki` field. |
 | `rec.html` | Withdrawn dossiers, base64-encoded (`atob`). Holds 7 incl. VAD-0103 (Township Line / Nov 25 2026 window) and VAD-0117 (relay node). `?id=VAD-XXXX`. |
 | `ax-k.html` | Sealed Annex K (CHAFF messages, breadcrumbs to 0103/0105). |
-| `sw.js` | Shared service worker, cache `silo-v0.40`. Network-first. |
+| `sw.js` | Shared service worker, cache `silo-v0.42`. Network-first. |
 | `silo.webmanifest` | PWA manifest. |
 | `.nojekyll` | Stops GitHub Pages Jekyll processing. |
+| `SILO-HANDOFF.md`, `SILO-LESSONS-AND-METHOD.md`, `SILO-BEAT-BANK.md` | This doc + the lessons pass + the open-ended beat menu. In the working repo/zip; not deployed. |
 
-**Constants to know for patching:** `WITHDRAWN = ["VAD-0102","VAD-0103","VAD-0105","VAD-0108","VAD-0112","VAD-0114","VAD-0117"]`; `UNDOCUMENTED = ["VAD-0119","VAD-0117"]`; `HERE_ID="VAD-0119"` (anchor card); `JOE_PINNED="SNGK9EP"`. localStorage keys: `silo_sid` (device id, shared with ax-k/rec), `silo_q` (event queue with per-event sent flags), `silo_role`, `silo_hidemine`, `silo_mine_ids`.
+**Constants to know for patching:** `WITHDRAWN = ["VAD-0102","VAD-0103","VAD-0105","VAD-0108","VAD-0112","VAD-0114","VAD-0117"]`; `UNDOCUMENTED = ["VAD-0119","VAD-0117","VAD-0136"]`; `HERE_ID="VAD-0119"` (anchor card); `JOE_PINNED="SNGK9EP"`. Static notice/file records are recognized by `kind:"notice"` / `kind:"file"` in `sightings.json` and routed in `rebuild()`. localStorage keys: `silo_sid` (device id, shared with ax-k/rec), `silo_q` (event queue with per-event sent flags), `silo_role`, `silo_hidemine`, `silo_mine_ids`, `silo_seen` (alert bell count).
 
 **NOT in the current repo (off-repo deliverables in outputs / earlier):** `doc-6114.html` (agent briefing, holds codes in plaintext — was in the repo earlier; confirm whether it should be re-added or kept out), `CHAPTER-2.md`, `silo-playbook.md`, drop-kit PDFs (qr-drops.pdf, ch2-drop.pdf, bday-drop.pdf), `firestore-rules.txt`, `DROP-KIT-GUIDE.md`, `QR-DROPS-GUIDE.md`.
 
@@ -123,7 +137,7 @@ Working dir: `/home/claude/silo/repo/` — deployed copies + zip go to `/mnt/use
    - `https://motbuchanan.github.io/silo/index.html`
    - `https://motbuchanan.github.io/silo/gpi.html`
    - `https://motbuchanan.github.io/silo/sw.js`
-   Confirm the footer/badge version. If the live version is newer than v0.40, the live copy is authoritative — reconcile, don't overwrite blind.
+   Confirm the footer/badge version. The working copy here is v0.42; if the live version is newer, the live copy is authoritative, reconcile, don't overwrite blind. (Also fetch `sightings.json` to compare record/notice state.) Note: the `motbuchanan.github.io` Pages host is not reachable from the build sandbox; use the raw GitHub mirror `https://raw.githubusercontent.com/motbuchanan/silo/main/<file>` to fetch live copies for comparison.
 2. Working copy is `/home/claude/silo/repo/`. Read this doc's Locked Decisions before proposing anything.
 3. To change a story beat, prefer a Firestore push from gpi.html over a code change (reaches Joe's installed icon over the network; no upload, no version risk).
 4. If code must change: patch the deploy file directly, bump all three version strings to the real current date, run every validation gate in section 5, smoke-test headless, then copy changed files + a new `silo-vX.zip` to `/mnt/user-data/outputs/` and send via file cards.

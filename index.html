@@ -296,6 +296,27 @@ footer{
 .topic .tt{font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:var(--amber);padding:12px 14px 4px}
 .topic .tb{font-size:14px;line-height:1.5;padding:0 14px 6px}
 .topic .actions{padding:0 14px 14px;margin-top:6px}
+/* v0.42 report a sighting */
+#reportBtn{display:block;width:calc(100% - 24px);margin:2px 12px 12px;background:var(--panel-2);border:1px solid var(--amber);border-radius:4px;color:var(--amber);font-family:var(--mono);font-size:13px;letter-spacing:.12em;padding:15px;cursor:pointer;text-align:center;-webkit-tap-highlight-color:transparent}
+#reportBtn:active{background:var(--line-dim)}
+#reportBtn small{display:block;color:var(--txt-faint);font-size:10px;letter-spacing:.06em;margin-top:5px;text-transform:none}
+#reportModal{position:fixed;top:0;left:0;right:0;bottom:0;z-index:1000;background:rgba(6,10,7,.94);display:none;align-items:center;justify-content:center;padding:18px}
+#reportModal.open{display:flex}
+#reportModal .rm{position:relative;width:100%;max-width:440px;max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:18px 16px}
+#reportModal h6{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--txt-faint);margin-bottom:14px}
+#reportClose{position:absolute;top:8px;right:10px;background:var(--panel-2);border:1px solid var(--line);border-radius:4px;color:var(--txt);font-size:16px;cursor:pointer;padding:8px 12px}
+.rl{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--txt-faint);margin:12px 0 5px}
+.ri,.rt{width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:3px;color:var(--txt);font-family:var(--mono);font-size:14px;padding:11px;outline:none}
+.rt{min-height:80px;resize:vertical}
+.rsend{width:100%;margin-top:16px;background:var(--amber);color:#14100F;border:none;border-radius:4px;font-family:var(--mono);font-weight:700;font-size:14px;letter-spacing:.12em;padding:15px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.rsend:active{opacity:.85}
+.rnote{font-family:var(--mono);font-size:10px;color:var(--txt-faint);line-height:1.6;margin-top:12px}
+.rdone{font-family:var(--mono);font-size:15px;letter-spacing:.12em;color:#5FA36B;text-align:center;margin:14px 0 6px}
+.rref{font-family:var(--mono);font-size:13px;letter-spacing:.1em;color:var(--amber);text-align:center;margin-bottom:8px}
+#myReports{margin-top:16px;border-top:1px solid var(--line-dim);padding-top:12px}
+.myr{font-family:var(--mono);font-size:11.5px;color:var(--txt-dim);padding:8px 0;border-bottom:1px solid var(--line-dim)}
+.myr small{display:block;color:var(--txt-faint);font-size:9.5px;margin-top:3px;letter-spacing:.06em}
+.myr .rst{color:var(--amber);letter-spacing:.1em}
 </style>
 </head>
 <body>
@@ -333,6 +354,8 @@ footer{
   <div id="map"></div>
 
   <div id="stream" class="stream"></div>
+
+  <button id="reportBtn">＋ REPORT A SIGHTING<small>Seen a formation in a field? Add it to the registry for review.</small></button>
 
   <button id="regToggle" class="regtoggle open">ALL FORMATIONS · <span id="regCount">—</span> ON FILE <span class="caret">▾</span></button>
   <div id="regwrap" class="regwrap open">
@@ -397,8 +420,36 @@ footer{
       <p>Scroll down for every crop circle on file, with a satellite picture of each field. Use the search box to find one by name, place, or year.</p>
       <h5>4 · THEORIES &amp; RESEARCH</h5>
       <p>The bottom section covers the big questions: who or what makes them, the hoaxers, the ones nobody has explained, and the researchers who studied the plants and soil.</p>
+      <h5>5 · REPORT A SIGHTING</h5>
+      <p>Seen something in a field yourself? Tap REPORT A SIGHTING under the new reports. Tell us what and where. It goes to the review queue and shows up in the registry if it checks out.</p>
       <p class="st">Status codes: <b class="c-log">LOGGED</b> confirmed. <b class="c-unv">UNVERIFIED</b> one report only. <b class="c-rev">UNDER REVIEW</b> being looked into. <b class="c-wdn">WITHDRAWN</b> removed from the list.</p>
       <button class="abtn" id="manBegin" style="width:100%;margin-top:20px;padding:16px;font-size:14px">CLOSE</button>
+    </div>
+  </div>
+
+  <div id="reportModal">
+    <div class="rm">
+      <button id="reportClose" aria-label="Close">✕</button>
+      <h6>REPORT A SIGHTING · INTAKE FORM</h6>
+      <div id="reportForm">
+        <label class="rl">WHAT DID YOU SEE / NAME IT</label>
+        <input id="rpName" class="ri" type="text" placeholder="e.g. RING IN A WHEAT FIELD" autocomplete="off">
+        <label class="rl">WHERE (town, county, or landmark)</label>
+        <input id="rpPlace" class="ri" type="text" placeholder="e.g. off Route 94, Wadsworth" autocomplete="off">
+        <label class="rl">WHEN</label>
+        <input id="rpDate" class="ri" type="date">
+        <label class="rl">DETAILS (optional)</label>
+        <textarea id="rpNote" class="rt" placeholder="Size, shape, how you found it, anything unusual…"></textarea>
+        <button id="rpSend" class="rsend">SUBMIT REPORT</button>
+        <p class="rnote">Submissions are logged and reviewed before they appear in the registry. Photos are reviewed separately.</p>
+      </div>
+      <div id="reportDone" style="display:none">
+        <div class="rdone">✓ REPORT LOGGED</div>
+        <div class="rref" id="rpRef">—</div>
+        <p class="rnote">Your report has been added to the review queue. You'll see it in the registry if it clears review.</p>
+        <button id="rpAgain" class="abtn" style="width:100%;padding:14px;margin-top:4px">SUBMIT ANOTHER</button>
+      </div>
+      <div id="myReports"></div>
     </div>
   </div>
 
@@ -406,7 +457,7 @@ footer{
     U.S. DEPARTMENT OF AGRICULTURE COOPERATIVE SURVEY INSTRUMENT (UNOFFICIAL MIRROR)<br>
     FORM SILO-registry-04 · CONTROL NO. 0704-6114 · DATA REFRESH: DAILY 0400 UTC<br>
     UNAUTHORIZED ACCESS TO ANNEXED MATERIAL IS LOGGED.<br>
-    <span id="ver">v0.41 · Sep 20</span>
+    <span id="ver">v0.42 · Sep 21</span>
     <div id="devtag">
       <div class="dtstate" id="dtState">DEVICE: PLAYER</div>
       <button class="dtbtn" id="dtMine">TAG THIS DEVICE AS MINE</button>
@@ -423,7 +474,7 @@ footer{
 (function(){
 "use strict";
 
-var VERSION = "v0.41 · Sep 20";
+var VERSION = "v0.42 · Sep 21";
 var WITHDRAWN = ["VAD-0102","VAD-0103","VAD-0105","VAD-0108","VAD-0112","VAD-0114","VAD-0117"];
 
 /* ===== FIREBASE (optional — paste config to activate) =====
@@ -1028,6 +1079,66 @@ document.getElementById("manClose").addEventListener("click",closeManual);
 document.getElementById("manBegin").addEventListener("click",closeManual);
 document.getElementById("manual").addEventListener("click",function(e){
   if(e.target===this){closeManual();}
+});
+
+/* ---------- report a sighting (subject submissions) ----------
+   Writes a t:"report" event into the existing (open) log collection,
+   so it reaches the ops console INTAKE tab with no new Firestore rule
+   and no upload. Always confirms to the user, even offline. */
+function pad2(n){ return (n<10?"0":"")+n; }
+function makeRef(){
+  var d=new Date();
+  var s="INTAKE-"+String(d.getFullYear()).slice(2)+pad2(d.getMonth()+1)+pad2(d.getDate())+"-";
+  var c="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  for(var i=0;i<4;i++){ s+=c.charAt(Math.floor(Math.random()*c.length)); }
+  return s;
+}
+function loadReports(){ try{ return JSON.parse(load("silo_reports")||"[]"); }catch(e){ return []; } }
+function renderMyReports(){
+  var box=document.getElementById("myReports");
+  var list=loadReports();
+  if(!list.length){ box.innerHTML=""; return; }
+  var h="<h6>YOUR REPORTS</h6>";
+  for(var i=list.length-1;i>=0;i--){ var r=list[i];
+    h+="<div class='myr'>"+esc(r.name||"(no name)")+" <span class='rst'>· UNDER REVIEW</span>"+
+       "<small>"+esc(r.ref)+" · "+esc(r.place||"location not given")+" · "+esc((r.at||"").slice(0,10))+"</small></div>";
+  }
+  box.innerHTML=h;
+}
+function openReport(){
+  document.getElementById("reportForm").style.display="block";
+  document.getElementById("reportDone").style.display="none";
+  var di=document.getElementById("rpDate"); if(di && !di.value){ di.value=new Date().toISOString().slice(0,10); }
+  renderMyReports();
+  document.getElementById("reportModal").classList.add("open"); lock(true);
+  logEvent("report_open");
+}
+function closeReport(){ document.getElementById("reportModal").classList.remove("open"); lock(false); }
+function submitReport(){
+  var name=(document.getElementById("rpName").value||"").trim();
+  var place=(document.getElementById("rpPlace").value||"").trim();
+  var date=(document.getElementById("rpDate").value||"").trim();
+  var note=(document.getElementById("rpNote").value||"").trim();
+  if(!name && !place){ toast("ADD WHAT YOU SAW OR WHERE"); return; }
+  var ref=makeRef();
+  var obj={ t:"report", r:name||place, s:SUBJECT, at:new Date().toISOString(), ref:ref, name:name, place:place, rdate:date, note:note };
+  if(DB){ try{ DB.collection("log").add(obj); obj.sent=true; }catch(e){} }
+  try{ var q=JSON.parse(load("silo_q")||"[]"); q.push(obj); if(q.length>200)q=q.slice(-200); store("silo_q",JSON.stringify(q)); }catch(e){}
+  try{ var mr=loadReports(); mr.push({ref:ref,name:name,place:place,date:date,at:obj.at}); store("silo_reports",JSON.stringify(mr)); }catch(e){}
+  document.getElementById("rpName").value=""; document.getElementById("rpPlace").value=""; document.getElementById("rpNote").value="";
+  document.getElementById("rpRef").textContent=ref;
+  document.getElementById("reportForm").style.display="none";
+  document.getElementById("reportDone").style.display="block";
+  renderMyReports();
+  logEvent("report_submit", ref);
+}
+document.getElementById("reportBtn").addEventListener("click",openReport);
+document.getElementById("reportClose").addEventListener("click",closeReport);
+document.getElementById("reportModal").addEventListener("click",function(e){ if(e.target===this){ closeReport(); } });
+document.getElementById("rpSend").addEventListener("click",submitReport);
+document.getElementById("rpAgain").addEventListener("click",function(){
+  document.getElementById("reportForm").style.display="block";
+  document.getElementById("reportDone").style.display="none";
 });
 
 /* ---------- install ---------- */

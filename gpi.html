@@ -217,6 +217,7 @@ textarea{min-height:84px;resize:vertical}
   <nav>
     <button data-pane="drops" class="on">DROPS</button>
     <button data-pane="log">LOG</button>
+    <button data-pane="intake">INTAKE</button>
     <button data-pane="alert">ALERT</button>
     <button data-pane="ideas">IDEAS</button>
   </nav>
@@ -243,6 +244,12 @@ textarea{min-height:84px;resize:vertical}
       <button id="mgrAdd" class="mgrbtn">ADD ID</button>
     </div>
     <div id="logList"><div class="empty">NO EVENTS. (Live feed activates when Firestore is configured and the subject's app syncs.)</div></div>
+  </div>
+
+  <div class="pane" id="pane-intake">
+    <h4>INTAKE QUEUE — SUBMITTED BY THE SUBJECT</h4>
+    <p class="hint" style="margin:0 0 12px">Reports Joe submits from his app land here. PROMOTE prefills the ALERT push (add coordinates and a REF, then push it back as a logged intake). DISMISS deletes it.</p>
+    <div id="intakeList"><div class="empty">NO SUBMISSIONS YET.</div></div>
   </div>
 
   <div class="pane" id="pane-alert">
@@ -289,7 +296,7 @@ textarea{min-height:84px;resize:vertical}
 </div>
 </div>
 
-<div id="ver">ops v0.41 · Sep 20</div>
+<div id="ver">ops v0.42 · Sep 21</div>
 <div id="toast"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -298,7 +305,7 @@ textarea{min-height:84px;resize:vertical}
 (function(){
 "use strict";
 
-var VERSION="ops v0.41 · Sep 20";
+var VERSION="ops v0.42 · Sep 21";
 
 /* ===== FIREBASE (optional — paste config to activate) ===== */
 var FIREBASE_CONFIG = {
@@ -382,6 +389,7 @@ for(var n=0;n<navBtns.length;n++){
       var panes=document.querySelectorAll(".pane");
       for(var j=0;j<panes.length;j++){panes[j].classList.remove("on");}
       document.getElementById("pane-"+b.getAttribute("data-pane")).classList.add("on");
+      if(b.getAttribute("data-pane")==="intake"){ renderIntake(); }
     });
   })(navBtns[n]);
 }
@@ -556,7 +564,7 @@ function isMine(sid, roles){
 }
 function renderLog(){
   var el=document.getElementById("logList");
-  var allrows=LOG_ROWS.filter(function(e){return e.t!=="mark";});  /* mark events are control, not activity */
+  var allrows=LOG_ROWS.filter(function(e){return e.t!=="mark" && e.t!=="report";});  /* mark = control, report = intake tab */
   var roles=deviceRoles(LOG_ROWS);
   var rows = HIDE_MINE ? allrows.filter(function(e){return !isMine(e.s||"", roles);}) : allrows;
   var joe=joeSid(LOG_ROWS), counts=deviceCounts(rows);
@@ -624,9 +632,61 @@ document.addEventListener("click",function(e){
 });
 function watchLog(){
   db.collection("log").orderBy("at","desc").limit(200).onSnapshot(function(snap){
-    LOG_ROWS=[]; snap.forEach(function(d){ LOG_ROWS.push(d.data()); });
-    renderLog();
+    LOG_ROWS=[]; snap.forEach(function(d){ var o=d.data(); o._doc=d.id; LOG_ROWS.push(o); });
+    renderLog(); renderIntake();
   });
+}
+
+/* intake queue — subject-submitted reports (t:"report" in the log collection) */
+function renderIntake(){
+  var el=document.getElementById("intakeList"); if(!el) return;
+  var rows=LOG_ROWS.filter(function(e){return e.t==="report";});
+  if(!rows.length){ el.innerHTML="<div class='empty'>NO SUBMISSIONS YET.</div>"; return; }
+  el.innerHTML="";
+  for(var i=0;i<rows.length;i++){
+    (function(r){
+      var c=document.createElement("div"); c.className="card";
+      var when=(r.at||"").replace("T"," ").slice(0,16);
+      var dev=(r.s===JOE_PINNED)?"JOE":(r.s||"?");
+      var body=(r.place||"location not given")+(r.rdate?" · "+r.rdate:"")+(r.note?"\n"+r.note:"");
+      c.innerHTML=
+        "<div class='id'>INTAKE "+esc(r.ref||"—")+(r.promoted?" · PROMOTED":"")+"</div>"+
+        "<div class='ttl'>"+esc(r.name||"(no name given)")+"</div>"+
+        "<div class='dt'>"+esc(body)+"</div>"+
+        "<div class='meta'>FROM "+esc(dev)+" · "+esc(when)+"</div>";
+      var btns=document.createElement("div"); btns.className="btns";
+      var p=document.createElement("button"); p.className="b"; p.textContent="PROMOTE → ALERT";
+      p.addEventListener("click",function(){ promoteIntake(r); });
+      btns.appendChild(p);
+      var x=document.createElement("button"); x.className="b warn"; x.textContent="DISMISS";
+      x.addEventListener("click",function(){ dismissIntake(r); });
+      btns.appendChild(x);
+      c.appendChild(btns);
+      el.appendChild(c);
+    })(rows[i]);
+  }
+}
+function promoteIntake(r){
+  var navb=document.querySelectorAll("#app nav button");
+  for(var i=0;i<navb.length;i++){ if(navb[i].getAttribute("data-pane")==="alert"){ navb[i].click(); break; } }
+  document.getElementById("aKind").value="sighting";
+  document.getElementById("aName").value=(r.name||"").toUpperCase();
+  document.getElementById("aRegion").value=r.place||"";
+  document.getElementById("aDate").value=r.rdate||"";
+  document.getElementById("aType").value="PENDING";
+  document.getElementById("aStatus").value="UNDER REVIEW";
+  document.getElementById("aRef").value="";
+  document.getElementById("aLat").value=""; document.getElementById("aLng").value="";
+  var note="Report received through the feed"+(r.rdate?", "+r.rdate:"")+". ";
+  if(r.note){ note+=r.note+" "; }
+  note+="No imagery submitted. No second source. Cross-check pending survey.";
+  document.getElementById("aNotes").value=note;
+  toast("PREFILLED · add COORDS + REF, then PUSH");
+  if(ensureDb() && r._doc){ try{ db.collection("log").doc(r._doc).update({promoted:true}); }catch(e){} }
+}
+function dismissIntake(r){
+  if(ensureDb() && r._doc){ db.collection("log").doc(r._doc).delete().then(function(){toast("DISMISSED");}).catch(function(e){toast("FAIL: "+((e&&e.code)||"err"));}); }
+  else { toast("NOT LIVE"); }
 }
 
 /* alerts */
